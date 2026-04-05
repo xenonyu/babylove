@@ -7,6 +7,7 @@ BabyLove 自主迭代 Agent
 
 import anyio
 import sys
+import signal
 import json
 from datetime import datetime
 from pathlib import Path
@@ -29,6 +30,20 @@ SIM_ID      = "8457B971-4286-457B-8AE0-8A6728C35CC5"   # iPhone 17 / iOS 26.2
 BUNDLE_ID   = "com.babylove.app"
 SCHEME      = "BabyLove"
 SKILL_LOG   = Path(PROJECT_DIR) / "agent" / "skill_log.json"
+
+# ─── 优雅退出信号处理 ─────────────────────────────────────────────────────────
+_shutdown = False
+
+def _sigint(sig, frame):
+    global _shutdown
+    if _shutdown:
+        # 第二次 Ctrl+C → 立即强制退出
+        print("\n\n💀 强制退出", flush=True)
+        sys.exit(1)
+    _shutdown = True
+    print("\n\n⚠️  收到停止信号，等待本次迭代结束…（再按一次强制退出）", flush=True)
+
+signal.signal(signal.SIGINT, _sigint)
 
 # ─── 系统 Prompt ─────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = """你是一位有乔布斯式产品直觉的 iOS Swift 工程师，负责打磨 BabyLove——一款让每位家长优雅记录宝宝成长的应用。
@@ -249,6 +264,9 @@ async def run_iteration(iteration: int, total_cost: float) -> tuple[float, str]:
             await client.query(prompt)
 
             async for message in client.receive_response():
+                if _shutdown:
+                    break
+
                 if isinstance(message, SystemMessage) and message.subtype == "init":
                     sid = message.data.get("session_id", "")[:8]
                     print(f"  Session: {sid}…", flush=True)
@@ -273,16 +291,14 @@ async def run_iteration(iteration: int, total_cost: float) -> tuple[float, str]:
                     print(f"\n  ✓ 完成  💰 ${cost:.4f}  🔄 {turns}轮  📊 {inp:,}in/{out:,}out", flush=True)
                     print(f"  {preview}", flush=True)
 
-                    # 提取改进摘要存入 skill log
                     if result_summary:
                         save_skill(result_summary[:120])
 
                     return cost, result_summary
 
-    except KeyboardInterrupt:
-        raise
     except Exception as e:
-        print(f"\n  ✗ 出错: {type(e).__name__}: {e}", flush=True)
+        if not _shutdown:
+            print(f"\n  ✗ 出错: {type(e).__name__}: {e}", flush=True)
         return 0.0, ""
 
     return 0.0, ""
@@ -310,29 +326,31 @@ async def main():
     total_cost = 0.0
     errors     = 0
 
-    while True:
+    while not _shutdown:
         try:
             cost, _ = await run_iteration(iteration, total_cost)
             total_cost += cost
-            errors = 0  # 成功后重置错误计数
-        except KeyboardInterrupt:
-            print(f"\n\n👋 已停止  迭代: {iteration - 1}次  总花费: ${total_cost:.4f}")
-            sys.exit(0)
+            errors = 0
         except Exception as e:
             errors += 1
             print(f"  ⚠️  未处理错误 ({errors}/3): {e}", flush=True)
             if errors >= 3:
                 print("  连续3次错误，停止运行", flush=True)
-                sys.exit(1)
+                break
+
+        if _shutdown:
+            break
 
         iteration += 1
         print(f"\n  ⏳ {interval}s 后开始迭代 #{iteration}…  [累计: ${total_cost:.4f}]", flush=True)
 
-        try:
-            await anyio.sleep(interval)
-        except KeyboardInterrupt:
-            print(f"\n\n👋 已停止  迭代: {iteration - 1}次  总花费: ${total_cost:.4f}")
-            sys.exit(0)
+        # 分段 sleep，每秒检查一次 _shutdown flag
+        for _ in range(interval):
+            if _shutdown:
+                break
+            await anyio.sleep(1)
+
+    print(f"\n👋 已停止  迭代: {iteration - 1}次  总花费: ${total_cost:.4f}")
 
 
 if __name__ == "__main__":
