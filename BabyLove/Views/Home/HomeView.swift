@@ -334,6 +334,10 @@ struct HomeView: View {
                 startSleepTimerIfNeeded()
                 startFeedingTimerIfNeeded()
             }
+            .onDisappear {
+                stopSleepTimer()
+                stopFeedingTimer()
+            }
             .onChange(of: selectedDate) { _, _ in
                 withAnimation(.easeInOut(duration: 0.2)) {
                     updatePredicates()
