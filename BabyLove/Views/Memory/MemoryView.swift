@@ -7,11 +7,59 @@ struct MemoryView: View {
     @State private var showAddMilestone = false
     @State private var milestoneToEdit: CDMilestone?
     @State private var milestoneToDelete: CDMilestone?
+    @State private var selectedFilter: MilestoneFilter = .all
+
+    enum MilestoneFilter: Hashable {
+        case all
+        case category(MilestoneCategory)
+
+        var label: String {
+            switch self {
+            case .all: return "All"
+            case .category(let c): return c.displayName
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .all: return "square.grid.2x2"
+            case .category(let c): return c.icon
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .all: return .blPrimary
+            case .category(let c): return Color(hex: c.color)
+            }
+        }
+
+        static var allFilters: [MilestoneFilter] {
+            [.all] + MilestoneCategory.allCases.map { .category($0) }
+        }
+    }
 
     @FetchRequest(
         entity: CDMilestone.entity(),
         sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
     ) private var milestones: FetchedResults<CDMilestone>
+
+    private var filteredMilestones: [CDMilestone] {
+        switch selectedFilter {
+        case .all:
+            return Array(milestones)
+        case .category(let cat):
+            return milestones.filter { $0.category == cat.rawValue }
+        }
+    }
+
+    /// Summary counts for the header
+    private var achievedCount: Int {
+        filteredMilestones.filter { $0.isCompleted }.count
+    }
+    private var upcomingCount: Int {
+        filteredMilestones.filter { !$0.isCompleted }.count
+    }
 
     var body: some View {
         NavigationStack {
@@ -22,27 +70,64 @@ struct MemoryView: View {
                     emptyState
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 16) {
-                            ForEach(milestones) { m in
-                                MilestoneCard(milestone: m) {
-                                    withAnimation(.spring(response: 0.35)) {
-                                        vm.toggleMilestoneCompleted(m, in: ctx)
+                        VStack(spacing: 16) {
+                            // Category filter chips
+                            categoryFilterBar
+                                .padding(.horizontal, 20)
+
+                            // Summary counts
+                            if !filteredMilestones.isEmpty {
+                                HStack(spacing: 16) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.blDiaper)
+                                        Text("\(achievedCount) Achieved")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.blTextSecondary)
+                                    }
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "clock")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.blGrowth)
+                                        Text("\(upcomingCount) Upcoming")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.blTextSecondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 20)
+                            }
+
+                            // Milestones list
+                            if filteredMilestones.isEmpty {
+                                noResultsState
+                            } else {
+                                LazyVStack(spacing: 16) {
+                                    ForEach(filteredMilestones, id: \.objectID) { m in
+                                        MilestoneCard(milestone: m) {
+                                            withAnimation(.spring(response: 0.35)) {
+                                                vm.toggleMilestoneCompleted(m, in: ctx)
+                                            }
+                                        }
+                                            .padding(.horizontal, 20)
+                                            .contextMenu {
+                                                Button {
+                                                    milestoneToEdit = m
+                                                } label: {
+                                                    Label("Edit", systemImage: "pencil")
+                                                }
+                                                Button(role: .destructive) {
+                                                    milestoneToDelete = m
+                                                } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                }
+                                            }
+                                            .transition(.opacity.combined(with: .move(edge: .top)))
                                     }
                                 }
-                                    .padding(.horizontal, 20)
-                                    .contextMenu {
-                                        Button {
-                                            milestoneToEdit = m
-                                        } label: {
-                                            Label("Edit", systemImage: "pencil")
-                                        }
-                                        Button(role: .destructive) {
-                                            milestoneToDelete = m
-                                        } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
                             }
+
                             Spacer(minLength: 100)
                         }
                         .padding(.top, 16)
@@ -84,6 +169,60 @@ struct MemoryView: View {
             Text("This memory will be permanently removed.")
         }
     }
+
+    // MARK: - Category Filter Bar
+
+    private var categoryFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(MilestoneFilter.allFilters, id: \.self) { filter in
+                    let isSelected = selectedFilter == filter
+                    Button {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedFilter = filter
+                        }
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: filter.icon)
+                                .font(.system(size: 12, weight: .medium))
+                            Text(filter.label)
+                                .font(.system(size: 13, weight: .medium))
+                        }
+                        .foregroundColor(isSelected ? .white : filter.color)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(isSelected ? filter.color : filter.color.opacity(0.1))
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    // MARK: - No Results for Filter
+
+    private var noResultsState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: selectedFilter.icon)
+                .font(.system(size: 36))
+                .foregroundColor(selectedFilter.color.opacity(0.4))
+            Text("No \(selectedFilter.label.lowercased()) milestones yet")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.blTextSecondary)
+            Button {
+                showAddMilestone = true
+            } label: {
+                Text("Add One")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(selectedFilter.color)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+    }
+
+    // MARK: - Empty State (no milestones at all)
 
     private var emptyState: some View {
         VStack(spacing: 20) {
