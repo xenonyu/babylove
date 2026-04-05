@@ -160,9 +160,11 @@ struct HomeView: View {
                             .padding(.horizontal, 20)
                         }
 
-                        // Recent activity
+                        // Recent activity or empty state
                         if !todayFeedings.isEmpty || !todaySleeps.isEmpty || !todayDiapers.isEmpty {
                             recentActivitySection
+                        } else {
+                            emptyDaySection
                         }
 
                         Spacer(minLength: 100)
@@ -336,6 +338,42 @@ struct HomeView: View {
         .padding(20)
         .blCard()
         .padding(.horizontal, 20)
+    }
+
+    // MARK: - Empty Day State
+
+    private var emptyDaySection: some View {
+        VStack(spacing: 16) {
+            BLSectionHeader(title: "Recent Activity")
+                .padding(.horizontal, 20)
+
+            VStack(spacing: 14) {
+                Image(systemName: "sun.horizon.fill")
+                    .font(.system(size: 40))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.blPrimary.opacity(0.5), .blGrowth.opacity(0.5)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .padding(.top, 4)
+
+                Text("No activity yet today")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.blTextSecondary)
+
+                Text("Tap a Quick Log button above to start tracking \(baby?.name ?? "baby")'s day")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blTextTertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 8)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
+            .blCard()
+            .padding(.horizontal, 20)
+        }
     }
 
     // MARK: - Recent Activity
