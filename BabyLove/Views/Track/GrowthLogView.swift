@@ -23,6 +23,31 @@ struct GrowthLogView: View {
         [weightKG, heightCM, headCM].contains { Double($0).map { $0 > 0 } ?? false }
     }
 
+    // MARK: - Realistic bounds (in display units)
+    /// Returns a validation warning if any entered value is unrealistically large/negative
+    private var validationWarning: String? {
+        if let w = Double(weightKG) {
+            if w < 0 { return "Weight cannot be negative" }
+            let maxWeight = unit == .metric ? 30.0 : 66.0  // 30 kg / 66 lbs
+            if w > maxWeight { return "Weight seems too high (\(unit == .metric ? "max ~30 kg" : "max ~66 lbs"))" }
+        }
+        if let h = Double(heightCM) {
+            if h < 0 { return "Height cannot be negative" }
+            let maxHeight = unit == .metric ? 130.0 : 51.0  // 130 cm / 51 in
+            if h > maxHeight { return "Height seems too high (\(unit == .metric ? "max ~130 cm" : "max ~51 in"))" }
+        }
+        if let hc = Double(headCM) {
+            if hc < 0 { return "Head circumference cannot be negative" }
+            let maxHead = unit == .metric ? 60.0 : 24.0  // 60 cm / 24 in
+            if hc > maxHead { return "Head circumference seems too high (\(unit == .metric ? "max ~60 cm" : "max ~24 in"))" }
+        }
+        return nil
+    }
+
+    private var canSave: Bool {
+        hasValidMeasurement && validationWarning == nil
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -115,11 +140,16 @@ struct GrowthLogView: View {
                             dismiss()
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
-                        .disabled(!hasValidMeasurement)
-                        .opacity(hasValidMeasurement ? 1 : 0.5)
+                        .disabled(!canSave)
+                        .opacity(canSave ? 1 : 0.5)
                         .padding(.top, 8)
 
-                        if !hasValidMeasurement {
+                        if let warning = validationWarning {
+                            Label(warning, systemImage: "exclamationmark.triangle.fill")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blPrimary)
+                                .frame(maxWidth: .infinity)
+                        } else if !hasValidMeasurement {
                             Text("Enter at least one measurement to save")
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)

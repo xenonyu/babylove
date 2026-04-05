@@ -443,16 +443,18 @@ struct SimpleLineChart: View {
 
         let rawMin = allValues.min()!
         let rawMax = allValues.max()!
-        let padding = (rawMax - rawMin) * 0.08
-        let chartMin = rawMin - padding
-        let chartMax = rawMax + padding
-        let chartRange = chartMax - chartMin
+        // Ensure a minimum range to prevent division by zero when all values are identical
+        let naturalPadding = (rawMax - rawMin) * 0.08
+        let safePadding = max(naturalPadding, rawMax * 0.05, 0.5)
+        let chartMin = rawMin - safePadding
+        let chartMax = rawMax + safePadding
+        let chartRange = chartMax - chartMin  // Always > 0
 
         // Age range for X axis
         let agePadding = max((ageMax - ageMin) * 0.05, 0.5)
         let xMin = max(0, ageMin - agePadding)
         let xMax = ageMax + agePadding
-        let xRange = xMax - xMin
+        let xRange = xMax - xMin  // Always > 0 due to agePadding >= 0.5
 
         // Y-axis ticks in display units
         let tickCount = 4
