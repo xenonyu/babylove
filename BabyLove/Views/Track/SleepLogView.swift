@@ -16,6 +16,13 @@ struct SleepLogView: View {
 
     private var isEditing: Bool { editingRecord != nil }
 
+    /// Whether the form is valid for saving:
+    /// - Ongoing mode: always valid (starting a sleep timer)
+    /// - Finished mode: endTime must be after startTime (duration > 0)
+    private var canSave: Bool {
+        isOngoing || duration > 0
+    }
+
     private var duration: Int {
         Int(endTime.timeIntervalSince(startTime) / 60)
     }
@@ -180,7 +187,16 @@ struct SleepLogView: View {
                             if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blSleep))
+                        .disabled(!canSave)
+                        .opacity(canSave ? 1 : 0.5)
                         .padding(.top, 8)
+
+                        if !canSave && !isOngoing {
+                            Text("End time must be after start time")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextSecondary)
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                     .padding(24)
                 }
