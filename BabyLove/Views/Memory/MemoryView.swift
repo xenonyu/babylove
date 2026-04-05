@@ -466,11 +466,20 @@ struct AddMilestoneView: View {
                     .padding(24)
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isEditing ? "Edit Milestone" : "Add Milestone")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    }
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.blPrimary)
                 }
             }
             .onAppear { populateFromRecord() }

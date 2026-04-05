@@ -292,11 +292,20 @@ struct FeedingLogView: View {
                     .padding(24)
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isEditing ? "Edit Feeding" : "Log Feeding")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    }
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.blFeeding)
                 }
             }
             .onAppear {
