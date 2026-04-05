@@ -70,8 +70,10 @@ struct SettingsView: View {
                             Text("1.0.0")
                                 .foregroundColor(.blTextSecondary)
                         }
-                        Link(destination: URL(string: "https://babylove.app/privacy")!) {
-                            Label("Privacy Policy", systemImage: "hand.raised.fill")
+                        if let privacyURL = URL(string: "https://babylove.app/privacy") {
+                            Link(destination: privacyURL) {
+                                Label("Privacy Policy", systemImage: "hand.raised.fill")
+                            }
                         }
                     } header: {
                         Text("About")

@@ -131,7 +131,7 @@ struct GrowthView: View {
             // Simple bar chart
             if records.count > 1 {
                 SimpleLineChart(records: Array(records), metric: selectedMetric, unit: appState.measurementUnit)
-                    .frame(height: 180)
+                    .frame(height: 220)
                     .blCard()
             }
         }
@@ -236,20 +236,43 @@ struct SimpleLineChart: View {
     let metric: GrowthView.GrowthMetric
     var unit: MeasurementUnit = .metric
 
-    private func values() -> [Double] {
-        records.map { r in
+    /// Left margin reserved for Y-axis labels
+    private let yAxisWidth: CGFloat = 40
+    /// Bottom margin reserved for X-axis date labels
+    private let xAxisHeight: CGFloat = 24
+
+    /// Pairs of (date, value) filtered to non-zero values
+    private func dataPoints() -> [(date: Date, value: Double)] {
+        records.compactMap { r -> (Date, Double)? in
+            let v: Double
             switch metric {
-            case .weight: return unit.weightFromKG(r.weightKG)
-            case .height: return unit.lengthFromCM(r.heightCM)
-            case .head:   return unit.lengthFromCM(r.headCircumferenceCM)
+            case .weight: v = unit.weightFromKG(r.weightKG)
+            case .height: v = unit.lengthFromCM(r.heightCM)
+            case .head:   v = unit.lengthFromCM(r.headCircumferenceCM)
             }
-        }.filter { $0 > 0 }
+            guard v > 0, let d = r.date else { return nil }
+            return (d, v)
+        }
+    }
+
+    private var unitLabel: String {
+        switch metric {
+        case .weight: return unit.weightLabel
+        case .height, .head: return unit.heightLabel
+        }
+    }
+
+    /// Format value for display — weight uses 2 decimals, others 1
+    private func formatValue(_ v: Double) -> String {
+        metric == .weight ? String(format: "%.2f", v) : String(format: "%.1f", v)
     }
 
     var body: some View {
-        let vals = values()
-        guard vals.count > 1,
-              let minV = vals.min(), let maxV = vals.max(), maxV > minV else {
+        let data = dataPoints()
+        guard data.count > 1,
+              let minV = data.map(\.value).min(),
+              let maxV = data.map(\.value).max(),
+              maxV > minV else {
             return AnyView(
                 Text("Not enough data")
                     .font(.system(size: 14))
@@ -257,44 +280,151 @@ struct SimpleLineChart: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             )
         }
+
+        // Add 10% vertical padding so dots aren't at edges
+        let padding = (maxV - minV) * 0.1
+        let chartMin = minV - padding
+        let chartMax = maxV + padding
+        let chartRange = chartMax - chartMin
+
+        // Y-axis: 3 nice tick values
+        let yTicks = [minV, (minV + maxV) / 2, maxV]
+
         return AnyView(
-            GeometryReader { geo in
-                let w = geo.size.width
-                let h = geo.size.height
-                let range = maxV - minV
-                let points = vals.enumerated().map { i, v in
-                    CGPoint(
-                        x: w * CGFloat(i) / CGFloat(vals.count - 1),
-                        y: h - h * CGFloat((v - minV) / range)
-                    )
+            VStack(spacing: 0) {
+                // Unit label above chart
+                HStack {
+                    Text(unitLabel)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.blTextTertiary)
+                    Spacer()
                 }
-                ZStack {
-                    // Fill
-                    Path { p in
-                        p.move(to: CGPoint(x: points[0].x, y: h))
-                        points.forEach { p.addLine(to: $0) }
-                        p.addLine(to: CGPoint(x: points.last!.x, y: h))
-                        p.closeSubpath()
-                    }
-                    .fill(Color.blGrowth.opacity(0.12))
+                .padding(.leading, 4)
+                .padding(.bottom, 2)
 
-                    // Line
-                    Path { p in
-                        p.move(to: points[0])
-                        points.dropFirst().forEach { p.addLine(to: $0) }
+                HStack(alignment: .top, spacing: 0) {
+                    // Y-axis labels
+                    GeometryReader { geo in
+                        let h = geo.size.height
+                        ForEach(yTicks, id: \.self) { tick in
+                            let yFrac = CGFloat((tick - chartMin) / chartRange)
+                            let y = h - h * yFrac
+                            Text(formatValue(tick))
+                                .font(.system(size: 9, weight: .medium))
+                                .foregroundColor(.blTextTertiary)
+                                .frame(width: yAxisWidth - 4, alignment: .trailing)
+                                .position(x: (yAxisWidth - 4) / 2, y: y)
+                        }
                     }
-                    .stroke(Color.blGrowth, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+                    .frame(width: yAxisWidth)
 
-                    // Dots
-                    ForEach(0..<points.count, id: \.self) { i in
-                        Circle()
-                            .fill(Color.blGrowth)
-                            .frame(width: 8, height: 8)
-                            .position(points[i])
+                    // Chart area
+                    GeometryReader { geo in
+                        let w = geo.size.width
+                        let h = geo.size.height
+                        let points = data.enumerated().map { i, dp in
+                            CGPoint(
+                                x: w * CGFloat(i) / CGFloat(data.count - 1),
+                                y: h - h * CGFloat((dp.value - chartMin) / chartRange)
+                            )
+                        }
+
+                        if let first = points.first, let last = points.last {
+                            ZStack {
+                                // Horizontal grid lines
+                                ForEach(yTicks, id: \.self) { tick in
+                                    let yFrac = CGFloat((tick - chartMin) / chartRange)
+                                    let y = h - h * yFrac
+                                    Path { p in
+                                        p.move(to: CGPoint(x: 0, y: y))
+                                        p.addLine(to: CGPoint(x: w, y: y))
+                                    }
+                                    .stroke(Color.blTextTertiary.opacity(0.15), style: StrokeStyle(lineWidth: 0.5, dash: [4, 3]))
+                                }
+
+                                // Gradient fill
+                                Path { p in
+                                    p.move(to: CGPoint(x: first.x, y: h))
+                                    points.forEach { p.addLine(to: $0) }
+                                    p.addLine(to: CGPoint(x: last.x, y: h))
+                                    p.closeSubpath()
+                                }
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color.blGrowth.opacity(0.2), Color.blGrowth.opacity(0.02)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+
+                                // Line
+                                Path { p in
+                                    p.move(to: first)
+                                    points.dropFirst().forEach { p.addLine(to: $0) }
+                                }
+                                .stroke(Color.blGrowth, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+
+                                // Dots + value labels
+                                ForEach(0..<points.count, id: \.self) { i in
+                                    let pt = points[i]
+                                    // Value label above dot
+                                    Text(formatValue(data[i].value))
+                                        .font(.system(size: 9, weight: .semibold))
+                                        .foregroundColor(.blGrowth)
+                                        .position(x: pt.x, y: pt.y - 12)
+
+                                    // Dot with white border
+                                    Circle()
+                                        .fill(Color.white)
+                                        .frame(width: 10, height: 10)
+                                        .position(pt)
+                                    Circle()
+                                        .fill(Color.blGrowth)
+                                        .frame(width: 7, height: 7)
+                                        .position(pt)
+                                }
+                            }
+                        }
                     }
                 }
-                .padding(16)
+
+                // X-axis date labels
+                HStack(alignment: .top, spacing: 0) {
+                    // Spacer matching Y-axis width
+                    Color.clear.frame(width: yAxisWidth, height: 1)
+
+                    // Date labels for first, middle, last
+                    GeometryReader { geo in
+                        let indices = xAxisIndices(count: data.count)
+                        ForEach(indices, id: \.self) { i in
+                            let x = geo.size.width * CGFloat(i) / CGFloat(max(1, data.count - 1))
+                            let alignment: Alignment = i == 0 ? .leading : (i == data.count - 1 ? .trailing : .center)
+                            Text(shortDate(data[i].date))
+                                .font(.system(size: 9, weight: .medium))
+                                .foregroundColor(.blTextTertiary)
+                                .frame(width: 50, alignment: alignment)
+                                .position(x: x, y: 8)
+                        }
+                    }
+                }
+                .frame(height: xAxisHeight)
             }
+            .padding(.top, 12)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 4)
         )
+    }
+
+    /// Pick indices for X-axis labels: first, middle (if >2), last
+    private func xAxisIndices(count: Int) -> [Int] {
+        guard count > 0 else { return [] }
+        if count <= 2 { return Array(0..<count) }
+        return [0, count / 2, count - 1]
+    }
+
+    private func shortDate(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "M/d"
+        return f.string(from: date)
     }
 }
