@@ -16,6 +16,8 @@ struct HomeView: View {
     @State private var feedingElapsed: TimeInterval = 0
     @State private var feedingTimer: Timer?
     @State private var selectedDate: Date = Date()
+    /// Tracks the calendar day when the view was last active, so we can detect day-boundary crossings
+    @State private var lastActiveCalendarDay: Date = Calendar.current.startOfDay(for: Date())
     /// Set of start-of-day dates that have at least one record (within the date range window)
     @State private var activeDays: Set<Date> = []
 
@@ -345,6 +347,14 @@ struct HomeView: View {
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
+                    // Detect day-boundary crossing: if the calendar day changed
+                    // since the view was last active, snap back to today so the
+                    // user doesn't open the app to a stale past-day view.
+                    let today = Calendar.current.startOfDay(for: Date())
+                    if today != lastActiveCalendarDay {
+                        lastActiveCalendarDay = today
+                        selectedDate = Date()
+                    }
                     updatePredicates()
                     refreshGlobalLastTimes()
                     refreshActiveDays()
