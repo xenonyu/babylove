@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var sleepTimer: Timer?
     @State private var feedingElapsed: TimeInterval = 0
     @State private var feedingTimer: Timer?
+    @State private var selectedDate: Date = Date()
 
     // Initialize with today's predicate to avoid flashing all-time data
     @FetchRequest(
@@ -55,13 +56,19 @@ struct HomeView: View {
 
     private var baby: Baby? { appState.currentBaby }
 
-    /// Refresh predicates to reflect current calendar day.
-    /// Called on appear AND when returning from background to handle midnight crossover.
+    private var isSelectedDateToday: Bool {
+        Calendar.current.isDateInToday(selectedDate)
+    }
+
+    /// Refresh predicates to reflect the selected date.
+    /// Called on appear, when returning from background, and when selectedDate changes.
     private func updatePredicates() {
-        let startOfDay = Calendar.current.startOfDay(for: Date()) as NSDate
-        todayFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@", startOfDay)
-        todaySleeps.nsPredicate   = NSPredicate(format: "startTime >= %@", startOfDay)
-        todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", startOfDay)
+        let cal = Calendar.current
+        let startOfDay = cal.startOfDay(for: selectedDate) as NSDate
+        let endOfDay = cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: selectedDate))! as NSDate
+        todayFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
+        todaySleeps.nsPredicate   = NSPredicate(format: "startTime >= %@ AND startTime < %@", startOfDay, endOfDay)
+        todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
     }
 
     /// Total feeding volume in ml for today (sum of all amountML values)
@@ -159,23 +166,27 @@ struct HomeView: View {
                         // Baby hero card
                         babyHeroCard
 
-                        // Ongoing sleep banner
-                        if let ongoing = ongoingSleep {
+                        // Date navigation bar
+                        dateNavigationBar
+                            .padding(.horizontal, 20)
+
+                        // Ongoing sleep banner (only on today)
+                        if isSelectedDateToday, let ongoing = ongoingSleep {
                             ongoingSleepBanner(ongoing)
                                 .padding(.horizontal, 20)
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                        // Ongoing feeding banner
-                        if let ongoing = ongoingFeeding {
+                        // Ongoing feeding banner (only on today)
+                        if isSelectedDateToday, let ongoing = ongoingFeeding {
                             ongoingFeedingBanner(ongoing)
                                 .padding(.horizontal, 20)
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                        // Today stats
+                        // Day stats
                         VStack(spacing: 12) {
-                            BLSectionHeader(title: "Today's Summary")
+                            BLSectionHeader(title: isSelectedDateToday ? "Today's Summary" : "Day Summary")
                                 .padding(.horizontal, 20)
 
                             HStack(spacing: 12) {
@@ -183,43 +194,45 @@ struct HomeView: View {
                                           label: "Feedings",
                                           color: .blFeeding,
                                           subtitle: feedingVolumeSubtitle,
-                                          timeSince: feedingTimeSince)
+                                          timeSince: isSelectedDateToday ? feedingTimeSince : nil)
                                 StatBadge(value: sleepText.isEmpty ? "0m" : sleepText,
                                           label: "Sleep",
                                           color: .blSleep,
-                                          timeSince: sleepTimeSince)
+                                          timeSince: isSelectedDateToday ? sleepTimeSince : nil)
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: "Diapers",
                                           color: .blDiaper,
                                           subtitle: diaperBreakdownSubtitle,
-                                          timeSince: diaperTimeSince)
+                                          timeSince: isSelectedDateToday ? diaperTimeSince : nil)
                             }
                             .padding(.horizontal, 20)
                         }
 
-                        // Quick log
-                        VStack(spacing: 12) {
-                            BLSectionHeader(title: "Quick Log")
-                                .padding(.horizontal, 20)
+                        // Quick log (only shown for today)
+                        if isSelectedDateToday {
+                            VStack(spacing: 12) {
+                                BLSectionHeader(title: "Quick Log")
+                                    .padding(.horizontal, 20)
 
-                            LazyVGrid(columns: [
-                                GridItem(.flexible()),
-                                GridItem(.flexible())
-                            ], spacing: 12) {
-                                QuickLogCard(icon: "drop.fill",
-                                             label: "Feeding",
-                                             color: .blFeeding) { showFeedingLog = true }
-                                QuickLogCard(icon: "moon.zzz.fill",
-                                             label: "Sleep",
-                                             color: .blSleep) { showSleepLog = true }
-                                QuickLogCard(icon: "oval.fill",
-                                             label: "Diaper",
-                                             color: .blDiaper) { showDiaperLog = true }
-                                QuickLogCard(icon: "chart.bar.fill",
-                                             label: "Growth",
-                                             color: .blGrowth) { showGrowthLog = true }
+                                LazyVGrid(columns: [
+                                    GridItem(.flexible()),
+                                    GridItem(.flexible())
+                                ], spacing: 12) {
+                                    QuickLogCard(icon: "drop.fill",
+                                                 label: "Feeding",
+                                                 color: .blFeeding) { showFeedingLog = true }
+                                    QuickLogCard(icon: "moon.zzz.fill",
+                                                 label: "Sleep",
+                                                 color: .blSleep) { showSleepLog = true }
+                                    QuickLogCard(icon: "oval.fill",
+                                                 label: "Diaper",
+                                                 color: .blDiaper) { showDiaperLog = true }
+                                    QuickLogCard(icon: "chart.bar.fill",
+                                                 label: "Growth",
+                                                 color: .blGrowth) { showGrowthLog = true }
+                                }
+                                .padding(.horizontal, 20)
                             }
-                            .padding(.horizontal, 20)
                         }
 
                         // Recent activity or empty state
@@ -239,6 +252,11 @@ struct HomeView: View {
                 updatePredicates()
                 startSleepTimerIfNeeded()
                 startFeedingTimerIfNeeded()
+            }
+            .onChange(of: selectedDate) { _, _ in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    updatePredicates()
+                }
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
@@ -500,6 +518,142 @@ struct HomeView: View {
         )
     }
 
+    // MARK: - Date Navigation Bar
+
+    /// Returns the last 14 days (today + 13 past days) for the date picker
+    private var dateRange: [Date] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        return (0..<14).compactMap { cal.date(byAdding: .day, value: -$0, to: today) }
+    }
+
+    private var dateNavigationBar: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Button {
+                    let cal = Calendar.current
+                    if let prev = cal.date(byAdding: .day, value: -1, to: selectedDate) {
+                        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = prev }
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blPrimary)
+                        .frame(width: 32, height: 32)
+                }
+
+                Spacer()
+
+                Text(dateHeaderText)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.blTextPrimary)
+                    .contentTransition(.numericText())
+
+                Spacer()
+
+                if isSelectedDateToday {
+                    // Placeholder to keep layout balanced
+                    Color.clear.frame(width: 32, height: 32)
+                } else {
+                    Button {
+                        let cal = Calendar.current
+                        let tomorrow = cal.date(byAdding: .day, value: 1, to: selectedDate) ?? Date()
+                        let capped = min(tomorrow, Date())
+                        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = capped }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.blPrimary)
+                            .frame(width: 32, height: 32)
+                    }
+                }
+            }
+
+            // Scrollable day pills
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(dateRange, id: \.self) { date in
+                            let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
+                            let isToday = Calendar.current.isDateInToday(date)
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) { selectedDate = date }
+                            } label: {
+                                VStack(spacing: 2) {
+                                    Text(dayOfWeekText(date))
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundColor(isSelected ? .white : .blTextTertiary)
+                                    Text(dayNumberText(date))
+                                        .font(.system(size: 15, weight: isSelected ? .bold : .medium))
+                                        .foregroundColor(isSelected ? .white : (isToday ? .blPrimary : .blTextPrimary))
+                                }
+                                .frame(width: 40, height: 48)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .fill(isSelected ? Color.blPrimary : Color.clear)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .id(date)
+                        }
+                    }
+                    .padding(.horizontal, 2)
+                }
+                .onAppear {
+                    proxy.scrollTo(Calendar.current.startOfDay(for: selectedDate), anchor: .leading)
+                }
+                .onChange(of: selectedDate) { _, newDate in
+                    withAnimation {
+                        proxy.scrollTo(Calendar.current.startOfDay(for: newDate), anchor: .center)
+                    }
+                }
+            }
+
+            // "Back to Today" button when viewing past date
+            if !isSelectedDateToday {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) { selectedDate = Date() }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.uturn.left")
+                            .font(.system(size: 11, weight: .semibold))
+                        Text("Back to Today")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundColor(.blPrimary)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(Color.blPrimary.opacity(0.1))
+                    .clipShape(Capsule())
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            }
+        }
+        .padding(.vertical, 8)
+        .blCard()
+    }
+
+    private var dateHeaderText: String {
+        let cal = Calendar.current
+        if cal.isDateInToday(selectedDate) { return "Today" }
+        if cal.isDateInYesterday(selectedDate) { return "Yesterday" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d"
+        return formatter.string(from: selectedDate)
+    }
+
+    private func dayOfWeekText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter.string(from: date).uppercased()
+    }
+
+    private func dayNumberText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter.string(from: date)
+    }
+
     // MARK: - Baby Hero Card
 
     private var babyHeroCard: some View {
@@ -551,11 +705,13 @@ struct HomeView: View {
                     )
                     .padding(.top, 4)
 
-                Text("No activity yet today")
+                Text(isSelectedDateToday ? "No activity yet today" : "No activity on this day")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.blTextSecondary)
 
-                Text("Tap a Quick Log button above to start tracking \(baby?.name ?? "baby")'s day")
+                Text(isSelectedDateToday
+                     ? "Tap a Quick Log button above to start tracking \(baby?.name ?? "baby")'s day"
+                     : "No records were logged for \(baby?.name ?? "baby") on this date")
                     .font(.system(size: 14))
                     .foregroundColor(.blTextTertiary)
                     .multilineTextAlignment(.center)
