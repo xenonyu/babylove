@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22758" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDFeedingRecord" representedClassName="CDFeedingRecord" syncable="YES" codeGenerationType="class">
+        <attribute name="amountML" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="breastSide" optional="YES" attributeType="String"/>
+        <attribute name="durationMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="feedType" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="CDSleepRecord" representedClassName="CDSleepRecord" syncable="YES" codeGenerationType="class">
+        <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="location" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="startTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="CDDiaperRecord" representedClassName="CDDiaperRecord" syncable="YES" codeGenerationType="class">
+        <attribute name="diaperType" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="CDGrowthRecord" representedClassName="CDGrowthRecord" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="headCircumferenceCM" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="heightCM" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="weightKG" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="CDMilestone" representedClassName="CDMilestone" syncable="YES" codeGenerationType="class">
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="CDFeedingRecord" positionX="-63" positionY="-18" width="128" height="163"/>
+        <element name="CDSleepRecord" positionX="126" positionY="-18" width="128" height="118"/>
+        <element name="CDDiaperRecord" positionX="315" positionY="-18" width="128" height="103"/>
+        <element name="CDGrowthRecord" positionX="-63" positionY="189" width="128" height="148"/>
+        <element name="CDMilestone" positionX="126" positionY="189" width="128" height="133"/>
+    </elements>
+</model>
