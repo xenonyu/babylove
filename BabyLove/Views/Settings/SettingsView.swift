@@ -1,10 +1,16 @@
 import SwiftUI
 import CoreData
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
     @State private var showEditBaby = false
     @State private var showResetAlert = false
+    @State private var showExportShare = false
+    @State private var exportFileURL: URL?
+    @State private var isExporting = false
+    @State private var exportError: String?
+    @State private var showExportError = false
 
     var body: some View {
         NavigationStack {
@@ -62,6 +68,27 @@ struct SettingsView: View {
                         Text("Measurements")
                     }
 
+                    // Data export
+                    Section {
+                        Button {
+                            exportAllData()
+                        } label: {
+                            HStack {
+                                Label("Export All Data (CSV)", systemImage: "square.and.arrow.up")
+                                Spacer()
+                                if isExporting {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                }
+                            }
+                        }
+                        .disabled(isExporting)
+                    } header: {
+                        Text("Data")
+                    } footer: {
+                        Text("Export all records as CSV files. Share with your pediatrician or save as a backup.")
+                    }
+
                     // App info
                     Section {
                         HStack {
@@ -99,6 +126,11 @@ struct SettingsView: View {
         .sheet(isPresented: $showEditBaby) {
             EditBabyView()
         }
+        .sheet(isPresented: $showExportShare) {
+            if let url = exportFileURL {
+                ShareSheet(activityItems: [url])
+            }
+        }
         .alert("Reset All Data?", isPresented: $showResetAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Reset", role: .destructive) {
@@ -107,6 +139,147 @@ struct SettingsView: View {
         } message: {
             Text("This will permanently delete all tracking records and baby profiles. This action cannot be undone.")
         }
+        .alert("Export Failed", isPresented: $showExportError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(exportError ?? "An unknown error occurred.")
+        }
+    }
+
+    // MARK: - Export
+
+    private func exportAllData() {
+        isExporting = true
+        let ctx = PersistenceController.shared.container.viewContext
+        let unit = appState.measurementUnit
+        let babyName = appState.currentBaby?.name ?? "Baby"
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
+
+        do {
+            // Build CSV content with all record types in one file
+            var csv = "Record Type,Date,Time,Details,Notes\n"
+
+            // Feeding records
+            let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+            feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+            let feedings = try ctx.fetch(feedReq)
+            for r in feedings {
+                let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
+                let time = r.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
+                let feedType = FeedType(rawValue: r.feedType ?? "")?.displayName ?? r.feedType ?? ""
+                var details = [feedType]
+                if r.durationMinutes > 0 { details.append("\(r.durationMinutes) min") }
+                if r.amountML > 0 {
+                    let val = unit.volumeFromML(r.amountML)
+                    details.append(unit == .metric ? "\(Int(val)) \(unit.volumeLabel)" : String(format: "%.1f %@", val, unit.volumeLabel))
+                }
+                if let side = r.breastSide, !side.isEmpty {
+                    details.append(BreastSide(rawValue: side)?.displayName ?? side)
+                }
+                let notes = csvEscape(r.notes)
+                csv += "Feeding,\(date),\(time),\(csvEscape(details.joined(separator: "; "))),\(notes)\n"
+            }
+
+            // Sleep records
+            let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+            sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: true)]
+            let sleeps = try ctx.fetch(sleepReq)
+            for r in sleeps {
+                let date = r.startTime.map { dateFormatter.string(from: $0) } ?? ""
+                let startTime = r.startTime?.formatted(date: .omitted, time: .shortened) ?? ""
+                var details = [String]()
+                if let loc = r.location, let sl = SleepLocation(rawValue: loc) {
+                    details.append(sl.displayName)
+                }
+                if let s = r.startTime, let e = r.endTime {
+                    let mins = Int(e.timeIntervalSince(s) / 60)
+                    let h = mins / 60, m = mins % 60
+                    details.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
+                    details.append("End: \(e.formatted(date: .omitted, time: .shortened))")
+                } else {
+                    details.append("Ongoing")
+                }
+                let notes = csvEscape(r.notes)
+                csv += "Sleep,\(date),\(startTime),\(csvEscape(details.joined(separator: "; "))),\(notes)\n"
+            }
+
+            // Diaper records
+            let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+            diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+            let diapers = try ctx.fetch(diaperReq)
+            for r in diapers {
+                let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
+                let time = r.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
+                let dType = DiaperType(rawValue: r.diaperType ?? "")?.displayName ?? r.diaperType ?? ""
+                let notes = csvEscape(r.notes)
+                csv += "Diaper,\(date),\(time),\(dType),\(notes)\n"
+            }
+
+            // Growth records
+            let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+            growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+            let growths = try ctx.fetch(growthReq)
+            for r in growths {
+                let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
+                var details = [String]()
+                if r.weightKG > 0 {
+                    let w = unit.weightFromKG(r.weightKG)
+                    details.append(String(format: "%.2f %@", w, unit.weightLabel))
+                }
+                if r.heightCM > 0 {
+                    let h = unit.lengthFromCM(r.heightCM)
+                    details.append(String(format: "%.1f %@ height", h, unit.heightLabel))
+                }
+                if r.headCircumferenceCM > 0 {
+                    let hc = unit.lengthFromCM(r.headCircumferenceCM)
+                    details.append(String(format: "%.1f %@ head", hc, unit.heightLabel))
+                }
+                let notes = csvEscape(r.notes)
+                csv += "Growth,\(date),,\(csvEscape(details.joined(separator: "; "))),\(notes)\n"
+            }
+
+            // Milestones
+            let mileReq: NSFetchRequest<CDMilestone> = CDMilestone.fetchRequest()
+            mileReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+            let milestones = try ctx.fetch(mileReq)
+            for r in milestones {
+                let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
+                let title = csvEscape(r.title)
+                let cat = MilestoneCategory(rawValue: r.category ?? "")?.displayName ?? r.category ?? ""
+                let status = r.isCompleted ? "Completed" : "In Progress"
+                let notes = csvEscape(r.notes)
+                csv += "Milestone,\(date),,\(title) [\(cat)] (\(status)),\(notes)\n"
+            }
+
+            // Write to temp file
+            let fileName = "\(babyName)_BabyLove_Export_\(Self.fileDate()).csv"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            try csv.write(to: tempURL, atomically: true, encoding: .utf8)
+
+            exportFileURL = tempURL
+            isExporting = false
+            showExportShare = true
+
+        } catch {
+            isExporting = false
+            exportError = error.localizedDescription
+            showExportError = true
+        }
+    }
+
+    private func csvEscape(_ value: String?) -> String {
+        guard let value, !value.isEmpty else { return "" }
+        if value.contains(",") || value.contains("\"") || value.contains("\n") {
+            return "\"\(value.replacingOccurrences(of: "\"", with: "\"\""))\""
+        }
+        return value
+    }
+
+    private static func fileDate() -> String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: Date())
     }
 
     private func resetAllData() {
@@ -185,4 +358,15 @@ struct EditBabyView: View {
             }
         }
     }
+}
+
+// MARK: - Share Sheet (UIKit bridge)
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
