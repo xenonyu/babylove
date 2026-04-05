@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct FeedingLogView: View {
     @ObservedObject var vm: TrackViewModel
@@ -16,6 +17,8 @@ struct FeedingLogView: View {
     @State private var timestamp = Date()
     @State private var showTimePicker = false
     @State private var isTimerMode = false
+    @State private var lastSideUsed: BreastSide?
+    @State private var didAutoSuggestSide = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -99,6 +102,28 @@ struct FeedingLogView: View {
                                         }
                                         .buttonStyle(.plain)
                                     }
+                                }
+
+                                // Smart side suggestion hint
+                                if !isEditing, let lastSide = lastSideUsed, lastSide != .both {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "brain.head.profile")
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(.blFeeding)
+                                        Text("Last: \(lastSide.displayName)")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.blTextSecondary)
+                                        Image(systemName: "arrow.right")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.blTextTertiary)
+                                        Text("Suggested: \(side.displayName)")
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundColor(.blFeeding)
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.blFeeding.opacity(0.08))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                                 }
                             }
 
@@ -262,7 +287,10 @@ struct FeedingLogView: View {
                     Button("Cancel") { dismiss() }
                 }
             }
-            .onAppear { populateFromRecord() }
+            .onAppear {
+                populateFromRecord()
+                if !isEditing { suggestNextSide() }
+            }
         }
     }
 
@@ -274,5 +302,31 @@ struct FeedingLogView: View {
         amount = unit.volumeFromML(r.amountML)
         notes = r.notes ?? ""
         timestamp = r.timestamp ?? Date()
+    }
+
+    /// Fetch the last breast/pump feeding's side and auto-select the opposite
+    private func suggestNextSide() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let req: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        req.predicate = NSPredicate(format: "(feedType == %@ OR feedType == %@) AND breastSide != nil AND breastSide != %@",
+                                    FeedType.breast.rawValue, FeedType.pump.rawValue, "")
+        req.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        req.fetchLimit = 1
+
+        guard let last = (try? ctx.fetch(req))?.first,
+              let lastRaw = last.breastSide,
+              let lastSide = BreastSide(rawValue: lastRaw) else { return }
+
+        lastSideUsed = lastSide
+
+        // Auto-select opposite side
+        let suggested: BreastSide
+        switch lastSide {
+        case .left:  suggested = .right
+        case .right: suggested = .left
+        case .both:  suggested = .both
+        }
+        side = suggested
+        didAutoSuggestSide = true
     }
 }

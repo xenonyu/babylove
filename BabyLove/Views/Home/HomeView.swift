@@ -124,14 +124,35 @@ struct HomeView: View {
 
     /// Formatted feeding volume subtitle (e.g. "480 ml" or "16.0 oz"), empty if no volume recorded
     private var feedingVolumeSubtitle: String {
-        guard totalFeedingVolumeML > 0 else { return "" }
-        let unit = appState.measurementUnit
-        let display = unit.volumeFromML(totalFeedingVolumeML)
-        if unit == .metric {
-            return "\(Int(display)) \(unit.volumeLabel)"
-        } else {
-            return String(format: "%.1f \(unit.volumeLabel)", display)
+        var parts: [String] = []
+        // Volume total
+        if totalFeedingVolumeML > 0 {
+            let unit = appState.measurementUnit
+            let display = unit.volumeFromML(totalFeedingVolumeML)
+            if unit == .metric {
+                parts.append("\(Int(display)) \(unit.volumeLabel)")
+            } else {
+                parts.append(String(format: "%.1f %@", display, unit.volumeLabel))
+            }
         }
+        // Last breast side (helps moms remember which side to use next)
+        if let lastSide = lastBreastSide {
+            parts.append("Last: \(lastSide.displayName)")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    /// The side used in the most recent breast/pump feeding today
+    private var lastBreastSide: BreastSide? {
+        for r in todayFeedings {
+            let ft = FeedType(rawValue: r.feedType ?? "")
+            if ft == .breast || ft == .pump,
+               let sideRaw = r.breastSide, !sideRaw.isEmpty,
+               let s = BreastSide(rawValue: sideRaw) {
+                return s
+            }
+        }
+        return nil
     }
 
     /// Short "time since last" string for a given date, e.g. "32m ago", "1h 5m ago"
