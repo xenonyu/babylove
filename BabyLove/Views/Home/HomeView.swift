@@ -34,9 +34,16 @@ struct HomeView: View {
     )
     private var todayFeedings: FetchedResults<CDFeedingRecord>
 
+    // Use overlap-based predicate so cross-midnight sleep sessions appear
+    // on both days they span (e.g. 10 PM–6 AM shows on both Day 1 and Day 2).
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
-        predicate: NSPredicate(format: "startTime >= %@", Calendar.current.startOfDay(for: Date()) as NSDate)
+        predicate: NSPredicate(
+            format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)",
+            Calendar.current.date(byAdding: .day, value: 1,
+                                  to: Calendar.current.startOfDay(for: Date()))! as NSDate,
+            Calendar.current.startOfDay(for: Date()) as NSDate
+        )
     )
     private var todaySleeps: FetchedResults<CDSleepRecord>
 
@@ -123,7 +130,9 @@ struct HomeView: View {
         let startOfDay = cal.startOfDay(for: selectedDate) as NSDate
         let endOfDay = cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: selectedDate))! as NSDate
         todayFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
-        todaySleeps.nsPredicate   = NSPredicate(format: "startTime >= %@ AND startTime < %@", startOfDay, endOfDay)
+        // Overlap predicate: include sleeps that started before the day ends
+        // AND (ended after the day starts OR are still ongoing).
+        todaySleeps.nsPredicate   = NSPredicate(format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)", endOfDay, startOfDay)
         todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
     }
 
@@ -239,11 +248,20 @@ struct HomeView: View {
     }
 
     private var totalSleepMinutes: Int {
-        todaySleeps.reduce(0) { sum, r in
+        let cal = Calendar.current
+        let dayStart = cal.startOfDay(for: selectedDate)
+        guard let dayEnd = cal.date(byAdding: .day, value: 1, to: dayStart) else { return 0 }
+
+        return todaySleeps.reduce(0) { sum, r in
             guard let s = r.startTime else { return sum }
             // Use current time for ongoing sleep (endTime == nil)
             let e = r.endTime ?? Date()
-            return sum + Int(e.timeIntervalSince(s) / 60)
+            // Clip the sleep session to the selected day boundaries so that
+            // cross-midnight sleeps only count the portion within this day.
+            let clippedStart = max(s, dayStart)
+            let clippedEnd = min(e, dayEnd)
+            guard clippedEnd > clippedStart else { return sum }
+            return sum + Int(clippedEnd.timeIntervalSince(clippedStart) / 60)
         }
     }
 
