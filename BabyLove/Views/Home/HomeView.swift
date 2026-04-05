@@ -303,6 +303,44 @@ struct HomeView: View {
 
     // MARK: - Recent Activity
 
+    // MARK: - Time Since Helpers
+
+    /// Format a time interval as a human-readable "time ago" string
+    private static func timeAgoText(from date: Date) -> String {
+        let seconds = Int(Date().timeIntervalSince(date))
+        if seconds < 60 { return "Just now" }
+        let minutes = seconds / 60
+        if minutes < 60 { return "\(minutes)m ago" }
+        let hours = minutes / 60
+        let remainMinutes = minutes % 60
+        if hours < 24 {
+            return remainMinutes > 0 ? "\(hours)h \(remainMinutes)m ago" : "\(hours)h ago"
+        }
+        let days = hours / 24
+        return days == 1 ? "Yesterday" : "\(days)d ago"
+    }
+
+    /// Build a short detail string for the last feeding (e.g. "15m · Left" or "120 ml")
+    private func feedingDetail(_ r: CDFeedingRecord) -> String {
+        let unit = appState.measurementUnit
+        var parts: [String] = []
+        if r.durationMinutes > 0 {
+            parts.append("\(r.durationMinutes)m")
+        }
+        if r.amountML > 0 {
+            let display = unit.volumeFromML(r.amountML)
+            if unit == .metric {
+                parts.append("\(Int(display)) ml")
+            } else {
+                parts.append(String(format: "%.1f oz", display))
+            }
+        }
+        if let side = r.breastSide, !side.isEmpty {
+            parts.append(BreastSide(rawValue: side)?.displayName ?? side)
+        }
+        return parts.joined(separator: " · ")
+    }
+
     private var recentActivitySection: some View {
         VStack(spacing: 12) {
             BLSectionHeader(title: "Recent Activity")
@@ -310,27 +348,59 @@ struct HomeView: View {
 
             VStack(spacing: 1) {
                 if let last = todayFeedings.first {
-                    ActivityRow(
-                        icon: "drop.fill",
+                    let feedType = FeedType(rawValue: last.feedType ?? "")
+                    TimeSinceRow(
+                        icon: feedType?.icon ?? "drop.fill",
                         color: .blFeeding,
-                        title: FeedType(rawValue: last.feedType ?? "")?.displayName ?? "Feeding",
-                        subtitle: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
+                        title: feedType?.displayName ?? "Feeding",
+                        detail: feedingDetail(last),
+                        timeAgo: last.timestamp.map { Self.timeAgoText(from: $0) } ?? "",
+                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
                     )
+                    if !todaySleeps.isEmpty || !todayDiapers.isEmpty {
+                        Divider().padding(.leading, 70)
+                    }
                 }
                 if let last = todaySleeps.first {
-                    ActivityRow(
-                        icon: "moon.fill",
+                    let sleepDetail: String = {
+                        if last.endTime == nil {
+                            return "Ongoing"
+                        } else if let s = last.startTime, let e = last.endTime {
+                            let mins = Int(e.timeIntervalSince(s) / 60)
+                            let h = mins / 60, m = mins % 60
+                            return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+                        }
+                        return ""
+                    }()
+                    let sleepAgo: String = {
+                        if last.endTime == nil {
+                            return "Now"
+                        } else if let endTime = last.endTime {
+                            return Self.timeAgoText(from: endTime)
+                        }
+                        return ""
+                    }()
+                    TimeSinceRow(
+                        icon: "moon.zzz.fill",
                         color: .blSleep,
                         title: "Sleep",
-                        subtitle: last.startTime?.formatted(date: .omitted, time: .shortened) ?? ""
+                        detail: sleepDetail,
+                        timeAgo: sleepAgo,
+                        timeLabel: last.startTime?.formatted(date: .omitted, time: .shortened) ?? ""
                     )
+                    if !todayDiapers.isEmpty {
+                        Divider().padding(.leading, 70)
+                    }
                 }
                 if let last = todayDiapers.first {
-                    ActivityRow(
+                    let dType = DiaperType(rawValue: last.diaperType ?? "")
+                    TimeSinceRow(
                         icon: "oval.fill",
                         color: .blDiaper,
-                        title: DiaperType(rawValue: last.diaperType ?? "")?.displayName ?? "Diaper",
-                        subtitle: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
+                        title: dType?.displayName ?? "Diaper",
+                        detail: dType?.icon ?? "",
+                        timeAgo: last.timestamp.map { Self.timeAgoText(from: $0) } ?? "",
+                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
                     )
                 }
             }
@@ -340,12 +410,14 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Activity Row
-struct ActivityRow: View {
+// MARK: - Time Since Row
+struct TimeSinceRow: View {
     let icon: String
     let color: Color
     let title: String
-    let subtitle: String
+    let detail: String
+    let timeAgo: String
+    let timeLabel: String
 
     var body: some View {
         HStack(spacing: 14) {
@@ -358,17 +430,27 @@ struct ActivityRow: View {
                     .foregroundColor(color)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.blTextPrimary)
-                Text(subtitle)
+                HStack(spacing: 6) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                    if !detail.isEmpty {
+                        Text("·")
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextTertiary)
+                        Text(detail)
+                            .font(.system(size: 14))
+                            .foregroundColor(color)
+                    }
+                }
+                Text(timeLabel)
                     .font(.system(size: 13))
                     .foregroundColor(.blTextSecondary)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12))
-                .foregroundColor(.blTextTertiary)
+            Text(timeAgo)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(color)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
