@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FeedingLogView: View {
     @ObservedObject var vm: TrackViewModel
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
     @State private var feedType: FeedType = .breast
@@ -9,6 +10,11 @@ struct FeedingLogView: View {
     @State private var duration: Double = 10
     @State private var amount: Double = 0
     @State private var notes = ""
+
+    private var unit: MeasurementUnit { appState.measurementUnit }
+    /// Max amount in display unit (300 ml ≈ 10 oz)
+    private var maxAmount: Double { unit == .metric ? 300 : 10 }
+    private var amountStep: Double { unit == .metric ? 5 : 0.5 }
 
     var body: some View {
         NavigationStack {
@@ -86,18 +92,21 @@ struct FeedingLogView: View {
                         }
 
                         // Amount (formula/pump/solid)
-                        if feedType == .formula || feedType == .solid {
+                        if feedType == .formula || feedType == .pump || feedType == .solid {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
-                                    Label("Amount", systemImage: "scalemass.fill")
+                                    Label(feedType == .pump ? "Amount Pumped" : "Amount",
+                                          systemImage: feedType == .pump ? "drop.halffull" : "scalemass.fill")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
-                                    Text("\(Int(amount)) ml")
+                                    Text(unit == .metric
+                                         ? "\(Int(amount)) ml"
+                                         : String(format: "%.1f oz", amount))
                                         .font(.system(size: 17, weight: .bold))
                                         .foregroundColor(.blFeeding)
                                 }
-                                Slider(value: $amount, in: 0...300, step: 5)
+                                Slider(value: $amount, in: 0...maxAmount, step: amountStep)
                                     .tint(.blFeeding)
                             }
                         }
@@ -115,11 +124,12 @@ struct FeedingLogView: View {
                         }
 
                         Button("Log Feeding") {
+                            let amountML = unit.volumeToML(amount)
                             vm.logFeeding(
                                 type: feedType,
                                 side: (feedType == .breast || feedType == .pump) ? side : nil,
                                 durationMinutes: Int(duration),
-                                amountML: amount,
+                                amountML: amountML,
                                 notes: notes
                             )
                             dismiss()

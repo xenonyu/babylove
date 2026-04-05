@@ -2,6 +2,7 @@ import SwiftUI
 import CoreData
 
 struct TrackView: View {
+    @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm: TrackViewModel = TrackViewModel(context: PersistenceController.shared.container.viewContext)
 
@@ -109,7 +110,8 @@ struct TrackView: View {
     }
 
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
-        HStack {
+        let unit = appState.measurementUnit
+        return HStack {
             Text(FeedType(rawValue: r.feedType ?? "")?.displayName ?? "Feeding")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.blTextPrimary)
@@ -120,7 +122,10 @@ struct TrackView: View {
                     .foregroundColor(.blFeeding)
             }
             if r.amountML > 0 {
-                Text("\(Int(r.amountML))ml")
+                let displayAmount = unit.volumeFromML(r.amountML)
+                Text(unit == .metric
+                     ? "\(Int(displayAmount))\(unit.volumeLabel)"
+                     : String(format: "%.1f\(unit.volumeLabel)", displayAmount))
                     .font(.system(size: 14))
                     .foregroundColor(.blFeeding)
             }
