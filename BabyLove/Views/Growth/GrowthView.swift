@@ -116,16 +116,27 @@ struct GrowthView: View {
         }
     }
 
+    // MARK: - Latest value helpers
+
+    /// Find the latest record that has a non-zero value for the given metric.
+    /// Falls back through all records (sorted ascending), checking from newest.
+    private func latestRecord(for metric: GrowthMetric) -> CDGrowthRecord? {
+        for record in records.reversed() {
+            switch metric {
+            case .weight: if record.weightKG > 0 { return record }
+            case .height: if record.heightCM > 0 { return record }
+            case .head:   if record.headCircumferenceCM > 0 { return record }
+            }
+        }
+        return nil
+    }
+
     // MARK: - Chart Area
     private var chartArea: some View {
         VStack(spacing: 16) {
-            // Latest measurement
-            if let latest = records.last {
-                HStack(spacing: 20) {
-                    latestValue(for: latest)
-                }
-                .padding(20)
-                .blCard()
+            // Latest measurements overview — shows most recent non-zero value for each metric
+            if !records.isEmpty {
+                latestMeasurementsCard
             }
 
             // Simple bar chart
@@ -137,38 +148,72 @@ struct GrowthView: View {
         }
     }
 
-    private func latestValue(for r: CDGrowthRecord) -> some View {
+    private var latestMeasurementsCard: some View {
         let unit = appState.measurementUnit
-        return Group {
-            if selectedMetric == .weight {
-                VStack(spacing: 4) {
-                    Text(String(format: "%.2f", unit.weightFromKG(r.weightKG)))
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.blGrowth)
-                    Text(unit.weightLabel)
-                        .font(.system(size: 14))
-                        .foregroundColor(.blTextSecondary)
-                }
-            } else if selectedMetric == .height {
-                VStack(spacing: 4) {
-                    Text(String(format: "%.1f", unit.lengthFromCM(r.heightCM)))
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.blGrowth)
-                    Text(unit.heightLabel)
-                        .font(.system(size: 14))
-                        .foregroundColor(.blTextSecondary)
-                }
-            } else {
-                VStack(spacing: 4) {
-                    Text(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM)))
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.blGrowth)
-                    Text("Head " + unit.heightLabel)
-                        .font(.system(size: 14))
-                        .foregroundColor(.blTextSecondary)
-                }
-            }
+        let latestWeight = latestRecord(for: .weight)
+        let latestHeight = latestRecord(for: .height)
+        let latestHead   = latestRecord(for: .head)
+
+        return HStack(spacing: 0) {
+            // Weight
+            metricColumn(
+                value: latestWeight.map { String(format: "%.2f", unit.weightFromKG($0.weightKG)) },
+                label: unit.weightLabel,
+                icon: "scalemass.fill",
+                isSelected: selectedMetric == .weight
+            ) { selectedMetric = .weight }
+
+            dividerLine
+
+            // Height
+            metricColumn(
+                value: latestHeight.map { String(format: "%.1f", unit.lengthFromCM($0.heightCM)) },
+                label: unit.heightLabel,
+                icon: "ruler.fill",
+                isSelected: selectedMetric == .height
+            ) { selectedMetric = .height }
+
+            dividerLine
+
+            // Head
+            metricColumn(
+                value: latestHead.map { String(format: "%.1f", unit.lengthFromCM($0.headCircumferenceCM)) },
+                label: "Head",
+                icon: "circle.dashed",
+                isSelected: selectedMetric == .head
+            ) { selectedMetric = .head }
         }
+        .padding(.vertical, 16)
+        .blCard()
+    }
+
+    private var dividerLine: some View {
+        Rectangle()
+            .fill(Color.blSurface)
+            .frame(width: 1, height: 44)
+    }
+
+    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.3)) { action() }
+        }) {
+            VStack(spacing: 4) {
+                if let value {
+                    Text(value)
+                        .font(.system(size: isSelected ? 26 : 20, weight: .bold))
+                        .foregroundColor(isSelected ? .blGrowth : .blTextSecondary)
+                } else {
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .foregroundColor(.blTextTertiary)
+                }
+                Text(label)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(isSelected ? .blGrowth : .blTextTertiary)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
     }
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {
