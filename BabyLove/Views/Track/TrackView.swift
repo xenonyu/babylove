@@ -16,6 +16,7 @@ struct TrackView: View {
     @State private var feedingToEdit: CDFeedingRecord?
     @State private var sleepToEdit: CDSleepRecord?
     @State private var diaperToEdit: CDDiaperRecord?
+    @State private var growthToEdit: CDGrowthRecord?
 
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
@@ -31,6 +32,11 @@ struct TrackView: View {
         entity: CDDiaperRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)]
     ) private var recentDiapers: FetchedResults<CDDiaperRecord>
+
+    @FetchRequest(
+        entity: CDGrowthRecord.entity(),
+        sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
+    ) private var recentGrowth: FetchedResults<CDGrowthRecord>
 
     var body: some View {
         NavigationStack {
@@ -125,6 +131,27 @@ struct TrackView: View {
                             }
                         }
 
+                        // Recent growth
+                        if !recentGrowth.isEmpty {
+                            recentSection(title: "Growth", color: .blGrowth, destination: GrowthView()) {
+                                ForEach(recentGrowth.prefix(5)) { r in
+                                    growthRow(r)
+                                        .contextMenu {
+                                            Button {
+                                                growthToEdit = r
+                                            } label: {
+                                                Label("Edit", systemImage: "pencil")
+                                            }
+                                            Button(role: .destructive) {
+                                                recordToDelete = r
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
+                                }
+                            }
+                        }
+
                         Spacer(minLength: 100)
                     }
                     .padding(.top, 16)
@@ -146,6 +173,9 @@ struct TrackView: View {
         }
         .sheet(item: $diaperToEdit) { record in
             DiaperLogView(vm: vm, editingRecord: record)
+        }
+        .sheet(item: $growthToEdit) { record in
+            GrowthLogView(vm: vm, editingRecord: record)
         }
         .alert("Delete Record?", isPresented: Binding(
             get: { recordToDelete != nil },
@@ -268,6 +298,45 @@ struct TrackView: View {
                 .foregroundColor(.blTextPrimary)
             Spacer()
             Text(Self.timestampText(r.timestamp))
+                .font(.system(size: 13))
+                .foregroundColor(.blTextTertiary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+    }
+
+    private func growthRow(_ r: CDGrowthRecord) -> some View {
+        let unit = appState.measurementUnit
+        return HStack(spacing: 8) {
+            Text("Growth")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.blTextPrimary)
+            Spacer()
+            // Show available measurements compactly
+            if r.weightKG > 0 {
+                let w = unit.weightFromKG(r.weightKG)
+                Text(unit == .metric
+                     ? String(format: "%.1f %@", w, unit.weightLabel)
+                     : String(format: "%.1f %@", w, unit.weightLabel))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.blGrowth)
+            }
+            if r.heightCM > 0 {
+                let h = unit.lengthFromCM(r.heightCM)
+                Text(unit == .metric
+                     ? String(format: "%.1f %@", h, unit.heightLabel)
+                     : String(format: "%.1f %@", h, unit.heightLabel))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.blGrowth)
+            }
+            if r.headCircumferenceCM > 0 {
+                let hc = unit.lengthFromCM(r.headCircumferenceCM)
+                Text(String(format: "%.1f %@", hc, unit.heightLabel))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.blGrowth)
+                    .lineLimit(1)
+            }
+            Text(r.date?.formatted(date: .abbreviated, time: .omitted) ?? "")
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
