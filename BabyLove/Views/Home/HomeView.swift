@@ -70,6 +70,40 @@ struct HomeView: View {
         }
     }
 
+    /// Short "time since last" string for a given date, e.g. "32m ago", "1h 5m ago"
+    private static func timeSinceText(from date: Date?) -> String {
+        guard let date else { return "" }
+        let seconds = Int(Date().timeIntervalSince(date))
+        guard seconds >= 0 else { return "" }
+        if seconds < 60 { return "just now" }
+        let minutes = seconds / 60
+        if minutes < 60 { return "\(minutes)m ago" }
+        let hours = minutes / 60
+        let remMins = minutes % 60
+        if hours < 24 {
+            return remMins > 0 ? "\(hours)h \(remMins)m ago" : "\(hours)h ago"
+        }
+        let days = hours / 24
+        return days == 1 ? "1d ago" : "\(days)d ago"
+    }
+
+    /// Time since last feeding
+    private var feedingTimeSince: String {
+        Self.timeSinceText(from: todayFeedings.first?.timestamp)
+    }
+
+    /// Time since last sleep ended (or "sleeping" if ongoing)
+    private var sleepTimeSince: String {
+        guard let last = todaySleeps.first else { return "" }
+        if last.endTime == nil { return "sleeping now" }
+        return Self.timeSinceText(from: last.endTime)
+    }
+
+    /// Time since last diaper change
+    private var diaperTimeSince: String {
+        Self.timeSinceText(from: todayDiapers.first?.timestamp)
+    }
+
     /// Diaper breakdown subtitle (e.g. "3💧 2💩")
     private var diaperBreakdownSubtitle: String {
         guard !todayDiapers.isEmpty else { return "" }
@@ -130,14 +164,17 @@ struct HomeView: View {
                                 StatBadge(value: "\(todayFeedings.count)",
                                           label: "Feedings",
                                           color: .blFeeding,
-                                          subtitle: feedingVolumeSubtitle)
+                                          subtitle: feedingVolumeSubtitle,
+                                          timeSince: feedingTimeSince)
                                 StatBadge(value: sleepText.isEmpty ? "0m" : sleepText,
                                           label: "Sleep",
-                                          color: .blSleep)
+                                          color: .blSleep,
+                                          timeSince: sleepTimeSince)
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: "Diapers",
                                           color: .blDiaper,
-                                          subtitle: diaperBreakdownSubtitle)
+                                          subtitle: diaperBreakdownSubtitle,
+                                          timeSince: diaperTimeSince)
                             }
                             .padding(.horizontal, 20)
                         }

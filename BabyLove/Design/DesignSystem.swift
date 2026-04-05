@@ -137,6 +137,8 @@ struct StatBadge: View {
     let label: String
     let color: Color
     var subtitle: String? = nil
+    /// Shows how long since the last event (e.g. "1h 23m ago")
+    var timeSince: String? = nil
 
     var body: some View {
         VStack(spacing: 4) {
@@ -150,6 +152,12 @@ struct StatBadge: View {
                 Text(subtitle)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(color.opacity(0.7))
+            }
+            if let timeSince, !timeSince.isEmpty {
+                Text(timeSince)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.blTextTertiary)
+                    .lineLimit(1)
             }
         }
         .frame(maxWidth: .infinity)
