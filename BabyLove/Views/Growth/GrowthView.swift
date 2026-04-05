@@ -170,7 +170,7 @@ struct GrowthView: View {
             }
 
             // Growth chart with WHO percentile curves
-            if records.count > 1 {
+            if !records.isEmpty {
                 SimpleLineChart(
                     records: Array(records),
                     metric: selectedMetric,
@@ -416,7 +416,7 @@ struct SimpleLineChart: View {
 
     var body: some View {
         let data = dataPoints()
-        guard data.count > 1 else {
+        guard !data.isEmpty else {
             return AnyView(
                 Text("Not enough data")
                     .font(.system(size: 14))
@@ -464,8 +464,14 @@ struct SimpleLineChart: View {
         let chartMax = rawMax + safePadding
         let chartRange = chartMax - chartMin  // Always > 0
 
-        // Age range for X axis
-        let agePadding = max((ageMax - ageMin) * 0.05, 0.5)
+        // Age range for X axis — for a single data point, show context window around it
+        let agePadding: Double
+        if ageMax - ageMin < 0.01 {
+            // Single point: show ±2 months context so WHO curves are visible
+            agePadding = 2.0
+        } else {
+            agePadding = max((ageMax - ageMin) * 0.05, 0.5)
+        }
         let xMin = max(0, ageMin - agePadding)
         let xMax = ageMax + agePadding
         let xRange = xMax - xMin  // Always > 0 due to agePadding >= 0.5
@@ -572,26 +578,29 @@ struct SimpleLineChart: View {
                             }
 
                             if let first = points.first, let last = points.last {
-                                Path { p in
-                                    p.move(to: CGPoint(x: first.x, y: h))
-                                    points.forEach { p.addLine(to: $0) }
-                                    p.addLine(to: CGPoint(x: last.x, y: h))
-                                    p.closeSubpath()
-                                }
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color.blGrowth.opacity(0.25), Color.blGrowth.opacity(0.02)],
-                                        startPoint: .top,
-                                        endPoint: .bottom
+                                // Only draw fill and line when we have 2+ points
+                                if points.count > 1 {
+                                    Path { p in
+                                        p.move(to: CGPoint(x: first.x, y: h))
+                                        points.forEach { p.addLine(to: $0) }
+                                        p.addLine(to: CGPoint(x: last.x, y: h))
+                                        p.closeSubpath()
+                                    }
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.blGrowth.opacity(0.25), Color.blGrowth.opacity(0.02)],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
                                     )
-                                )
 
-                                // Baby's line
-                                Path { p in
-                                    p.move(to: first)
-                                    points.dropFirst().forEach { p.addLine(to: $0) }
+                                    // Baby's line
+                                    Path { p in
+                                        p.move(to: first)
+                                        points.dropFirst().forEach { p.addLine(to: $0) }
+                                    }
+                                    .stroke(Color.blGrowth, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
                                 }
-                                .stroke(Color.blGrowth, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
 
                                 // Dots + value labels
                                 ForEach(0..<points.count, id: \.self) { i in
