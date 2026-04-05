@@ -43,6 +43,15 @@ class TrackViewModel: ObservableObject {
         save()
     }
 
+    func endSleepByID(_ id: UUID, context: NSManagedObjectContext) {
+        let req: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        req.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        req.fetchLimit = 1
+        guard let record = (try? context.fetch(req))?.first else { return }
+        record.endTime = Date()
+        try? context.save()
+    }
+
     func logSleep(start: Date, end: Date, location: SleepLocation = .crib, notes: String = "") {
         let record = CDSleepRecord(context: ctx)
         record.id = UUID()
