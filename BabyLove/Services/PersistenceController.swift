@@ -1,12 +1,12 @@
 import CoreData
 
-struct PersistenceController {
+struct PersistenceController: Sendable {
     static let shared = PersistenceController()
 
-    static var preview: PersistenceController = {
+    @MainActor
+    static let preview: PersistenceController = {
         let ctrl = PersistenceController(inMemory: true)
         let ctx = ctrl.container.viewContext
-        // Insert sample data for previews
         let feed = CDFeedingRecord(context: ctx)
         feed.id = UUID()
         feed.timestamp = Date()
@@ -29,7 +29,7 @@ struct PersistenceController {
             }
         }
         container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
 
     func save() {

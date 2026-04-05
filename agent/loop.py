@@ -25,7 +25,7 @@ from claude_agent_sdk import (
 
 # ─── 项目配置 ────────────────────────────────────────────────────────────────
 PROJECT_DIR = "/Users/yaxinli/xym/babylove"
-SIM_ID      = "6449AACA-25FA-4F2F-906D-C1564DDEF26E"   # iPhone 16
+SIM_ID      = "8457B971-4286-457B-8AE0-8A6728C35CC5"   # iPhone 17 / iOS 26.2
 BUNDLE_ID   = "com.babylove.app"
 SCHEME      = "BabyLove"
 SKILL_LOG   = Path(PROJECT_DIR) / "agent" / "skill_log.json"
@@ -50,7 +50,7 @@ BabyLove = 极简记录 × 深度洞察 × 永久珍藏
 
 ## 架构概览
 ```
-Bundle ID: com.babylove.app | iOS 16.0+ | SwiftUI + CoreData + MVVM
+Bundle ID: com.babylove.app | iOS 26.0+ | SwiftUI + CoreData + MVVM | Swift 6
 项目路径: /Users/yaxinli/xym/babylove
 
 关键文件:
@@ -116,7 +116,7 @@ cd /Users/yaxinli/xym/babylove && xcodegen generate && \\
 xcodebuild build \\
   -project BabyLove.xcodeproj \\
   -scheme BabyLove \\
-  -destination 'id=6449AACA-25FA-4F2F-906D-C1564DDEF26E' \\
+  -destination 'id=8457B971-4286-457B-8AE0-8A6728C35CC5' \\
   -configuration Debug \\
   ONLY_ACTIVE_ARCH=YES 2>&1 | grep -E "error:|BUILD SUCCEEDED|BUILD FAILED"
 ```
@@ -129,19 +129,19 @@ APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/BabyLove-*/Build/Products/
 echo "APP: $APP_PATH"
 
 # 2. 启动 Simulator
-xcrun simctl boot 6449AACA-25FA-4F2F-906D-C1564DDEF26E 2>/dev/null || true
+xcrun simctl boot 8457B971-4286-457B-8AE0-8A6728C35CC5 2>/dev/null || true
 sleep 2
 
 # 3. 安装 & 启动
-xcrun simctl install 6449AACA-25FA-4F2F-906D-C1564DDEF26E "$APP_PATH"
-xcrun simctl launch 6449AACA-25FA-4F2F-906D-C1564DDEF26E com.babylove.app
+xcrun simctl install 8457B971-4286-457B-8AE0-8A6728C35CC5 "$APP_PATH"
+xcrun simctl launch 8457B971-4286-457B-8AE0-8A6728C35CC5 com.babylove.app
 sleep 3
 
 # 4. 检查崩溃日志
-xcrun simctl spawn 6449AACA-25FA-4F2F-906D-C1564DDEF26E log show --last 30s --predicate 'process == "BabyLove"' 2>/dev/null | grep -i "crash\\|fault\\|exception" | head -5
+xcrun simctl spawn 8457B971-4286-457B-8AE0-8A6728C35CC5 log show --last 30s --predicate 'process == "BabyLove"' 2>/dev/null | grep -i "crash\\|fault\\|exception" | head -5
 
 # 5. 终止
-xcrun simctl terminate 6449AACA-25FA-4F2F-906D-C1564DDEF26E com.babylove.app 2>/dev/null || true
+xcrun simctl terminate 8457B971-4286-457B-8AE0-8A6728C35CC5 com.babylove.app 2>/dev/null || true
 ```
 确认启动无崩溃。
 
@@ -153,7 +153,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
 ## 硬性约束
-- iOS 16+ Swift 5.9 兼容语法
+- iOS 26+ Swift 6.0 兼容语法（注意 Swift 6 并发安全）
 - 不引入任何第三方 Swift Package（无 SPM 依赖）
 - 不修改 BabyLove.xcdatamodeld entity 结构
 - 每次只做一个聚焦改进，不大规模重构
@@ -298,7 +298,7 @@ async def main():
 
     print("🍼 BabyLove 自主迭代 Agent  (Ctrl+C 停止)")
     print(f"   项目:      {PROJECT_DIR}")
-    print(f"   Simulator: iPhone 16 ({SIM_ID[:8]}…)")
+    print(f"   Simulator: iPhone 17 / iOS 26.2 ({SIM_ID[:8]}…)")
     print(f"   模型:      claude-opus-4-6 (1M context)")
     print(f"   间隔:      {interval}s")
     print(f"   Skill Log: {SKILL_LOG}\n")
