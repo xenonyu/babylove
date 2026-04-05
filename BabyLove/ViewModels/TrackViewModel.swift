@@ -188,9 +188,11 @@ class TrackViewModel: ObservableObject {
                       heightCM: Double? = nil,
                       headCM: Double? = nil,
                       notes: String = "") {
-        record.weightKG = weightKG ?? 0
-        record.heightCM = heightCM ?? 0
-        record.headCircumferenceCM = headCM ?? 0
+        // Preserve existing values when a field is not provided (nil),
+        // but allow explicit zero to clear a measurement.
+        record.weightKG = weightKG ?? record.weightKG
+        record.heightCM = heightCM ?? record.heightCM
+        record.headCircumferenceCM = headCM ?? record.headCircumferenceCM
         record.date = record.date ?? Date()
         record.notes = notes.isEmpty ? nil : notes
         save()
