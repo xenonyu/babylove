@@ -9,6 +9,7 @@ struct GrowthView: View {
     @State private var selectedMetric: GrowthMetric = .weight
     @State private var recordToDelete: CDGrowthRecord?
     @State private var recordToEdit: CDGrowthRecord?
+    @State private var showAllRecords = false
 
     @FetchRequest(
         entity: CDGrowthRecord.entity(),
@@ -43,9 +44,19 @@ struct GrowthView: View {
                         // Records list
                         if !records.isEmpty {
                             VStack(spacing: 12) {
-                                BLSectionHeader(title: "Records")
-                                    .padding(.horizontal, 20)
-                                let displayed = Array(records.suffix(10).reversed())
+                                HStack {
+                                    BLSectionHeader(title: "Records")
+                                    Spacer()
+                                    Text("\(records.count)")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.blTextTertiary)
+                                }
+                                .padding(.horizontal, 20)
+
+                                let previewLimit = 10
+                                let allReversed = Array(records.reversed())
+                                let displayed = showAllRecords ? allReversed : Array(allReversed.prefix(previewLimit))
+
                                 VStack(spacing: 0) {
                                     ForEach(Array(displayed.enumerated()), id: \.element.id) { index, r in
                                         growthRow(r)
@@ -66,6 +77,28 @@ struct GrowthView: View {
                                         if index < displayed.count - 1 {
                                             Divider().padding(.leading, 56)
                                         }
+                                    }
+
+                                    // Show more / Show less toggle when there are more than previewLimit records
+                                    if records.count > previewLimit {
+                                        Divider().padding(.leading, 56)
+                                        Button {
+                                            Haptic.selection()
+                                            withAnimation(.spring(response: 0.35)) {
+                                                showAllRecords.toggle()
+                                            }
+                                        } label: {
+                                            HStack(spacing: 6) {
+                                                Text(showAllRecords ? "Show Less" : "Show All \(records.count) Records")
+                                                    .font(.system(size: 14, weight: .medium))
+                                                Image(systemName: showAllRecords ? "chevron.up" : "chevron.down")
+                                                    .font(.system(size: 11, weight: .semibold))
+                                            }
+                                            .foregroundColor(.blGrowth)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 14)
+                                        }
+                                        .buttonStyle(.plain)
                                     }
                                 }
                                 .blCard()
@@ -109,6 +142,7 @@ struct GrowthView: View {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
+                    appState.showToast("Growth record deleted", icon: "trash.fill", color: .blGrowth)
                 }
                 recordToDelete = nil
             }
