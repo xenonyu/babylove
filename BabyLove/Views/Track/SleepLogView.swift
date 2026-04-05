@@ -187,6 +187,12 @@ struct SleepLogView: View {
                 }
             }
             .onAppear { populateFromRecord() }
+            .onChange(of: isOngoing) { oldValue, newValue in
+                // When toggling from ongoing → finished, snap endTime to now
+                if oldValue == true && newValue == false {
+                    endTime = Date()
+                }
+            }
         }
     }
 
