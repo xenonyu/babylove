@@ -152,7 +152,7 @@ struct GrowthView: View {
                     Text(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM)))
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.blGrowth)
-                    Text(unit.heightLabel)
+                    Text("Head " + unit.heightLabel)
                         .font(.system(size: 14))
                         .foregroundColor(.blTextSecondary)
                 }
@@ -183,6 +183,11 @@ struct GrowthView: View {
                     }
                     if r.heightCM > 0 {
                         Text("\(String(format: "%.1f", unit.lengthFromCM(r.heightCM))) \(unit.heightLabel)")
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextSecondary)
+                    }
+                    if r.headCircumferenceCM > 0 {
+                        Text("HC \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }
