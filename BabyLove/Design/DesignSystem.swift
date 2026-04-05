@@ -33,6 +33,13 @@ enum Haptic {
         g.notificationOccurred(.warning)
     }
 
+    /// Error notification — save failed
+    static func error() {
+        let g = UINotificationFeedbackGenerator()
+        g.prepare()
+        g.notificationOccurred(.error)
+    }
+
     /// Selection tick — segment changes, date pills, filter chips
     static func selection() {
         let g = UISelectionFeedbackGenerator()

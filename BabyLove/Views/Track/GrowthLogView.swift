@@ -125,19 +125,23 @@ struct GrowthLogView: View {
                         }
 
                         Button(isEditing ? "Update Measurements" : "Save Measurements") {
-                            Haptic.success()
                             // Convert from display unit to metric for storage
                             let wKG = Double(weightKG).map { unit.weightToKG($0) }
                             let hCM = Double(heightCM).map { unit.lengthToCM($0) }
                             let hd  = Double(headCM).map { unit.lengthToCM($0) }
+                            var ok = false
                             if let record = editingRecord {
-                                vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
-                                appState.showToast("Growth updated", icon: "pencil.circle.fill", color: .blGrowth)
+                                ok = vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
+                                appState.showToast(ok ? "Growth updated" : "Save failed — try again",
+                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blGrowth : .red)
                             } else {
-                                vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
-                                appState.showToast("Growth logged", icon: "chart.bar.fill", color: .blGrowth)
+                                ok = vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
+                                appState.showToast(ok ? "Growth logged" : "Save failed — try again",
+                                                   icon: ok ? "chart.bar.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blGrowth : .red)
                             }
-                            dismiss()
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
                         .disabled(!canSave)

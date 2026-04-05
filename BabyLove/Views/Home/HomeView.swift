@@ -530,12 +530,18 @@ struct HomeView: View {
 
     private func endOngoingSleep() {
         guard let ongoing = ongoingSleep, let id = ongoing.id else { return }
-        Haptic.success()
+        var ok = false
         withAnimation(.spring(response: 0.4)) {
-            vm.endSleepByID(id, context: ctx)
+            ok = vm.endSleepByID(id, context: ctx)
         }
-        stopSleepTimer()
-        appState.showToast("Sleep ended", icon: "sun.and.horizon.fill", color: .blSleep)
+        if ok {
+            Haptic.success()
+            stopSleepTimer()
+            appState.showToast("Sleep ended", icon: "sun.and.horizon.fill", color: .blSleep)
+        } else {
+            Haptic.error()
+            appState.showToast("Save failed — try again", icon: "exclamationmark.triangle.fill", color: .red)
+        }
     }
 
     @ViewBuilder
@@ -638,12 +644,18 @@ struct HomeView: View {
 
     private func endOngoingFeeding() {
         guard let ongoing = ongoingFeeding, let id = ongoing.id else { return }
-        Haptic.success()
+        var ok = false
         withAnimation(.spring(response: 0.4)) {
-            vm.endFeedingByID(id, context: ctx)
+            ok = vm.endFeedingByID(id, context: ctx)
         }
-        stopFeedingTimer()
-        appState.showToast("Feeding ended", icon: "checkmark.circle.fill", color: .blFeeding)
+        if ok {
+            Haptic.success()
+            stopFeedingTimer()
+            appState.showToast("Feeding ended", icon: "checkmark.circle.fill", color: .blFeeding)
+        } else {
+            Haptic.error()
+            appState.showToast("Save failed — try again", icon: "exclamationmark.triangle.fill", color: .red)
+        }
     }
 
     @ViewBuilder

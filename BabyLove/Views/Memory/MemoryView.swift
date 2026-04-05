@@ -449,15 +449,19 @@ struct AddMilestoneView: View {
                         }
 
                         Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
-                            Haptic.success()
+                            var ok = false
                             if let record = editingRecord {
-                                vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
-                                appState.showToast("Milestone updated", icon: "pencil.circle.fill", color: .blPrimary)
+                                ok = vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                appState.showToast(ok ? "Milestone updated" : "Save failed — try again",
+                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blPrimary : .red)
                             } else {
-                                vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
-                                appState.showToast("Milestone saved", icon: "star.fill", color: .blPrimary)
+                                ok = vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                appState.showToast(ok ? "Milestone saved" : "Save failed — try again",
+                                                   icon: ok ? "star.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blPrimary : .red)
                             }
-                            dismiss()
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
                         .buttonStyle(BLPrimaryButton())
                         .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)

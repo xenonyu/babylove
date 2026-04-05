@@ -235,11 +235,11 @@ struct FeedingLogView: View {
                         }
 
                         Button(buttonLabel) {
-                            Haptic.success()
                             let amountML = unit.volumeToML(amount)
                             let hasDuration = feedType == .breast || feedType == .pump
+                            var ok = false
                             if let record = editingRecord {
-                                vm.updateFeeding(
+                                ok = vm.updateFeeding(
                                     record,
                                     type: feedType,
                                     side: hasDuration ? side : nil,
@@ -248,18 +248,22 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast("Feeding updated", icon: "pencil.circle.fill", color: .blFeeding)
+                                appState.showToast(ok ? "Feeding updated" : "Save failed — try again",
+                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blFeeding : .red)
                             } else if isTimerMode && supportsTimer {
                                 // Start a feeding timer (ongoing record)
-                                _ = vm.startFeeding(
+                                ok = vm.startFeeding(
                                     type: feedType,
                                     side: side,
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast("Feeding timer started", icon: "timer", color: .blFeeding)
+                                appState.showToast(ok ? "Feeding timer started" : "Save failed — try again",
+                                                   icon: ok ? "timer" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blFeeding : .red)
                             } else {
-                                vm.logFeeding(
+                                ok = vm.logFeeding(
                                     type: feedType,
                                     side: hasDuration ? side : nil,
                                     durationMinutes: hasDuration ? Int(duration) : 0,
@@ -267,9 +271,11 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast("Feeding logged", icon: "drop.fill", color: .blFeeding)
+                                appState.showToast(ok ? "Feeding logged" : "Save failed — try again",
+                                                   icon: ok ? "drop.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blFeeding : .red)
                             }
-                            dismiss()
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
                         .disabled(!canSave)

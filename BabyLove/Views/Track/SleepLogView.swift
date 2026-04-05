@@ -160,18 +160,24 @@ struct SleepLogView: View {
                         }
 
                         Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
-                            Haptic.success()
+                            var ok = false
                             if let record = editingRecord {
-                                vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
-                                appState.showToast("Sleep updated", icon: "pencil.circle.fill", color: .blSleep)
+                                ok = vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
+                                appState.showToast(ok ? "Sleep updated" : "Save failed — try again",
+                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blSleep : .red)
                             } else if isOngoing {
-                                _ = vm.startSleep(at: startTime, location: location, notes: notes)
-                                appState.showToast("Sleep timer started", icon: "moon.zzz.fill", color: .blSleep)
+                                ok = vm.startSleep(at: startTime, location: location, notes: notes)
+                                appState.showToast(ok ? "Sleep timer started" : "Save failed — try again",
+                                                   icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blSleep : .red)
                             } else {
-                                vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
-                                appState.showToast("Sleep logged", icon: "moon.zzz.fill", color: .blSleep)
+                                ok = vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
+                                appState.showToast(ok ? "Sleep logged" : "Save failed — try again",
+                                                   icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blSleep : .red)
                             }
-                            dismiss()
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blSleep))
                         .padding(.top, 8)

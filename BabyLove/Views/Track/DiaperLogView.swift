@@ -104,15 +104,19 @@ struct DiaperLogView: View {
                     Spacer()
 
                     Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
-                        Haptic.success()
+                        var ok = false
                         if let record = editingRecord {
-                            vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
-                            appState.showToast("Diaper updated", icon: "pencil.circle.fill", color: .blDiaper)
+                            ok = vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
+                            appState.showToast(ok ? "Diaper updated" : "Save failed — try again",
+                                               icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                                               color: ok ? .blDiaper : .red)
                         } else {
-                            vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
-                            appState.showToast("Diaper logged", icon: "oval.fill", color: .blDiaper)
+                            ok = vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
+                            appState.showToast(ok ? "Diaper logged" : "Save failed — try again",
+                                               icon: ok ? "oval.fill" : "exclamationmark.triangle.fill",
+                                               color: ok ? .blDiaper : .red)
                         }
-                        dismiss()
+                        if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                     }
                     .buttonStyle(BLPrimaryButton(color: .blDiaper))
                     .padding(.horizontal, 24)
