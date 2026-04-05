@@ -136,6 +136,7 @@ struct StatBadge: View {
     let value: String
     let label: String
     let color: Color
+    var subtitle: String? = nil
 
     var body: some View {
         VStack(spacing: 4) {
@@ -145,6 +146,11 @@ struct StatBadge: View {
             Text(label)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(.blTextSecondary)
+            if let subtitle, !subtitle.isEmpty {
+                Text(subtitle)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(color.opacity(0.7))
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)

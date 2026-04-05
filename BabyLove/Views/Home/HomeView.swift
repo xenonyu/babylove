@@ -52,6 +52,41 @@ struct HomeView: View {
         todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", startOfDay)
     }
 
+    /// Total feeding volume in ml for today (sum of all amountML values)
+    private var totalFeedingVolumeML: Double {
+        todayFeedings.reduce(0.0) { sum, r in sum + r.amountML }
+    }
+
+    /// Formatted feeding volume subtitle (e.g. "480 ml" or "16.0 oz"), empty if no volume recorded
+    private var feedingVolumeSubtitle: String {
+        guard totalFeedingVolumeML > 0 else { return "" }
+        let unit = appState.measurementUnit
+        let display = unit.volumeFromML(totalFeedingVolumeML)
+        if unit == .metric {
+            return "\(Int(display)) \(unit.volumeLabel)"
+        } else {
+            return String(format: "%.1f \(unit.volumeLabel)", display)
+        }
+    }
+
+    /// Diaper breakdown subtitle (e.g. "3💧 2💩")
+    private var diaperBreakdownSubtitle: String {
+        guard !todayDiapers.isEmpty else { return "" }
+        var wet = 0, dirty = 0
+        for r in todayDiapers {
+            switch DiaperType(rawValue: r.diaperType ?? "") {
+            case .wet:   wet += 1
+            case .dirty: dirty += 1
+            case .both:  wet += 1; dirty += 1
+            case .dry, .none: break
+            }
+        }
+        var parts: [String] = []
+        if wet > 0   { parts.append("\(wet)💧") }
+        if dirty > 0 { parts.append("\(dirty)💩") }
+        return parts.joined(separator: " ")
+    }
+
     private var totalSleepMinutes: Int {
         todaySleeps.reduce(0) { sum, r in
             guard let s = r.startTime else { return sum }
@@ -93,13 +128,15 @@ struct HomeView: View {
                             HStack(spacing: 12) {
                                 StatBadge(value: "\(todayFeedings.count)",
                                           label: "Feedings",
-                                          color: .blFeeding)
+                                          color: .blFeeding,
+                                          subtitle: feedingVolumeSubtitle)
                                 StatBadge(value: sleepText.isEmpty ? "0m" : sleepText,
                                           label: "Sleep",
                                           color: .blSleep)
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: "Diapers",
-                                          color: .blDiaper)
+                                          color: .blDiaper,
+                                          subtitle: diaperBreakdownSubtitle)
                             }
                             .padding(.horizontal, 20)
                         }
