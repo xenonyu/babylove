@@ -5,6 +5,7 @@ struct MemoryView: View {
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var showAddMilestone = false
+    @State private var milestoneToEdit: CDMilestone?
     @State private var milestoneToDelete: CDMilestone?
 
     @FetchRequest(
@@ -26,6 +27,11 @@ struct MemoryView: View {
                                 MilestoneCard(milestone: m)
                                     .padding(.horizontal, 20)
                                     .contextMenu {
+                                        Button {
+                                            milestoneToEdit = m
+                                        } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
                                         Button(role: .destructive) {
                                             milestoneToDelete = m
                                         } label: {
@@ -55,6 +61,9 @@ struct MemoryView: View {
         }
         .sheet(isPresented: $showAddMilestone) {
             AddMilestoneView(vm: vm)
+        }
+        .sheet(item: $milestoneToEdit) { record in
+            AddMilestoneView(vm: vm, editingRecord: record)
         }
         .alert("Delete Milestone?", isPresented: Binding(
             get: { milestoneToDelete != nil },
@@ -147,10 +156,15 @@ struct AddMilestoneView: View {
     @ObservedObject var vm: TrackViewModel
     @Environment(\.dismiss) var dismiss
 
+    /// When non-nil, we are editing an existing record
+    var editingRecord: CDMilestone?
+
     @State private var title    = ""
     @State private var category: MilestoneCategory = .social
     @State private var date     = Date()
     @State private var notes    = ""
+
+    private var isEditing: Bool { editingRecord != nil }
 
     var body: some View {
         NavigationStack {
@@ -222,8 +236,12 @@ struct AddMilestoneView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button("Save Milestone ⭐️") {
-                            vm.addMilestone(title: title, category: category, date: date, notes: notes)
+                        Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
+                            if let record = editingRecord {
+                                vm.updateMilestone(record, title: title, category: category, date: date, notes: notes)
+                            } else {
+                                vm.addMilestone(title: title, category: category, date: date, notes: notes)
+                            }
                             dismiss()
                         }
                         .buttonStyle(BLPrimaryButton())
@@ -233,13 +251,22 @@ struct AddMilestoneView: View {
                     .padding(24)
                 }
             }
-            .navigationTitle("Add Milestone")
+            .navigationTitle(isEditing ? "Edit Milestone" : "Add Milestone")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
+            .onAppear { populateFromRecord() }
         }
+    }
+
+    private func populateFromRecord() {
+        guard let r = editingRecord else { return }
+        title = r.title ?? ""
+        category = MilestoneCategory(rawValue: r.category ?? "") ?? .custom
+        date = r.date ?? Date()
+        notes = r.notes ?? ""
     }
 }

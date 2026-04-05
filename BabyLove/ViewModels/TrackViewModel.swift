@@ -107,6 +107,18 @@ class TrackViewModel: ObservableObject {
         save()
     }
 
+    func updateMilestone(_ record: CDMilestone,
+                         title: String,
+                         category: MilestoneCategory,
+                         date: Date,
+                         notes: String = "") {
+        record.title = title
+        record.category = category.rawValue
+        record.date = date
+        record.notes = notes.isEmpty ? nil : notes
+        save()
+    }
+
     // MARK: - Today Stats
 
     func todayFeedings(context: NSManagedObjectContext) -> Int {
