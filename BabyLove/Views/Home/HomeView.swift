@@ -388,6 +388,7 @@ struct HomeView: View {
             vm.endSleepByID(id, context: ctx)
         }
         stopSleepTimer()
+        appState.showToast("Sleep ended", icon: "sun.and.horizon.fill")
     }
 
     @ViewBuilder
@@ -492,6 +493,7 @@ struct HomeView: View {
             vm.endFeedingByID(id, context: ctx)
         }
         stopFeedingTimer()
+        appState.showToast("Feeding ended", icon: "checkmark.circle.fill")
     }
 
     @ViewBuilder

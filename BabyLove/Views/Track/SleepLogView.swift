@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SleepLogView: View {
     @ObservedObject var vm: TrackViewModel
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
     /// When non-nil, we are editing an existing record
@@ -155,10 +156,13 @@ struct SleepLogView: View {
                         Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
                             if let record = editingRecord {
                                 vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
+                                appState.showToast("Sleep updated", icon: "pencil.circle.fill")
                             } else if isOngoing {
                                 _ = vm.startSleep(at: startTime, location: location, notes: notes)
+                                appState.showToast("Sleep timer started", icon: "moon.zzz.fill")
                             } else {
                                 vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
+                                appState.showToast("Sleep logged", icon: "moon.zzz.fill")
                             }
                             dismiss()
                         }

@@ -166,6 +166,47 @@ struct StatBadge: View {
     }
 }
 
+// MARK: - Toast Notification
+struct BLToastOverlay: ViewModifier {
+    @EnvironmentObject var appState: AppState
+
+    func body(content: Content) -> some View {
+        content.overlay(alignment: .top) {
+            if let message = appState.toastMessage {
+                HStack(spacing: 10) {
+                    if let icon = appState.toastIcon {
+                        Image(systemName: icon)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.blDiaper)
+                    }
+                    Text(message)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 14)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
+                )
+                .overlay(
+                    Capsule()
+                        .strokeBorder(Color.blDiaper.opacity(0.2), lineWidth: 0.5)
+                )
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+    }
+}
+
+extension View {
+    func blToastOverlay() -> some View {
+        modifier(BLToastOverlay())
+    }
+}
+
 // MARK: - Baby Avatar (reusable photo / fallback emoji)
 struct BabyAvatarView: View {
     let baby: Baby

@@ -105,8 +105,10 @@ struct GrowthLogView: View {
                             let hd  = Double(headCM).map { unit.lengthToCM($0) }
                             if let record = editingRecord {
                                 vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
+                                appState.showToast("Growth updated", icon: "pencil.circle.fill")
                             } else {
                                 vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
+                                appState.showToast("Growth logged", icon: "chart.bar.fill")
                             }
                             dismiss()
                         }

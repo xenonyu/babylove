@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DiaperLogView: View {
     @ObservedObject var vm: TrackViewModel
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
     /// When non-nil, we are editing an existing record
@@ -101,8 +102,10 @@ struct DiaperLogView: View {
                     Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
                         if let record = editingRecord {
                             vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
+                            appState.showToast("Diaper updated", icon: "pencil.circle.fill")
                         } else {
                             vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
+                            appState.showToast("Diaper logged", icon: "oval.fill")
                         }
                         dismiss()
                     }

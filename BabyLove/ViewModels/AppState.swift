@@ -6,6 +6,10 @@ class AppState: ObservableObject {
     @Published var currentBaby: Baby?
     @Published var measurementUnit: MeasurementUnit = .metric
 
+    /// Toast notification state — set via showToast() to display a brief success message
+    @Published var toastMessage: String?
+    @Published var toastIcon: String?
+
     private let babyKey = "currentBaby"
     private let onboardingKey = "hasCompletedOnboarding"
     private let unitKey = "measurementUnit"
@@ -38,6 +42,23 @@ class AppState: ObservableObject {
     func setMeasurementUnit(_ unit: MeasurementUnit) {
         measurementUnit = unit
         UserDefaults.standard.set(unit.rawValue, forKey: unitKey)
+    }
+
+    /// Show a brief toast notification with an optional SF Symbol icon.
+    /// The toast auto-dismisses after 2 seconds.
+    @MainActor
+    func showToast(_ message: String, icon: String = "checkmark.circle.fill") {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+            toastMessage = message
+            toastIcon = icon
+        }
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            withAnimation(.easeOut(duration: 0.25)) {
+                self?.toastMessage = nil
+                self?.toastIcon = nil
+            }
+        }
     }
 }
 

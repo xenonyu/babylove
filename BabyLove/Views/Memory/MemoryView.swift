@@ -316,6 +316,7 @@ struct MilestoneCard: View {
 // MARK: - Add Milestone
 struct AddMilestoneView: View {
     @ObservedObject var vm: TrackViewModel
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
     /// When non-nil, we are editing an existing record
@@ -417,8 +418,10 @@ struct AddMilestoneView: View {
                         Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
                             if let record = editingRecord {
                                 vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                appState.showToast("Milestone updated", icon: "pencil.circle.fill")
                             } else {
                                 vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                appState.showToast("Milestone saved", icon: "star.fill")
                             }
                             dismiss()
                         }
