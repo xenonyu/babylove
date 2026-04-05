@@ -427,8 +427,15 @@ struct SimpleLineChart: View {
 
         // Determine chart bounds
         let rawValues = data.map(\.value)
-        let ageMin = data.map(\.age).min()!
-        let ageMax = data.map(\.age).max()!
+        guard let ageMin = data.map(\.age).min(),
+              let ageMax = data.map(\.age).max() else {
+            return AnyView(
+                Text("Not enough data")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blTextTertiary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            )
+        }
 
         // If WHO available, expand Y range to include percentile bounds
         var allValues = rawValues
@@ -441,8 +448,15 @@ struct SimpleLineChart: View {
             }
         }
 
-        let rawMin = allValues.min()!
-        let rawMax = allValues.max()!
+        guard let rawMin = allValues.min(),
+              let rawMax = allValues.max() else {
+            return AnyView(
+                Text("Not enough data")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blTextTertiary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            )
+        }
         // Ensure a minimum range to prevent division by zero when all values are identical
         let naturalPadding = (rawMax - rawMin) * 0.08
         let safePadding = max(naturalPadding, rawMax * 0.05, 0.5)
@@ -610,7 +624,7 @@ struct SimpleLineChart: View {
                         let labels = ageLabels(xMin: xMin, xMax: xMax)
                         ForEach(Array(labels.enumerated()), id: \.offset) { _, age in
                             let x = w * CGFloat((age - xMin) / xRange)
-                            Text(baby != nil ? "\(Int(age))m" : shortDate(data[min(Int(age), data.count - 1)].date))
+                            Text(baby != nil ? "\(Int(age))m" : shortDate(data[min(max(0, Int(age)), data.count - 1)].date))
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(.blTextTertiary)
                                 .position(x: x, y: 8)

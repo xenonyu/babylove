@@ -20,10 +20,10 @@ struct WHOGrowthTable {
 
     /// Interpolate a percentile value at a fractional month age.
     func value(atMonth age: Double, percentile: WHOPercentile) -> Double? {
-        guard !rows.isEmpty else { return nil }
-        let clamped = max(0, min(Double(rows.last!.month), age))
+        guard let lastRow = rows.last else { return nil }
+        let clamped = max(0, min(Double(lastRow.month), age))
         let lower = Int(clamped)
-        let upper = min(lower + 1, rows.last!.month)
+        let upper = min(lower + 1, lastRow.month)
         let frac = clamped - Double(lower)
 
         guard let lo = rows.first(where: { $0.month == lower }),
@@ -56,15 +56,18 @@ struct WHOGrowthTable {
         guard points.count >= 2 else { return nil }
 
         // If below P3 or above P97, clamp
-        if value <= points.first!.val { return max(1, points.first!.pctl) }
-        if value >= points.last!.val  { return min(99, points.last!.pctl) }
+        guard let firstPt = points.first, let lastPt = points.last else { return nil }
+        if value <= firstPt.val { return max(1, firstPt.pctl) }
+        if value >= lastPt.val  { return min(99, lastPt.pctl) }
 
         // Linear interpolation between the two bracketing percentile anchors
         for i in 0..<(points.count - 1) {
             let lo = points[i]
             let hi = points[i + 1]
             if value >= lo.val && value <= hi.val {
-                let frac = (value - lo.val) / (hi.val - lo.val)
+                let range = hi.val - lo.val
+                guard range > 0 else { return (lo.pctl + hi.pctl) / 2 }
+                let frac = (value - lo.val) / range
                 return lo.pctl + (hi.pctl - lo.pctl) * frac
             }
         }
