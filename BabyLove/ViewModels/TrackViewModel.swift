@@ -136,6 +136,18 @@ class TrackViewModel: ObservableObject {
         return (try? context.count(for: req)) ?? 0
     }
 
+    // MARK: - Delete
+
+    func deleteObject(_ object: NSManagedObject) {
+        ctx.delete(object)
+        save()
+    }
+
+    func deleteObject(_ object: NSManagedObject, in context: NSManagedObjectContext) {
+        context.delete(object)
+        try? context.save()
+    }
+
     private func save() {
         guard ctx.hasChanges else { return }
         try? ctx.save()

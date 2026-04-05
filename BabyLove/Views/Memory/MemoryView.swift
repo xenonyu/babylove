@@ -5,6 +5,7 @@ struct MemoryView: View {
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var showAddMilestone = false
+    @State private var milestoneToDelete: CDMilestone?
 
     @FetchRequest(
         entity: CDMilestone.entity(),
@@ -24,6 +25,13 @@ struct MemoryView: View {
                             ForEach(milestones) { m in
                                 MilestoneCard(milestone: m)
                                     .padding(.horizontal, 20)
+                                    .contextMenu {
+                                        Button(role: .destructive) {
+                                            milestoneToDelete = m
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                             }
                             Spacer(minLength: 100)
                         }
@@ -47,6 +55,20 @@ struct MemoryView: View {
         }
         .sheet(isPresented: $showAddMilestone) {
             AddMilestoneView(vm: vm)
+        }
+        .alert("Delete Milestone?", isPresented: Binding(
+            get: { milestoneToDelete != nil },
+            set: { if !$0 { milestoneToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { milestoneToDelete = nil }
+            Button("Delete", role: .destructive) {
+                if let m = milestoneToDelete {
+                    withAnimation { vm.deleteObject(m, in: ctx) }
+                }
+                milestoneToDelete = nil
+            }
+        } message: {
+            Text("This memory will be permanently removed.")
         }
     }
 

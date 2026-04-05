@@ -10,6 +10,7 @@ struct TrackView: View {
     @State private var showSleepLog    = false
     @State private var showDiaperLog   = false
     @State private var showGrowthLog   = false
+    @State private var recordToDelete: NSManagedObject?
 
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
@@ -61,6 +62,13 @@ struct TrackView: View {
                             recentSection(title: "Feedings", color: .blFeeding) {
                                 ForEach(recentFeedings.prefix(5)) { r in
                                     feedingRow(r)
+                                        .contextMenu {
+                                            Button(role: .destructive) {
+                                                recordToDelete = r
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
                                 }
                             }
                         }
@@ -70,6 +78,13 @@ struct TrackView: View {
                             recentSection(title: "Sleep", color: .blSleep) {
                                 ForEach(recentSleeps.prefix(5)) { r in
                                     sleepRow(r)
+                                        .contextMenu {
+                                            Button(role: .destructive) {
+                                                recordToDelete = r
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
                                 }
                             }
                         }
@@ -79,6 +94,13 @@ struct TrackView: View {
                             recentSection(title: "Diapers", color: .blDiaper) {
                                 ForEach(recentDiapers.prefix(5)) { r in
                                     diaperRow(r)
+                                        .contextMenu {
+                                            Button(role: .destructive) {
+                                                recordToDelete = r
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
                                 }
                             }
                         }
@@ -95,6 +117,20 @@ struct TrackView: View {
         .sheet(isPresented: $showSleepLog)   { SleepLogView(vm: vm) }
         .sheet(isPresented: $showDiaperLog)  { DiaperLogView(vm: vm) }
         .sheet(isPresented: $showGrowthLog)  { GrowthLogView(vm: vm) }
+        .alert("Delete Record?", isPresented: Binding(
+            get: { recordToDelete != nil },
+            set: { if !$0 { recordToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { recordToDelete = nil }
+            Button("Delete", role: .destructive) {
+                if let obj = recordToDelete {
+                    withAnimation { vm.deleteObject(obj, in: ctx) }
+                }
+                recordToDelete = nil
+            }
+        } message: {
+            Text("This record will be permanently removed.")
+        }
     }
 
     // MARK: - Recent Section

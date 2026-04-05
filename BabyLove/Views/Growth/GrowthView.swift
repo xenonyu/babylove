@@ -7,6 +7,7 @@ struct GrowthView: View {
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var showLog = false
     @State private var selectedMetric: GrowthMetric = .weight
+    @State private var recordToDelete: CDGrowthRecord?
 
     @FetchRequest(
         entity: CDGrowthRecord.entity(),
@@ -43,10 +44,18 @@ struct GrowthView: View {
                             VStack(spacing: 12) {
                                 BLSectionHeader(title: "Records")
                                     .padding(.horizontal, 20)
+                                let displayed = Array(records.suffix(10).reversed())
                                 VStack(spacing: 0) {
-                                    ForEach(records.suffix(10).reversed(), id: \.id) { r in
+                                    ForEach(Array(displayed.enumerated()), id: \.element.id) { index, r in
                                         growthRow(r)
-                                        if r != records.last {
+                                            .contextMenu {
+                                                Button(role: .destructive) {
+                                                    recordToDelete = r
+                                                } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                }
+                                            }
+                                        if index < displayed.count - 1 {
                                             Divider().padding(.leading, 56)
                                         }
                                     }
@@ -79,6 +88,20 @@ struct GrowthView: View {
         }
         .sheet(isPresented: $showLog) {
             GrowthLogView(vm: vm)
+        }
+        .alert("Delete Record?", isPresented: Binding(
+            get: { recordToDelete != nil },
+            set: { if !$0 { recordToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { recordToDelete = nil }
+            Button("Delete", role: .destructive) {
+                if let obj = recordToDelete {
+                    withAnimation { vm.deleteObject(obj, in: ctx) }
+                }
+                recordToDelete = nil
+            }
+        } message: {
+            Text("This record will be permanently removed.")
         }
     }
 
