@@ -276,7 +276,7 @@ struct MilestoneCard: View {
                     Text(milestone.title ?? "")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(isCompleted ? .blTextPrimary : .blTextSecondary)
-                        .strikethrough(!isCompleted, color: .blTextSecondary.opacity(0.4))
+                        .strikethrough(isCompleted, color: .blTextSecondary.opacity(0.4))
                     Spacer()
                     Text(isCompleted ? "Achieved" : "Upcoming")
                         .font(.system(size: 11, weight: .medium))
@@ -327,8 +327,14 @@ struct AddMilestoneView: View {
     @State private var date        = Date()
     @State private var notes       = ""
     @State private var isCompleted = true
+    @State private var showSuggestions = false
 
     private var isEditing: Bool { editingRecord != nil }
+
+    /// Suggestions for the currently selected category
+    private var currentSuggestions: [PresetMilestone] {
+        PresetMilestone.forCategory(category)
+    }
 
     var body: some View {
         NavigationStack {
@@ -336,16 +342,39 @@ struct AddMilestoneView: View {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Title
+                        // Title with suggestions
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Milestone", systemImage: "star.fill")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.blTextSecondary)
+                            HStack {
+                                Label("Milestone", systemImage: "star.fill")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.blTextSecondary)
+                                Spacer()
+                                if !isEditing {
+                                    Button {
+                                        withAnimation(.spring(response: 0.3)) {
+                                            showSuggestions.toggle()
+                                        }
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: showSuggestions ? "lightbulb.fill" : "lightbulb")
+                                                .font(.system(size: 12, weight: .medium))
+                                            Text("Suggestions")
+                                                .font(.system(size: 13, weight: .medium))
+                                        }
+                                        .foregroundColor(showSuggestions ? .blPrimary : .blTextTertiary)
+                                    }
+                                }
+                            }
                             TextField("e.g. First smile, First steps…", text: $title)
                                 .font(.system(size: 17))
                                 .padding(14)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                            // Preset suggestions chips
+                            if showSuggestions && !isEditing {
+                                suggestionsGrid
+                            }
                         }
 
                         // Category
@@ -450,6 +479,46 @@ struct AddMilestoneView: View {
         date = r.date ?? Date()
         notes = r.notes ?? ""
         isCompleted = r.isCompleted
+    }
+
+    // MARK: - Suggestions Grid
+
+    private var suggestionsGrid: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if currentSuggestions.isEmpty {
+                Text("No suggestions for this category")
+                    .font(.system(size: 13))
+                    .foregroundColor(.blTextTertiary)
+                    .padding(.vertical, 4)
+            } else {
+                FlowLayout(spacing: 8) {
+                    ForEach(currentSuggestions) { preset in
+                        Button {
+                            withAnimation(.spring(response: 0.3)) {
+                                title = preset.title
+                                showSuggestions = false
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(preset.title)
+                                    .font(.system(size: 13, weight: .medium))
+                                Text(preset.ageRangeMonths + "mo")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundColor(Color(hex: category.color).opacity(0.6))
+                            }
+                            .foregroundColor(title == preset.title ? .white : Color(hex: category.color))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(title == preset.title ? Color(hex: category.color) : Color(hex: category.color).opacity(0.1))
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(.top, 4)
+        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     private func statusButton(label: String, icon: String, selected: Bool, action: @escaping () -> Void) -> some View {

@@ -110,6 +110,50 @@ enum MilestoneCategory: String, CaseIterable, Codable {
     }
 }
 
+// MARK: - Preset Milestones
+struct PresetMilestone: Identifiable {
+    let id = UUID()
+    let title: String
+    let category: MilestoneCategory
+    let ageRangeMonths: String  // e.g. "0-2" for display
+
+    static let all: [PresetMilestone] = [
+        // Social
+        PresetMilestone(title: "First social smile", category: .social, ageRangeMonths: "1-2"),
+        PresetMilestone(title: "Laughed out loud", category: .social, ageRangeMonths: "3-4"),
+        PresetMilestone(title: "Stranger anxiety", category: .social, ageRangeMonths: "6-9"),
+        PresetMilestone(title: "Waved bye-bye", category: .social, ageRangeMonths: "9-12"),
+        PresetMilestone(title: "Played peek-a-boo", category: .social, ageRangeMonths: "6-9"),
+        // Motor
+        PresetMilestone(title: "Held head up", category: .motor, ageRangeMonths: "1-3"),
+        PresetMilestone(title: "Rolled over", category: .motor, ageRangeMonths: "3-5"),
+        PresetMilestone(title: "Sat without support", category: .motor, ageRangeMonths: "5-7"),
+        PresetMilestone(title: "Crawled", category: .motor, ageRangeMonths: "6-10"),
+        PresetMilestone(title: "Pulled to stand", category: .motor, ageRangeMonths: "8-12"),
+        PresetMilestone(title: "First steps", category: .motor, ageRangeMonths: "9-15"),
+        PresetMilestone(title: "Grasped a toy", category: .motor, ageRangeMonths: "3-5"),
+        // Language
+        PresetMilestone(title: "First coo", category: .language, ageRangeMonths: "1-3"),
+        PresetMilestone(title: "Babbled (ba-ba, da-da)", category: .language, ageRangeMonths: "4-6"),
+        PresetMilestone(title: "Said first word", category: .language, ageRangeMonths: "10-14"),
+        PresetMilestone(title: "Responded to own name", category: .language, ageRangeMonths: "5-7"),
+        // Cognitive
+        PresetMilestone(title: "Followed moving object", category: .cognitive, ageRangeMonths: "1-3"),
+        PresetMilestone(title: "Found hidden toy", category: .cognitive, ageRangeMonths: "6-9"),
+        PresetMilestone(title: "Pointed at objects", category: .cognitive, ageRangeMonths: "9-12"),
+        PresetMilestone(title: "Stacked blocks", category: .cognitive, ageRangeMonths: "12-18"),
+        // Health
+        PresetMilestone(title: "First tooth", category: .health, ageRangeMonths: "4-10"),
+        PresetMilestone(title: "Slept through the night", category: .health, ageRangeMonths: "3-6"),
+        PresetMilestone(title: "Started solid foods", category: .health, ageRangeMonths: "4-6"),
+        PresetMilestone(title: "First haircut", category: .health, ageRangeMonths: "6-12"),
+    ]
+
+    static func forCategory(_ category: MilestoneCategory) -> [PresetMilestone] {
+        all.filter { $0.category == category }
+    }
+}
+
 // MARK: - Sleep Location
 enum SleepLocation: String, CaseIterable, Codable {
     case crib    = "crib"
