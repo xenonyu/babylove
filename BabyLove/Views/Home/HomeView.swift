@@ -994,77 +994,128 @@ struct HomeView: View {
         return date.formatted(date: .omitted, time: .shortened)
     }
 
+    // MARK: - Activity Timeline
+
+    /// A unified activity item for the chronological timeline.
+    private struct ActivityItem: Identifiable {
+        let id: String  // unique key
+        let date: Date
+        let icon: String
+        let color: Color
+        let title: String
+        let detail: String
+        let timeLabel: String
+    }
+
+    /// Build a merged, reverse-chronological list of all activities for the selected day.
+    private var timelineItems: [ActivityItem] {
+        var items: [ActivityItem] = []
+
+        for r in todayFeedings {
+            guard let ts = r.timestamp else { continue }
+            let ft = FeedType(rawValue: r.feedType ?? "")
+            items.append(ActivityItem(
+                id: "f-\(r.id?.uuidString ?? UUID().uuidString)",
+                date: ts,
+                icon: ft?.icon ?? "drop.fill",
+                color: .blFeeding,
+                title: ft?.displayName ?? "Feeding",
+                detail: feedingDetail(r),
+                timeLabel: ts.formatted(date: .omitted, time: .shortened)
+            ))
+        }
+
+        for r in todaySleeps {
+            guard let st = r.startTime else { continue }
+            let detail: String = {
+                if r.endTime == nil { return "Ongoing" }
+                if let e = r.endTime {
+                    let mins = Int(e.timeIntervalSince(st) / 60)
+                    let h = mins / 60, m = mins % 60
+                    return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+                }
+                return ""
+            }()
+            items.append(ActivityItem(
+                id: "s-\(r.id?.uuidString ?? UUID().uuidString)",
+                date: st,
+                icon: "moon.zzz.fill",
+                color: .blSleep,
+                title: "Sleep",
+                detail: detail,
+                timeLabel: st.formatted(date: .omitted, time: .shortened)
+            ))
+        }
+
+        for r in todayDiapers {
+            guard let ts = r.timestamp else { continue }
+            let dt = DiaperType(rawValue: r.diaperType ?? "")
+            items.append(ActivityItem(
+                id: "d-\(r.id?.uuidString ?? UUID().uuidString)",
+                date: ts,
+                icon: "oval.fill",
+                color: .blDiaper,
+                title: dt?.displayName ?? "Diaper",
+                detail: dt?.icon ?? "",
+                timeLabel: ts.formatted(date: .omitted, time: .shortened)
+            ))
+        }
+
+        // Newest first
+        return items.sorted { $0.date > $1.date }
+    }
+
     private var recentActivitySection: some View {
-        VStack(spacing: 12) {
-            BLSectionHeader(title: "Recent Activity")
-                .padding(.horizontal, 20)
+        let items = timelineItems
+        let displayItems = Array(items.prefix(20))
+
+        return VStack(spacing: 12) {
+            HStack {
+                BLSectionHeader(title: isSelectedDateToday ? "Today's Timeline" : "Day Timeline")
+                Spacer()
+                if items.count > 0 {
+                    Text("\(items.count) events")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.blTextTertiary)
+                }
+            }
+            .padding(.horizontal, 20)
 
             VStack(spacing: 1) {
-                if let last = todayFeedings.first {
-                    let feedType = FeedType(rawValue: last.feedType ?? "")
+                ForEach(Array(displayItems.enumerated()), id: \.element.id) { index, item in
+                    let timeAgo: String = {
+                        if isSelectedDateToday {
+                            // For sleep that's ongoing, show "Now"
+                            if item.detail == "Ongoing" { return "Now" }
+                            return Self.timeAgoText(from: item.date)
+                        }
+                        return item.timeLabel
+                    }()
+
                     TimeSinceRow(
-                        icon: feedType?.icon ?? "drop.fill",
-                        color: .blFeeding,
-                        title: feedType?.displayName ?? "Feeding",
-                        detail: feedingDetail(last),
-                        timeAgo: activityTimeAgo(from: last.timestamp),
-                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? "",
+                        icon: item.icon,
+                        color: item.color,
+                        title: item.title,
+                        detail: item.detail,
+                        timeAgo: timeAgo,
+                        timeLabel: item.timeLabel,
                         showTimeAgoHighlight: isSelectedDateToday
                     )
-                    if !todaySleeps.isEmpty || !todayDiapers.isEmpty {
+
+                    if index < displayItems.count - 1 {
                         Divider().padding(.leading, 70)
                     }
-                }
-                if let last = todaySleeps.first {
-                    let sleepDetail: String = {
-                        if last.endTime == nil {
-                            return "Ongoing"
-                        } else if let s = last.startTime, let e = last.endTime {
-                            let mins = Int(e.timeIntervalSince(s) / 60)
-                            let h = mins / 60, m = mins % 60
-                            return h > 0 ? "\(h)h \(m)m" : "\(m)m"
-                        }
-                        return ""
-                    }()
-                    let sleepAgo: String = {
-                        if last.endTime == nil && isSelectedDateToday {
-                            return "Now"
-                        } else if last.endTime == nil {
-                            // Past ongoing sleep (shouldn't normally happen)
-                            return "Ongoing"
-                        } else if let endTime = last.endTime {
-                            return activityTimeAgo(from: endTime)
-                        }
-                        return ""
-                    }()
-                    TimeSinceRow(
-                        icon: "moon.zzz.fill",
-                        color: .blSleep,
-                        title: "Sleep",
-                        detail: sleepDetail,
-                        timeAgo: sleepAgo,
-                        timeLabel: last.startTime?.formatted(date: .omitted, time: .shortened) ?? "",
-                        showTimeAgoHighlight: isSelectedDateToday
-                    )
-                    if !todayDiapers.isEmpty {
-                        Divider().padding(.leading, 70)
-                    }
-                }
-                if let last = todayDiapers.first {
-                    let dType = DiaperType(rawValue: last.diaperType ?? "")
-                    TimeSinceRow(
-                        icon: "oval.fill",
-                        color: .blDiaper,
-                        title: dType?.displayName ?? "Diaper",
-                        detail: dType?.icon ?? "",
-                        timeAgo: activityTimeAgo(from: last.timestamp),
-                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? "",
-                        showTimeAgoHighlight: isSelectedDateToday
-                    )
                 }
             }
             .blCard()
             .padding(.horizontal, 20)
+
+            if items.count > 20 {
+                Text("Showing latest 20 of \(items.count) events")
+                    .font(.system(size: 12))
+                    .foregroundColor(.blTextTertiary)
+                    .padding(.horizontal, 20)
+            }
         }
     }
 }
