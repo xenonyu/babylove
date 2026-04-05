@@ -65,8 +65,10 @@ struct AllFeedingsView: View {
         )) {
             Button("Cancel", role: .cancel) { recordToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
+                    appState.showToast("Feeding deleted", icon: "trash.fill", color: .blFeeding)
                 }
                 recordToDelete = nil
             }
@@ -131,6 +133,7 @@ struct AllFeedingsView: View {
 
 // MARK: - All Sleeps
 struct AllSleepsView: View {
+    @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDSleepRecord?
@@ -192,8 +195,10 @@ struct AllSleepsView: View {
         )) {
             Button("Cancel", role: .cancel) { recordToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
+                    appState.showToast("Sleep record deleted", icon: "trash.fill", color: .blSleep)
                 }
                 recordToDelete = nil
             }
@@ -263,6 +268,7 @@ struct AllSleepsView: View {
 
 // MARK: - All Diapers
 struct AllDiapersView: View {
+    @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDDiaperRecord?
@@ -324,8 +330,10 @@ struct AllDiapersView: View {
         )) {
             Button("Cancel", role: .cancel) { recordToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
+                    appState.showToast("Diaper record deleted", icon: "trash.fill", color: .blDiaper)
                 }
                 recordToDelete = nil
             }
