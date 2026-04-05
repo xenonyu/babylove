@@ -866,27 +866,17 @@ struct HomeView: View {
     private var dateHeaderText: String {
         let cal = Calendar.current
         if cal.isDateInToday(selectedDate) || cal.isDateInYesterday(selectedDate) {
-            let rf = DateFormatter()
-            rf.doesRelativeDateFormatting = true
-            rf.dateStyle = .full
-            rf.timeStyle = .none
-            return rf.string(from: selectedDate)
+            return BLDateFormatters.relativeFull.string(from: selectedDate)
         }
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate("EEEEMMMd")
-        return formatter.string(from: selectedDate)
+        return BLDateFormatters.fullWeekdayMonthDay.string(from: selectedDate)
     }
 
     private func dayOfWeekText(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate("EEE")
-        return formatter.string(from: date).uppercased()
+        BLDateFormatters.shortWeekday.string(from: date).uppercased()
     }
 
     private func dayNumberText(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate("d")
-        return formatter.string(from: date)
+        BLDateFormatters.dayNumber.string(from: date)
     }
 
     // MARK: - Weekly Summary
@@ -1192,11 +1182,7 @@ struct HomeView: View {
         }
         let days = hours / 24
         if days == 1 {
-            let rf = DateFormatter()
-            rf.doesRelativeDateFormatting = true
-            rf.dateStyle = .short
-            rf.timeStyle = .none
-            return rf.string(from: Date(timeIntervalSinceNow: -86400))
+            return BLDateFormatters.relativeShort.string(from: Date(timeIntervalSinceNow: -86400))
         }
         return "\(days)d ago"
     }

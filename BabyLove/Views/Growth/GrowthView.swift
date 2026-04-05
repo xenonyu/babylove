@@ -730,8 +730,6 @@ struct SimpleLineChart: View {
     }
 
     private func shortDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.setLocalizedDateFormatFromTemplate("Md")
-        return f.string(from: date)
+        BLDateFormatters.monthDayCompact.string(from: date)
     }
 }

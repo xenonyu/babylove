@@ -383,11 +383,7 @@ private func groupedByDate<T: NSManagedObject>(_ results: FetchedResults<T>, key
         let date = record[keyPath: keyPath] ?? Date()
         let key: String
         if cal.isDateInToday(date) || cal.isDateInYesterday(date) {
-            let rf = DateFormatter()
-            rf.doesRelativeDateFormatting = true
-            rf.dateStyle = .medium
-            rf.timeStyle = .none
-            key = rf.string(from: date)
+            key = BLDateFormatters.relativeMedium.string(from: date)
         } else {
             key = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none)
         }

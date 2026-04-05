@@ -251,15 +251,9 @@ struct TrackView: View {
         let cal = Calendar.current
         if cal.isDateInToday(date) { return nil }
         if cal.isDateInYesterday(date) {
-            let rf = DateFormatter()
-            rf.doesRelativeDateFormatting = true
-            rf.dateStyle = .short
-            rf.timeStyle = .none
-            return rf.string(from: date)
+            return BLDateFormatters.relativeShort.string(from: date)
         }
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate("MMMd")
-        return formatter.string(from: date)
+        return BLDateFormatters.monthDay.string(from: date)
     }
 
     /// Formats time with optional relative date: "Yesterday · 8:00 PM" or just "8:00 PM"

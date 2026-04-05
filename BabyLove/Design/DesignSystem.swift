@@ -305,6 +305,80 @@ struct BabyAvatarView: View {
     }
 }
 
+// MARK: - Cached DateFormatters
+/// DateFormatter is extremely expensive to allocate (~30× costlier than String formatting).
+/// These cached instances are shared across the app for hot-path date formatting.
+enum BLDateFormatters {
+    /// "Today", "Yesterday" with relative formatting (short date, no time)
+    static let relativeShort: DateFormatter = {
+        let f = DateFormatter()
+        f.doesRelativeDateFormatting = true
+        f.dateStyle = .short
+        f.timeStyle = .none
+        return f
+    }()
+
+    /// "Today", "Yesterday" with relative formatting (medium date, no time)
+    static let relativeMedium: DateFormatter = {
+        let f = DateFormatter()
+        f.doesRelativeDateFormatting = true
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
+
+    /// "Today", "Yesterday" with relative formatting (full date, no time)
+    static let relativeFull: DateFormatter = {
+        let f = DateFormatter()
+        f.doesRelativeDateFormatting = true
+        f.dateStyle = .full
+        f.timeStyle = .none
+        return f
+    }()
+
+    /// "Apr 3", "Jan 12" — short month + day
+    static let monthDay: DateFormatter = {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("MMMd")
+        return f
+    }()
+
+    /// "Monday, Apr 3" — full weekday + month + day
+    static let fullWeekdayMonthDay: DateFormatter = {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("EEEEMMMd")
+        return f
+    }()
+
+    /// "Mon", "Tue" — abbreviated weekday, uppercased by caller
+    static let shortWeekday: DateFormatter = {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("EEE")
+        return f
+    }()
+
+    /// "6", "14" — day number only
+    static let dayNumber: DateFormatter = {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("d")
+        return f
+    }()
+
+    /// "4/3", "1/12" — short month/day for chart axis labels
+    static let monthDayCompact: DateFormatter = {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("Md")
+        return f
+    }()
+
+    /// "2026-04-06" — ISO-style for filenames
+    static let isoDate: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+}
+
 // MARK: - Flow Layout (for wrapping chips/tags)
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8

@@ -342,9 +342,7 @@ struct SettingsView: View {
     }
 
     private static func fileDate() -> String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: Date())
+        BLDateFormatters.isoDate.string(from: Date())
     }
 
     private func resetAllData() {
