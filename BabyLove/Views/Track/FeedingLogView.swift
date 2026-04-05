@@ -235,8 +235,10 @@ struct FeedingLogView: View {
                         }
 
                         Button(buttonLabel) {
-                            let amountML = unit.volumeToML(amount)
                             let hasDuration = feedType == .breast || feedType == .pump
+                            let hasAmount = feedType == .formula || feedType == .pump || feedType == .solid
+                            // Zero out irrelevant fields to avoid stale data across type switches
+                            let amountML = hasAmount ? unit.volumeToML(amount) : 0
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateFeeding(
@@ -313,6 +315,15 @@ struct FeedingLogView: View {
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.blFeeding)
                 }
+            }
+            .onChange(of: feedType) { _, newType in
+                let usesDuration = newType == .breast || newType == .pump
+                let usesAmount = newType == .formula || newType == .pump || newType == .solid
+                // Reset fields that are irrelevant to the new type
+                if !usesDuration { duration = 10 }
+                if !usesAmount { amount = 0 }
+                // Disable timer mode for types that don't support it
+                if !supportsTimer { isTimerMode = false }
             }
             .onAppear {
                 populateFromRecord()
