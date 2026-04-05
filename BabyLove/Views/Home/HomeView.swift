@@ -1271,11 +1271,20 @@ struct HomeView: View {
         return "\(days)d ago"
     }
 
+    /// Whether a feeding record represents an ongoing timer (breast/pump with durationMinutes == 0).
+    private static func isFeedingOngoing(_ r: CDFeedingRecord) -> Bool {
+        let ft = FeedType(rawValue: r.feedType ?? "")
+        let isTimerType = ft == .breast || ft == .pump
+        return isTimerType && r.durationMinutes == 0
+    }
+
     /// Build a short detail string for the last feeding (e.g. "15m · Left" or "120 ml")
     private func feedingDetail(_ r: CDFeedingRecord) -> String {
         let unit = appState.measurementUnit
         var parts: [String] = []
-        if r.durationMinutes > 0 {
+        if Self.isFeedingOngoing(r) {
+            parts.append("Ongoing")
+        } else if r.durationMinutes > 0 {
             parts.append("\(r.durationMinutes)m")
         }
         if r.amountML > 0 {
@@ -1336,12 +1345,16 @@ struct HomeView: View {
         for r in todayFeedings {
             guard let ts = r.timestamp else { continue }
             let ft = FeedType(rawValue: r.feedType ?? "")
+            let isOngoing = Self.isFeedingOngoing(r)
+            let title = isOngoing
+                ? "\(ft?.displayName ?? "Feeding") (in progress)"
+                : (ft?.displayName ?? "Feeding")
             items.append(ActivityItem(
                 id: "f-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
                 date: ts,
-                icon: ft?.icon ?? "drop.fill",
+                icon: isOngoing ? "drop.fill" : (ft?.icon ?? "drop.fill"),
                 color: .blFeeding,
-                title: ft?.displayName ?? "Feeding",
+                title: title,
                 detail: feedingDetail(r),
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
                 notes: r.notes,
