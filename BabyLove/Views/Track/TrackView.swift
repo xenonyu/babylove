@@ -155,6 +155,29 @@ struct TrackView: View {
         }
     }
 
+    // MARK: - Date Formatting Helpers
+
+    /// Returns a short relative date prefix for non-today dates (e.g. "Yesterday", "Apr 3")
+    private static func relativeDatePrefix(_ date: Date?) -> String? {
+        guard let date else { return nil }
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return nil }
+        if cal.isDateInYesterday(date) { return "Yesterday" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
+    }
+
+    /// Formats time with optional relative date: "Yesterday · 8:00 PM" or just "8:00 PM"
+    private static func timestampText(_ date: Date?) -> String {
+        guard let date else { return "" }
+        let time = date.formatted(date: .omitted, time: .shortened)
+        if let prefix = relativeDatePrefix(date) {
+            return "\(prefix) · \(time)"
+        }
+        return time
+    }
+
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
         let unit = appState.measurementUnit
         return HStack {
@@ -175,7 +198,7 @@ struct TrackView: View {
                     .font(.system(size: 14))
                     .foregroundColor(.blFeeding)
             }
-            Text(r.timestamp?.formatted(date: .omitted, time: .shortened) ?? "")
+            Text(Self.timestampText(r.timestamp))
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
@@ -200,7 +223,7 @@ struct TrackView: View {
                     .font(.system(size: 14))
                     .foregroundColor(.blSleep)
             }
-            Text(r.startTime?.formatted(date: .omitted, time: .shortened) ?? "")
+            Text(Self.timestampText(r.startTime))
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
@@ -214,7 +237,7 @@ struct TrackView: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.blTextPrimary)
             Spacer()
-            Text(r.timestamp?.formatted(date: .omitted, time: .shortened) ?? "")
+            Text(Self.timestampText(r.timestamp))
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
