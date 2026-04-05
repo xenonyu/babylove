@@ -116,7 +116,7 @@ struct SleepLogView: View {
                                 Label("Wake Time", systemImage: "sun.and.horizon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
-                                DatePicker("Wake up time", selection: $endTime, in: startTime..., displayedComponents: [.date, .hourAndMinute])
+                                DatePicker("Wake up time", selection: $endTime, in: startTime...Date(), displayedComponents: [.date, .hourAndMinute])
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
