@@ -11,6 +11,9 @@ class AppState: ObservableObject {
     @Published var toastIcon: String?
     @Published var toastColor: Color?
 
+    /// Tracks the current toast so stale dismiss tasks don't cancel a newer toast
+    private var currentToastID: UUID?
+
     private let babyKey = "currentBaby"
     private let onboardingKey = "hasCompletedOnboarding"
     private let unitKey = "measurementUnit"
@@ -47,8 +50,13 @@ class AppState: ObservableObject {
 
     /// Show a brief toast notification with an optional SF Symbol icon.
     /// The toast auto-dismisses after 2 seconds.
+    ///
+    /// Uses a unique ID per toast so that rapid successive calls don't
+    /// cause an earlier dismiss-task to prematurely clear a newer toast.
     @MainActor
     func showToast(_ message: String, icon: String = "checkmark.circle.fill", color: Color = .blPrimary) {
+        let id = UUID()
+        currentToastID = id
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
             toastMessage = message
             toastIcon = icon
@@ -56,6 +64,8 @@ class AppState: ObservableObject {
         }
         Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 2_000_000_000)
+            // Only dismiss if no newer toast has replaced this one
+            guard self?.currentToastID == id else { return }
             withAnimation(.easeOut(duration: 0.25)) {
                 self?.toastMessage = nil
                 self?.toastIcon = nil
