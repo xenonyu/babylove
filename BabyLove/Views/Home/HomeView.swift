@@ -54,7 +54,9 @@ struct HomeView: View {
 
     private var totalSleepMinutes: Int {
         todaySleeps.reduce(0) { sum, r in
-            guard let s = r.startTime, let e = r.endTime else { return sum }
+            guard let s = r.startTime else { return sum }
+            // Use current time for ongoing sleep (endTime == nil)
+            let e = r.endTime ?? Date()
             return sum + Int(e.timeIntervalSince(s) / 60)
         }
     }
