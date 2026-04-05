@@ -250,9 +250,15 @@ struct TrackView: View {
         guard let date else { return nil }
         let cal = Calendar.current
         if cal.isDateInToday(date) { return nil }
-        if cal.isDateInYesterday(date) { return "Yesterday" }
+        if cal.isDateInYesterday(date) {
+            let rf = DateFormatter()
+            rf.doesRelativeDateFormatting = true
+            rf.dateStyle = .short
+            rf.timeStyle = .none
+            return rf.string(from: date)
+        }
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         return formatter.string(from: date)
     }
 

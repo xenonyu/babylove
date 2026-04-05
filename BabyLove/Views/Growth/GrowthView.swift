@@ -717,7 +717,7 @@ struct SimpleLineChart: View {
 
     private func shortDate(_ date: Date) -> String {
         let f = DateFormatter()
-        f.dateFormat = "M/d"
+        f.setLocalizedDateFormatFromTemplate("Md")
         return f.string(from: date)
     }
 }

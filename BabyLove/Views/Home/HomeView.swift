@@ -750,7 +750,7 @@ struct HomeView: View {
                                 )
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(isToday ? "Today" : "\(dayOfWeekText(date)) \(dayNumberText(date))")
+                            .accessibilityLabel(isToday ? dateHeaderText : "\(dayOfWeekText(date)) \(dayNumberText(date))")
                             .accessibilityAddTraits(isSelected ? .isSelected : [])
                             .id(date)
                         }
@@ -793,22 +793,27 @@ struct HomeView: View {
 
     private var dateHeaderText: String {
         let cal = Calendar.current
-        if cal.isDateInToday(selectedDate) { return "Today" }
-        if cal.isDateInYesterday(selectedDate) { return "Yesterday" }
+        if cal.isDateInToday(selectedDate) || cal.isDateInYesterday(selectedDate) {
+            let rf = DateFormatter()
+            rf.doesRelativeDateFormatting = true
+            rf.dateStyle = .full
+            rf.timeStyle = .none
+            return rf.string(from: selectedDate)
+        }
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("EEEEMMMd")
         return formatter.string(from: selectedDate)
     }
 
     private func dayOfWeekText(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEE"
+        formatter.setLocalizedDateFormatFromTemplate("EEE")
         return formatter.string(from: date).uppercased()
     }
 
     private func dayNumberText(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "d"
+        formatter.setLocalizedDateFormatFromTemplate("d")
         return formatter.string(from: date)
     }
 
@@ -1112,7 +1117,14 @@ struct HomeView: View {
             return remainMinutes > 0 ? "\(hours)h \(remainMinutes)m ago" : "\(hours)h ago"
         }
         let days = hours / 24
-        return days == 1 ? "Yesterday" : "\(days)d ago"
+        if days == 1 {
+            let rf = DateFormatter()
+            rf.doesRelativeDateFormatting = true
+            rf.dateStyle = .short
+            rf.timeStyle = .none
+            return rf.string(from: Date(timeIntervalSinceNow: -86400))
+        }
+        return "\(days)d ago"
     }
 
     /// Build a short detail string for the last feeding (e.g. "15m · Left" or "120 ml")
