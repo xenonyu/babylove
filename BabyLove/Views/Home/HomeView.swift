@@ -1087,20 +1087,29 @@ struct HomeView: View {
         for r in todaySleeps {
             guard let st = r.startTime else { continue }
             let detail: String = {
-                if r.endTime == nil { return "Ongoing" }
-                if let e = r.endTime {
+                var parts: [String] = []
+                // Location
+                if let loc = r.location, !loc.isEmpty,
+                   let sl = SleepLocation(rawValue: loc) {
+                    parts.append(sl.displayName)
+                }
+                // Duration or Ongoing
+                if r.endTime == nil {
+                    parts.append("Ongoing")
+                } else if let e = r.endTime {
                     let mins = Int(e.timeIntervalSince(st) / 60)
                     let h = mins / 60, m = mins % 60
-                    return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+                    parts.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
                 }
-                return ""
+                return parts.joined(separator: " · ")
             }()
+            let isOngoing = r.endTime == nil
             items.append(ActivityItem(
                 id: "s-\(r.id?.uuidString ?? UUID().uuidString)",
                 date: st,
-                icon: "moon.zzz.fill",
+                icon: isOngoing ? "moon.fill" : "moon.zzz.fill",
                 color: .blSleep,
-                title: "Sleep",
+                title: isOngoing ? "Sleep (in progress)" : "Sleep",
                 detail: detail,
                 timeLabel: st.formatted(date: .omitted, time: .shortened),
                 record: .sleep(r)
@@ -1110,13 +1119,17 @@ struct HomeView: View {
         for r in todayDiapers {
             guard let ts = r.timestamp else { continue }
             let dt = DiaperType(rawValue: r.diaperType ?? "")
+            let diaperDetail: String = {
+                guard let dt = dt else { return "" }
+                return "\(dt.icon) \(dt.displayName)"
+            }()
             items.append(ActivityItem(
                 id: "d-\(r.id?.uuidString ?? UUID().uuidString)",
                 date: ts,
                 icon: "oval.fill",
                 color: .blDiaper,
-                title: dt?.displayName ?? "Diaper",
-                detail: dt?.icon ?? "",
+                title: "Diaper",
+                detail: diaperDetail,
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
                 record: .diaper(r)
             ))
@@ -1147,7 +1160,7 @@ struct HomeView: View {
                     let timeAgo: String = {
                         if isSelectedDateToday {
                             // For sleep that's ongoing, show "Now"
-                            if item.detail == "Ongoing" { return "Now" }
+                            if item.detail.contains("Ongoing") { return "Now" }
                             return Self.timeAgoText(from: item.date)
                         }
                         return item.timeLabel
