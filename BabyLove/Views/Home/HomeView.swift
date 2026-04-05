@@ -899,7 +899,9 @@ struct HomeView: View {
             let birthStart = cal.startOfDay(for: birth)
             // How many days from the later of (weekStart, birthStart) to today
             let effectiveStart = max(weekStart, birthStart)
-            let days = cal.dateComponents([.day], from: effectiveStart, to: today).day ?? 7
+            // dateComponents returns day-boundary crossings (exclusive end),
+            // so add 1 for inclusive day count: born today → 1 day of data
+            let days = (cal.dateComponents([.day], from: effectiveStart, to: today).day ?? 6) + 1
             return Double(max(1, min(7, days)))
         }
         return 7.0
@@ -920,7 +922,7 @@ struct HomeView: View {
                 return 7.0 // won't matter since prevWeek data will be empty
             }
             let effectiveStart = max(prevWeekStart, birthStart)
-            let days = cal.dateComponents([.day], from: effectiveStart, to: prevWeekEnd).day ?? 7
+            let days = (cal.dateComponents([.day], from: effectiveStart, to: prevWeekEnd).day ?? 6) + 1
             return Double(max(1, min(7, days)))
         }
         return 7.0
