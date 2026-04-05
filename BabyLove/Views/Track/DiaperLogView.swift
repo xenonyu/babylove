@@ -102,10 +102,10 @@ struct DiaperLogView: View {
                     Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
                         if let record = editingRecord {
                             vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
-                            appState.showToast("Diaper updated", icon: "pencil.circle.fill")
+                            appState.showToast("Diaper updated", icon: "pencil.circle.fill", color: .blDiaper)
                         } else {
                             vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
-                            appState.showToast("Diaper logged", icon: "oval.fill")
+                            appState.showToast("Diaper logged", icon: "oval.fill", color: .blDiaper)
                         }
                         dismiss()
                     }

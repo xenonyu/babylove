@@ -170,6 +170,10 @@ struct StatBadge: View {
 struct BLToastOverlay: ViewModifier {
     @EnvironmentObject var appState: AppState
 
+    private var accentColor: Color {
+        appState.toastColor ?? .blPrimary
+    }
+
     func body(content: Content) -> some View {
         content.overlay(alignment: .top) {
             if let message = appState.toastMessage {
@@ -177,7 +181,7 @@ struct BLToastOverlay: ViewModifier {
                     if let icon = appState.toastIcon {
                         Image(systemName: icon)
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.blDiaper)
+                            .foregroundColor(accentColor)
                     }
                     Text(message)
                         .font(.system(size: 15, weight: .medium))
@@ -192,7 +196,7 @@ struct BLToastOverlay: ViewModifier {
                 )
                 .overlay(
                     Capsule()
-                        .strokeBorder(Color.blDiaper.opacity(0.2), lineWidth: 0.5)
+                        .strokeBorder(accentColor.opacity(0.2), lineWidth: 0.5)
                 )
                 .padding(.top, 8)
                 .transition(.move(edge: .top).combined(with: .opacity))

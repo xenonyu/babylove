@@ -447,10 +447,10 @@ struct AddMilestoneView: View {
                         Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
                             if let record = editingRecord {
                                 vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
-                                appState.showToast("Milestone updated", icon: "pencil.circle.fill")
+                                appState.showToast("Milestone updated", icon: "pencil.circle.fill", color: .blPrimary)
                             } else {
                                 vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
-                                appState.showToast("Milestone saved", icon: "star.fill")
+                                appState.showToast("Milestone saved", icon: "star.fill", color: .blPrimary)
                             }
                             dismiss()
                         }

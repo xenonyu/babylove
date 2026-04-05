@@ -236,7 +236,7 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast("Feeding updated", icon: "pencil.circle.fill")
+                                appState.showToast("Feeding updated", icon: "pencil.circle.fill", color: .blFeeding)
                             } else if isTimerMode && supportsTimer {
                                 // Start a feeding timer (ongoing record)
                                 _ = vm.startFeeding(
@@ -245,7 +245,7 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast("Feeding timer started", icon: "timer")
+                                appState.showToast("Feeding timer started", icon: "timer", color: .blFeeding)
                             } else {
                                 vm.logFeeding(
                                     type: feedType,
@@ -255,7 +255,7 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast("Feeding logged", icon: "drop.fill")
+                                appState.showToast("Feeding logged", icon: "drop.fill", color: .blFeeding)
                             }
                             dismiss()
                         }

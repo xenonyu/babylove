@@ -9,6 +9,7 @@ class AppState: ObservableObject {
     /// Toast notification state — set via showToast() to display a brief success message
     @Published var toastMessage: String?
     @Published var toastIcon: String?
+    @Published var toastColor: Color?
 
     private let babyKey = "currentBaby"
     private let onboardingKey = "hasCompletedOnboarding"
@@ -47,16 +48,18 @@ class AppState: ObservableObject {
     /// Show a brief toast notification with an optional SF Symbol icon.
     /// The toast auto-dismisses after 2 seconds.
     @MainActor
-    func showToast(_ message: String, icon: String = "checkmark.circle.fill") {
+    func showToast(_ message: String, icon: String = "checkmark.circle.fill", color: Color = .blPrimary) {
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
             toastMessage = message
             toastIcon = icon
+            toastColor = color
         }
         Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 2_000_000_000)
             withAnimation(.easeOut(duration: 0.25)) {
                 self?.toastMessage = nil
                 self?.toastIcon = nil
+                self?.toastColor = nil
             }
         }
     }

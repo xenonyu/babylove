@@ -156,13 +156,13 @@ struct SleepLogView: View {
                         Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
                             if let record = editingRecord {
                                 vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
-                                appState.showToast("Sleep updated", icon: "pencil.circle.fill")
+                                appState.showToast("Sleep updated", icon: "pencil.circle.fill", color: .blSleep)
                             } else if isOngoing {
                                 _ = vm.startSleep(at: startTime, location: location, notes: notes)
-                                appState.showToast("Sleep timer started", icon: "moon.zzz.fill")
+                                appState.showToast("Sleep timer started", icon: "moon.zzz.fill", color: .blSleep)
                             } else {
                                 vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
-                                appState.showToast("Sleep logged", icon: "moon.zzz.fill")
+                                appState.showToast("Sleep logged", icon: "moon.zzz.fill", color: .blSleep)
                             }
                             dismiss()
                         }
