@@ -207,6 +207,29 @@ struct GrowthLogView: View {
         recordDate = r.date ?? Date()
     }
 
+    /// Strips non-numeric characters, keeping at most one decimal separator
+    /// and capping fractional digits at 2 (e.g. "5.55" ok, "5.555" → "5.55").
+    private static func sanitizeDecimalInput(_ input: String) -> String {
+        if input.isEmpty { return input }
+        var result = ""
+        var hasDecimal = false
+        var fractionDigits = 0
+        for ch in input {
+            if ch.isNumber {
+                if hasDecimal {
+                    guard fractionDigits < 2 else { continue }
+                    fractionDigits += 1
+                }
+                result.append(ch)
+            } else if (ch == "." || ch == ",") && !hasDecimal {
+                hasDecimal = true
+                result.append(".")   // normalise comma → dot
+            }
+            // silently drop any other character (minus, letters, extra dots…)
+        }
+        return result
+    }
+
     private func measurementField(
         label: String,
         unit: String,
@@ -223,6 +246,12 @@ struct GrowthLogView: View {
                 TextField(placeholder, text: value)
                     .keyboardType(.decimalPad)
                     .font(.system(size: 17))
+                    .onChange(of: value.wrappedValue) { oldValue, newValue in
+                        let sanitized = Self.sanitizeDecimalInput(newValue)
+                        if sanitized != newValue {
+                            value.wrappedValue = sanitized
+                        }
+                    }
                 Spacer()
                 Text(unit)
                     .font(.system(size: 15, weight: .medium))
