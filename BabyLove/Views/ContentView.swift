@@ -33,7 +33,7 @@ struct MainTabView: View {
 
             GrowthView()
                 .tabItem {
-                    Label("Growth", systemImage: selectedTab == 2 ? "chart.line.uptrend.xyaxis" : "chart.line.uptrend.xyaxis")
+                    Label("Growth", systemImage: selectedTab == 2 ? "chart.bar.fill" : "chart.bar")
                 }
                 .tag(2)
 

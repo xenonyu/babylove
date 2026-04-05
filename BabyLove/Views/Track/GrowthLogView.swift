@@ -12,6 +12,11 @@ struct GrowthLogView: View {
 
     private var unit: MeasurementUnit { appState.measurementUnit }
 
+    /// At least one measurement must be a valid positive number
+    private var hasValidMeasurement: Bool {
+        [weightKG, heightCM, headCM].contains { Double($0).map { $0 > 0 } ?? false }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -68,7 +73,16 @@ struct GrowthLogView: View {
                             dismiss()
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
+                        .disabled(!hasValidMeasurement)
+                        .opacity(hasValidMeasurement ? 1 : 0.5)
                         .padding(.top, 8)
+
+                        if !hasValidMeasurement {
+                            Text("Enter at least one measurement to save")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextSecondary)
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                     .padding(24)
                 }

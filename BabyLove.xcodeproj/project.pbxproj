@@ -15,30 +15,58 @@
 		2C483538BEA3D8CE002759F9 /* GrowthLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053E5A82A50B226040E832BD /* GrowthLogView.swift */; };
 		2E493A664C6C133F70A23942 /* FeedingLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCECAE45648C1C42C3C9F7D /* FeedingLogView.swift */; };
 		37FB93695ED51D9575591280 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6634790B09DF900EBFD38662 /* AppState.swift */; };
+		41C2FB55751928475AC650E8 /* MainTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6356131A5FD91F90E155E48E /* MainTabUITests.swift */; };
+		4B4EEB45620FA1FB22FD2728 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4203D6FB43A35070B595AC39 /* OnboardingUITests.swift */; };
 		4D535A22FEAF4778CD240D2F /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502AD43E02D7DDBE8A6C1584 /* PhotosUI.framework */; };
 		560B20B87D81AD2F8F35FDBB /* DiaperLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C95F233B930ADB06E9B9859 /* DiaperLogView.swift */; };
 		61E71EBFFCABEC19A453112F /* MemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673B4B9F6094D50AD5A2AA08 /* MemoryView.swift */; };
 		65D637F6C833D948660A8A50 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B584E212EAEC77D4BE5A0CC4 /* PersistenceController.swift */; };
 		6862115DF96AC5FA28BFCA24 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B98F4037DA0E6B9CD25D10A /* OnboardingView.swift */; };
 		76D7C8046DBEA67B6EC25C51 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B307A128ADC0AF566C8273 /* ContentView.swift */; };
+		7B24AB36E8E895382B0FA17C /* MeasurementUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0135558254C7620E5B97C0C /* MeasurementUnitTests.swift */; };
 		7DA63F22B6E64430766291E5 /* TrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC310D7FE3E975FA5F3BEF2A /* TrackView.swift */; };
 		802D5EEDE2F253B7E9B351A4 /* Baby.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CCD6F89702EF474129316C /* Baby.swift */; };
 		80CAB0B97D3F1C451DCD2591 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76E83015CBD149D49CDA6EE6 /* Assets.xcassets */; };
 		98BECFCD7EDDD3391DD9191B /* TrackingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F839C827D77ACEFAE44D8F76 /* TrackingModels.swift */; };
 		A309EDB311E378B0141DD6DF /* BabyLove.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5AEA6BF3D149E58A676172EB /* BabyLove.xcdatamodeld */; };
+		ADA6CC5F0666ADE0D9390394 /* TrackViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3FF8EA410AA77A514874E1 /* TrackViewModelTests.swift */; };
 		C7CCEF8ED59DDBA809C1A502 /* SleepLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87860DF03AD4B3B60EA4CEF3 /* SleepLogView.swift */; };
 		D199000C4589D1FE528D163E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709C21D5EB7D4BCDACEA7C19 /* SettingsView.swift */; };
+		D837CB4B6B05AD3B6841267D /* BabyModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49262E70FA0EB20482A2D08E /* BabyModelTests.swift */; };
 		E4DD6FFDEA470A7A0F9EC169 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B73E8B5F2D9845C9A03918C7 /* Photos.framework */; };
 		EE21A30A5CCA94EE8D3306A3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D3DD30D2D961910E0BFD57 /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0469DF86D1ED4A4C3F47497F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CE144FEAA18FDED8B57998F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18DE939E927CBA7AC19B689B;
+			remoteInfo = BabyLove;
+		};
+		FD97F5F1246DEE3971372EAB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CE144FEAA18FDED8B57998F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18DE939E927CBA7AC19B689B;
+			remoteInfo = BabyLove;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		053E5A82A50B226040E832BD /* GrowthLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthLogView.swift; sourceTree = "<group>"; };
 		09B5D01A6042586BA1799CB5 /* BabyLove.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BabyLove.xcdatamodel; sourceTree = "<group>"; };
+		0D3FF8EA410AA77A514874E1 /* TrackViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewModelTests.swift; sourceTree = "<group>"; };
 		1B98F4037DA0E6B9CD25D10A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		22849F5945EFD383E0FF08B6 /* BabyLoveUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BabyLoveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		38890DBB75E06D850CDAFE23 /* BabyLoveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BabyLoveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4203D6FB43A35070B595AC39 /* OnboardingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUITests.swift; sourceTree = "<group>"; };
 		49100C105EDD8129171ED8EF /* TrackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewModel.swift; sourceTree = "<group>"; };
+		49262E70FA0EB20482A2D08E /* BabyModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyModelTests.swift; sourceTree = "<group>"; };
 		502AD43E02D7DDBE8A6C1584 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
 		59D3DD30D2D961910E0BFD57 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		6356131A5FD91F90E155E48E /* MainTabUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabUITests.swift; sourceTree = "<group>"; };
 		6634790B09DF900EBFD38662 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		673B4B9F6094D50AD5A2AA08 /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
 		709C21D5EB7D4BCDACEA7C19 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -48,6 +76,7 @@
 		87860DF03AD4B3B60EA4CEF3 /* SleepLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepLogView.swift; sourceTree = "<group>"; };
 		89DE628BE1B26CD56A7BD37B /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		8C95F233B930ADB06E9B9859 /* DiaperLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaperLogView.swift; sourceTree = "<group>"; };
+		A0135558254C7620E5B97C0C /* MeasurementUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementUnitTests.swift; sourceTree = "<group>"; };
 		ACDABBF2A70EB5F67B70EF54 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B0247BB54BD42C6812F09569 /* BabyLove.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BabyLove.entitlements; sourceTree = "<group>"; };
 		B2B307A128ADC0AF566C8273 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -91,6 +120,8 @@
 			isa = PBXGroup;
 			children = (
 				37005688666149ED2C8369DA /* BabyLove */,
+				EC31BCA2D783AE55BEE8E8A5 /* BabyLoveTests */,
+				2F4FB42EE89848B566DDC69A /* BabyLoveUITests */,
 				60756BBE995C2A2ACB938AB2 /* Frameworks */,
 				199460850C29A886A6C03838 /* Products */,
 			);
@@ -114,8 +145,19 @@
 			isa = PBXGroup;
 			children = (
 				709CBB9F52E43EEE1D85CDCB /* BabyLove.app */,
+				38890DBB75E06D850CDAFE23 /* BabyLoveTests.xctest */,
+				22849F5945EFD383E0FF08B6 /* BabyLoveUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2F4FB42EE89848B566DDC69A /* BabyLoveUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6356131A5FD91F90E155E48E /* MainTabUITests.swift */,
+				4203D6FB43A35070B595AC39 /* OnboardingUITests.swift */,
+			);
+			path = BabyLoveUITests;
 			sourceTree = "<group>";
 		};
 		31AF4709B20897595582F4F8 /* App */ = {
@@ -235,6 +277,16 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
+		EC31BCA2D783AE55BEE8E8A5 /* BabyLoveTests */ = {
+			isa = PBXGroup;
+			children = (
+				49262E70FA0EB20482A2D08E /* BabyModelTests.swift */,
+				A0135558254C7620E5B97C0C /* MeasurementUnitTests.swift */,
+				0D3FF8EA410AA77A514874E1 /* TrackViewModelTests.swift */,
+			);
+			path = BabyLoveTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -257,6 +309,42 @@
 			productReference = 709CBB9F52E43EEE1D85CDCB /* BabyLove.app */;
 			productType = "com.apple.product-type.application";
 		};
+		4E2B131C1810F30FAF7FE5DF /* BabyLoveUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 823786E701D2E464FCFB4738 /* Build configuration list for PBXNativeTarget "BabyLoveUITests" */;
+			buildPhases = (
+				7E486704C65DA497CD63069F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				462978091A9E3B21176E5D20 /* PBXTargetDependency */,
+			);
+			name = BabyLoveUITests;
+			packageProductDependencies = (
+			);
+			productName = BabyLoveUITests;
+			productReference = 22849F5945EFD383E0FF08B6 /* BabyLoveUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		91FD7D61EA93B5D0C6A39EFE /* BabyLoveTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7200478FEF8675B35DCB5D30 /* Build configuration list for PBXNativeTarget "BabyLoveTests" */;
+			buildPhases = (
+				C02C316DFB60BB07D19B4B5A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4825C2D55093745B2BF4FE4C /* PBXTargetDependency */,
+			);
+			name = BabyLoveTests;
+			packageProductDependencies = (
+			);
+			productName = BabyLoveTests;
+			productReference = 38890DBB75E06D850CDAFE23 /* BabyLoveTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -267,6 +355,13 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					18DE939E927CBA7AC19B689B = {
+						DevelopmentTeam = MS49M8LMJ8;
+					};
+					4E2B131C1810F30FAF7FE5DF = {
+						DevelopmentTeam = MS49M8LMJ8;
+						TestTargetID = 18DE939E927CBA7AC19B689B;
+					};
+					91FD7D61EA93B5D0C6A39EFE = {
 						DevelopmentTeam = MS49M8LMJ8;
 					};
 				};
@@ -286,6 +381,8 @@
 			projectRoot = "";
 			targets = (
 				18DE939E927CBA7AC19B689B /* BabyLove */,
+				91FD7D61EA93B5D0C6A39EFE /* BabyLoveTests */,
+				4E2B131C1810F30FAF7FE5DF /* BabyLoveUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -328,7 +425,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7E486704C65DA497CD63069F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				41C2FB55751928475AC650E8 /* MainTabUITests.swift in Sources */,
+				4B4EEB45620FA1FB22FD2728 /* OnboardingUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C02C316DFB60BB07D19B4B5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D837CB4B6B05AD3B6841267D /* BabyModelTests.swift in Sources */,
+				7B24AB36E8E895382B0FA17C /* MeasurementUnitTests.swift in Sources */,
+				ADA6CC5F0666ADE0D9390394 /* TrackViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		462978091A9E3B21176E5D20 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 18DE939E927CBA7AC19B689B /* BabyLove */;
+			targetProxy = 0469DF86D1ED4A4C3F47497F /* PBXContainerItemProxy */;
+		};
+		4825C2D55093745B2BF4FE4C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 18DE939E927CBA7AC19B689B /* BabyLove */;
+			targetProxy = FD97F5F1246DEE3971372EAB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		012CE6557FF7127B13F8A8CE /* Debug */ = {
@@ -345,6 +474,25 @@
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		0276057174FD1277A0303E9A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.babylove.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = BabyLove;
 			};
 			name = Debug;
 		};
@@ -490,9 +638,84 @@
 			};
 			name = Debug;
 		};
+		CE1E33A10E7C032B16FDCD8A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.babylove.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = BabyLove;
+			};
+			name = Release;
+		};
+		EB6FF5583F5E9BFA6830A81F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.babylove.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyLove.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyLove";
+			};
+			name = Debug;
+		};
+		F12020EE351148A3045B069F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.babylove.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyLove.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyLove";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7200478FEF8675B35DCB5D30 /* Build configuration list for PBXNativeTarget "BabyLoveTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB6FF5583F5E9BFA6830A81F /* Debug */,
+				F12020EE351148A3045B069F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		823786E701D2E464FCFB4738 /* Build configuration list for PBXNativeTarget "BabyLoveUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0276057174FD1277A0303E9A /* Debug */,
+				CE1E33A10E7C032B16FDCD8A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		9CE4024DFA5C90205077182C /* Build configuration list for PBXProject "BabyLove" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -137,28 +137,43 @@ xcodebuild build \\
 ```
 ⚠️ 若有 Swift 编译错误，必须修复后重新构建，直到 BUILD SUCCEEDED 才能继续。
 
-### Step 5 — 企业级 Simulator 测试（必须）
+### Step 5 — 企业级 Simulator 测试 + 截图（必须）
 ```bash
+SIM="8457B971-4286-457B-8AE0-8A6728C35CC5"
+SCREENSHOTS_DIR="/Users/yaxinli/xym/babylove/agent/screenshots"
+mkdir -p "$SCREENSHOTS_DIR"
+TS=$(date +%Y%m%d_%H%M%S)
+
 # 1. 找到 .app 路径
 APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/BabyLove-*/Build/Products/Debug-iphonesimulator -name "BabyLove.app" 2>/dev/null | head -1)
 echo "APP: $APP_PATH"
 
 # 2. 启动 Simulator
-xcrun simctl boot 8457B971-4286-457B-8AE0-8A6728C35CC5 2>/dev/null || true
+xcrun simctl boot "$SIM" 2>/dev/null || true
 sleep 2
 
-# 3. 安装 & 启动
-xcrun simctl install 8457B971-4286-457B-8AE0-8A6728C35CC5 "$APP_PATH"
-xcrun simctl launch 8457B971-4286-457B-8AE0-8A6728C35CC5 com.babylove.app
-sleep 3
+# 3. 安装 & 启动（带 --skip-onboarding 快速进主界面）
+xcrun simctl install "$SIM" "$APP_PATH"
+xcrun simctl launch "$SIM" com.babylove.app --args --uitesting --skip-onboarding
+sleep 4
 
-# 4. 检查崩溃日志
-xcrun simctl spawn 8457B971-4286-457B-8AE0-8A6728C35CC5 log show --last 30s --predicate 'process == "BabyLove"' 2>/dev/null | grep -i "crash\\|fault\\|exception" | head -5
+# 4. 截图：主页
+xcrun simctl io "$SIM" screenshot "$SCREENSHOTS_DIR/${TS}_home.png"
+echo "📸 Home: $SCREENSHOTS_DIR/${TS}_home.png"
 
-# 5. 终止
-xcrun simctl terminate 8457B971-4286-457B-8AE0-8A6728C35CC5 com.babylove.app 2>/dev/null || true
+# 5. 检查崩溃日志
+CRASH=$(xcrun simctl spawn "$SIM" log show --last 30s --predicate 'process == "BabyLove"' 2>/dev/null | grep -i "crash\|SIGABRT\|exception" | head -3)
+if [ -n "$CRASH" ]; then
+    echo "⚠️  CRASH DETECTED: $CRASH"
+else
+    echo "✅ No crash detected"
+fi
+
+# 6. 终止
+xcrun simctl terminate "$SIM" com.babylove.app 2>/dev/null || true
+echo "截图保存至: $SCREENSHOTS_DIR"
 ```
-确认启动无崩溃。
+截图文件名格式：`YYYYMMDD_HHMMSS_home.png`，可在 Finder 中查看。确认启动无崩溃。
 
 ### Step 6 — 提交（commit message 必须英文）
 ```bash

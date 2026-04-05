@@ -16,6 +16,14 @@ struct FeedingLogView: View {
     private var maxAmount: Double { unit == .metric ? 300 : 10 }
     private var amountStep: Double { unit == .metric ? 5 : 0.5 }
 
+    /// Formula/solid require amount > 0; breast/pump always valid (have duration)
+    private var canSave: Bool {
+        switch feedType {
+        case .formula, .solid: return amount > 0
+        case .breast, .pump:   return true
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -135,7 +143,16 @@ struct FeedingLogView: View {
                             dismiss()
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
+                        .disabled(!canSave)
+                        .opacity(canSave ? 1 : 0.5)
                         .padding(.top, 8)
+
+                        if !canSave {
+                            Text("Set the amount before saving")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextSecondary)
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                     .padding(24)
                 }
