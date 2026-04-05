@@ -19,6 +19,8 @@ struct FeedingLogView: View {
     @State private var isTimerMode = false
     @State private var lastSideUsed: BreastSide?
     @State private var didAutoSuggestSide = false
+    /// True when another feeding timer is already running (prevents duplicates)
+    @State private var hasExistingOngoingFeeding = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -38,8 +40,12 @@ struct FeedingLogView: View {
         return "Log Feeding"
     }
 
-    /// Formula/solid require amount > 0; breast/pump always valid (have duration)
+    /// Formula/solid require amount > 0; breast/pump always valid (have duration).
+    /// Timer mode is blocked when another feeding timer is already running.
     private var canSave: Bool {
+        if isTimerMode && supportsTimer && !isEditing && hasExistingOngoingFeeding {
+            return false
+        }
         switch feedType {
         case .formula, .solid: return amount > 0
         case .breast, .pump:   return true
@@ -144,6 +150,30 @@ struct FeedingLogView: View {
                                 .padding(16)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+
+                            // Warning: another feeding timer already running
+                            if isTimerMode && hasExistingOngoingFeeding && !isEditing {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.blGrowth)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Feeding timer already running")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.blTextPrimary)
+                                        Text("End the current feeding from the Home screen before starting a new one.")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(.blTextSecondary)
+                                    }
+                                }
+                                .padding(14)
+                                .background(Color.blGrowth.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .strokeBorder(Color.blGrowth.opacity(0.3), lineWidth: 1)
+                                )
                             }
 
                             // Duration (manual mode only)
@@ -284,7 +314,12 @@ struct FeedingLogView: View {
                         .opacity(canSave ? 1 : 0.5)
                         .padding(.top, 8)
 
-                        if isTimerMode && supportsTimer && !isEditing {
+                        if isTimerMode && supportsTimer && !isEditing && hasExistingOngoingFeeding {
+                            Text("A feeding timer is already active")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blGrowth)
+                                .frame(maxWidth: .infinity)
+                        } else if isTimerMode && supportsTimer && !isEditing {
                             Text("Timer will run on the home screen — end it when done")
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
@@ -328,6 +363,7 @@ struct FeedingLogView: View {
             .onAppear {
                 populateFromRecord()
                 if !isEditing { suggestNextSide() }
+                checkExistingOngoingFeeding()
             }
         }
     }
@@ -340,6 +376,21 @@ struct FeedingLogView: View {
         amount = unit.volumeFromML(r.amountML)
         notes = r.notes ?? ""
         timestamp = r.timestamp ?? Date()
+    }
+
+    /// Check if another feeding timer (breast/pump with durationMinutes == 0) is already running.
+    private func checkExistingOngoingFeeding() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let req: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        req.predicate = NSPredicate(format: "durationMinutes == 0 AND (feedType == %@ OR feedType == %@)",
+                                    FeedType.breast.rawValue, FeedType.pump.rawValue)
+        req.fetchLimit = 1
+        guard let results = try? ctx.fetch(req) else { return }
+        if let editing = editingRecord {
+            hasExistingOngoingFeeding = results.contains(where: { $0.objectID != editing.objectID })
+        } else {
+            hasExistingOngoingFeeding = !results.isEmpty
+        }
     }
 
     /// Fetch the last breast/pump feeding's side and auto-select the opposite

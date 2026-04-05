@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct SleepLogView: View {
     @ObservedObject var vm: TrackViewModel
@@ -13,14 +14,21 @@ struct SleepLogView: View {
     @State private var location: SleepLocation = .crib
     @State private var notes = ""
     @State private var isOngoing = false
+    /// True when another sleep timer is already running (prevents duplicates)
+    @State private var hasExistingOngoingSleep = false
 
     private var isEditing: Bool { editingRecord != nil }
 
     /// Whether the form is valid for saving:
-    /// - Ongoing mode: always valid (starting a sleep timer)
+    /// - Ongoing mode: valid only if no other sleep timer is already running
     /// - Finished mode: endTime must be after startTime (duration > 0)
     private var canSave: Bool {
-        isOngoing || duration > 0
+        if isOngoing {
+            // Allow editing an existing ongoing record, but block creating a new one
+            // when another timer is already running
+            return isEditing || !hasExistingOngoingSleep
+        }
+        return duration > 0
     }
 
     private var duration: Int {
@@ -54,6 +62,30 @@ struct SleepLogView: View {
                         .padding(16)
                         .background(Color.blSurface)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                        // Warning: another sleep timer already running
+                        if isOngoing && hasExistingOngoingSleep && !isEditing {
+                            HStack(spacing: 10) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.blGrowth)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Sleep timer already running")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextPrimary)
+                                    Text("End the current sleep from the Home screen before starting a new one.")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.blTextSecondary)
+                                }
+                            }
+                            .padding(14)
+                            .background(Color.blGrowth.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .strokeBorder(Color.blGrowth.opacity(0.3), lineWidth: 1)
+                            )
+                        }
 
                         if isOngoing {
                             // Ongoing: show start time + live elapsed
@@ -191,7 +223,12 @@ struct SleepLogView: View {
                         .opacity(canSave ? 1 : 0.5)
                         .padding(.top, 8)
 
-                        if !canSave && !isOngoing {
+                        if !canSave && isOngoing && hasExistingOngoingSleep && !isEditing {
+                            Text("A sleep timer is already active")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blGrowth)
+                                .frame(maxWidth: .infinity)
+                        } else if !canSave && !isOngoing {
                             Text("End time must be after start time")
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
@@ -217,13 +254,32 @@ struct SleepLogView: View {
                     .foregroundColor(.blSleep)
                 }
             }
-            .onAppear { populateFromRecord() }
+            .onAppear {
+                populateFromRecord()
+                checkExistingOngoingSleep()
+            }
             .onChange(of: isOngoing) { oldValue, newValue in
                 // When toggling from ongoing → finished, snap endTime to now
                 if oldValue == true && newValue == false {
                     endTime = Date()
                 }
             }
+        }
+    }
+
+    /// Check if another sleep record is already ongoing (endTime == nil).
+    /// Excludes the record being edited (if any) to allow editing an ongoing sleep.
+    private func checkExistingOngoingSleep() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let req: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        req.predicate = NSPredicate(format: "endTime == nil")
+        req.fetchLimit = 1
+        guard let results = try? ctx.fetch(req) else { return }
+        // If editing an ongoing sleep, that record itself shouldn't count
+        if let editing = editingRecord {
+            hasExistingOngoingSleep = results.contains(where: { $0.objectID != editing.objectID })
+        } else {
+            hasExistingOngoingSleep = !results.isEmpty
         }
     }
 
