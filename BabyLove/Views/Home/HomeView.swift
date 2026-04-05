@@ -4,31 +4,42 @@ import CoreData
 struct HomeView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var vm: TrackViewModel = TrackViewModel(context: PersistenceController.shared.container.viewContext)
 
     @State private var showFeedingLog  = false
     @State private var showSleepLog    = false
     @State private var showDiaperLog   = false
 
+    // Initialize with today's predicate to avoid flashing all-time data
     @FetchRequest(
-        entity: CDFeedingRecord.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)],
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@", Calendar.current.startOfDay(for: Date()) as NSDate)
-    ) private var todayFeedings: FetchedResults<CDFeedingRecord>
+    )
+    private var todayFeedings: FetchedResults<CDFeedingRecord>
 
     @FetchRequest(
-        entity: CDSleepRecord.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "startTime", ascending: false)],
+        sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
         predicate: NSPredicate(format: "startTime >= %@", Calendar.current.startOfDay(for: Date()) as NSDate)
-    ) private var todaySleeps: FetchedResults<CDSleepRecord>
+    )
+    private var todaySleeps: FetchedResults<CDSleepRecord>
 
     @FetchRequest(
-        entity: CDDiaperRecord.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)],
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@", Calendar.current.startOfDay(for: Date()) as NSDate)
-    ) private var todayDiapers: FetchedResults<CDDiaperRecord>
+    )
+    private var todayDiapers: FetchedResults<CDDiaperRecord>
 
     private var baby: Baby? { appState.currentBaby }
+
+    /// Refresh predicates to reflect current calendar day.
+    /// Called on appear AND when returning from background to handle midnight crossover.
+    private func updatePredicates() {
+        let startOfDay = Calendar.current.startOfDay(for: Date()) as NSDate
+        todayFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@", startOfDay)
+        todaySleeps.nsPredicate   = NSPredicate(format: "startTime >= %@", startOfDay)
+        todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", startOfDay)
+    }
 
     private var totalSleepMinutes: Int {
         todaySleeps.reduce(0) { sum, r in
@@ -103,6 +114,10 @@ struct HomeView: View {
                 }
             }
             .navigationBarHidden(true)
+            .onAppear { updatePredicates() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { updatePredicates() }
+            }
         }
         .sheet(isPresented: $showFeedingLog) {
             FeedingLogView(vm: vm)
