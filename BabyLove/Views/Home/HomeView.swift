@@ -23,6 +23,7 @@ struct HomeView: View {
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingTime: Date?
+    @State private var globalLastFeedingIsOngoing: Bool = false
     @State private var globalLastSleepEnd: Date?
     @State private var globalLastSleepIsOngoing: Bool = false
     @State private var globalLastDiaperTime: Date?
@@ -213,9 +214,10 @@ struct HomeView: View {
         return days == 1 ? "1d ago" : "\(days)d ago"
     }
 
-    /// Time since last feeding (global — not limited to selected day)
+    /// Time since last feeding (global — not limited to selected day), or "feeding now" if ongoing
     private var feedingTimeSince: String {
-        Self.timeSinceText(from: globalLastFeedingTime)
+        if globalLastFeedingIsOngoing { return "feeding now" }
+        return Self.timeSinceText(from: globalLastFeedingTime)
     }
 
     /// Time since last sleep ended (global), or "sleeping now" if ongoing
@@ -479,7 +481,16 @@ struct HomeView: View {
         let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
         feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         feedReq.fetchLimit = 1
-        globalLastFeedingTime = (try? ctx.fetch(feedReq))?.first?.timestamp
+        if let lastFeeding = (try? ctx.fetch(feedReq))?.first {
+            globalLastFeedingTime = lastFeeding.timestamp
+            // An ongoing breast/pump feeding has durationMinutes == 0
+            let ft = FeedType(rawValue: lastFeeding.feedType ?? "")
+            let isTimerType = ft == .breast || ft == .pump
+            globalLastFeedingIsOngoing = isTimerType && lastFeeding.durationMinutes == 0
+        } else {
+            globalLastFeedingTime = nil
+            globalLastFeedingIsOngoing = false
+        }
 
         // Last sleep (any day)
         let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
