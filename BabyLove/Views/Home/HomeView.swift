@@ -801,20 +801,40 @@ struct HomeView: View {
         return (0..<14).compactMap { cal.date(byAdding: .day, value: -$0, to: today) }
     }
 
+    /// The earliest date the user can navigate to: the later of 13 days ago
+    /// or the baby's birth date (no point showing dates before birth).
+    private var earliestNavigableDate: Date {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let rangeStart = cal.date(byAdding: .day, value: -13, to: today) ?? today
+        if let birth = baby?.birthDate {
+            let birthStart = cal.startOfDay(for: birth)
+            return max(rangeStart, birthStart)
+        }
+        return rangeStart
+    }
+
+    /// Whether the left chevron should be disabled (already at earliest date)
+    private var canNavigateBack: Bool {
+        Calendar.current.startOfDay(for: selectedDate) > earliestNavigableDate
+    }
+
     private var dateNavigationBar: some View {
         VStack(spacing: 8) {
             HStack {
                 Button {
                     let cal = Calendar.current
-                    if let prev = cal.date(byAdding: .day, value: -1, to: selectedDate) {
+                    if let prev = cal.date(byAdding: .day, value: -1, to: selectedDate),
+                       cal.startOfDay(for: prev) >= earliestNavigableDate {
                         withAnimation(.easeInOut(duration: 0.2)) { selectedDate = prev }
                     }
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.blPrimary)
+                        .foregroundColor(canNavigateBack ? .blPrimary : .blTextTertiary)
                         .frame(width: 32, height: 32)
                 }
+                .disabled(!canNavigateBack)
 
                 Spacer()
 
