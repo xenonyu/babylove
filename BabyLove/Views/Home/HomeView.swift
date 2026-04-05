@@ -346,6 +346,31 @@ struct HomeView: View {
         .sheet(isPresented: $showGrowthLog) {
             GrowthLogView(vm: vm)
         }
+        // Timeline edit sheets
+        .sheet(item: $feedingToEdit) { record in
+            FeedingLogView(vm: vm, editingRecord: record)
+        }
+        .sheet(item: $sleepToEdit) { record in
+            SleepLogView(vm: vm, editingRecord: record)
+        }
+        .sheet(item: $diaperToEdit) { record in
+            DiaperLogView(vm: vm, editingRecord: record)
+        }
+        // Timeline delete confirmation
+        .alert("Delete Record?", isPresented: Binding(
+            get: { timelineRecordToDelete != nil },
+            set: { if !$0 { timelineRecordToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { timelineRecordToDelete = nil }
+            Button("Delete", role: .destructive) {
+                if let record = timelineRecordToDelete {
+                    withAnimation { vm.deleteObject(record, in: ctx) }
+                }
+                timelineRecordToDelete = nil
+            }
+        } message: {
+            Text("This record will be permanently removed.")
+        }
     }
 
     // MARK: - Sleep Timer
@@ -996,8 +1021,19 @@ struct HomeView: View {
 
     // MARK: - Activity Timeline
 
+    // Edit / delete state for timeline context menus
+    @State private var feedingToEdit: CDFeedingRecord?
+    @State private var sleepToEdit: CDSleepRecord?
+    @State private var diaperToEdit: CDDiaperRecord?
+    @State private var timelineRecordToDelete: NSManagedObject?
+
     /// A unified activity item for the chronological timeline.
     private struct ActivityItem: Identifiable {
+        enum RecordRef {
+            case feeding(CDFeedingRecord)
+            case sleep(CDSleepRecord)
+            case diaper(CDDiaperRecord)
+        }
         let id: String  // unique key
         let date: Date
         let icon: String
@@ -1005,6 +1041,7 @@ struct HomeView: View {
         let title: String
         let detail: String
         let timeLabel: String
+        let record: RecordRef
     }
 
     /// Build a merged, reverse-chronological list of all activities for the selected day.
@@ -1021,7 +1058,8 @@ struct HomeView: View {
                 color: .blFeeding,
                 title: ft?.displayName ?? "Feeding",
                 detail: feedingDetail(r),
-                timeLabel: ts.formatted(date: .omitted, time: .shortened)
+                timeLabel: ts.formatted(date: .omitted, time: .shortened),
+                record: .feeding(r)
             ))
         }
 
@@ -1043,7 +1081,8 @@ struct HomeView: View {
                 color: .blSleep,
                 title: "Sleep",
                 detail: detail,
-                timeLabel: st.formatted(date: .omitted, time: .shortened)
+                timeLabel: st.formatted(date: .omitted, time: .shortened),
+                record: .sleep(r)
             ))
         }
 
@@ -1057,7 +1096,8 @@ struct HomeView: View {
                 color: .blDiaper,
                 title: dt?.displayName ?? "Diaper",
                 detail: dt?.icon ?? "",
-                timeLabel: ts.formatted(date: .omitted, time: .shortened)
+                timeLabel: ts.formatted(date: .omitted, time: .shortened),
+                record: .diaper(r)
             ))
         }
 
@@ -1101,6 +1141,26 @@ struct HomeView: View {
                         timeLabel: item.timeLabel,
                         showTimeAgoHighlight: isSelectedDateToday
                     )
+                    .contextMenu {
+                        Button {
+                            switch item.record {
+                            case .feeding(let r): feedingToEdit = r
+                            case .sleep(let r):   sleepToEdit = r
+                            case .diaper(let r):  diaperToEdit = r
+                            }
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            switch item.record {
+                            case .feeding(let r): timelineRecordToDelete = r
+                            case .sleep(let r):   timelineRecordToDelete = r
+                            case .diaper(let r):  timelineRecordToDelete = r
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
 
                     if index < displayItems.count - 1 {
                         Divider().padding(.leading, 70)
