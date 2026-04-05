@@ -96,14 +96,15 @@ class TrackViewModel: ObservableObject {
     func addMilestone(title: String,
                       category: MilestoneCategory,
                       date: Date = Date(),
-                      notes: String = "") {
+                      notes: String = "",
+                      isCompleted: Bool = true) {
         let m = CDMilestone(context: ctx)
         m.id = UUID()
         m.title = title
         m.category = category.rawValue
         m.date = date
         m.notes = notes.isEmpty ? nil : notes
-        m.isCompleted = true
+        m.isCompleted = isCompleted
         save()
     }
 
@@ -111,12 +112,19 @@ class TrackViewModel: ObservableObject {
                          title: String,
                          category: MilestoneCategory,
                          date: Date,
-                         notes: String = "") {
+                         notes: String = "",
+                         isCompleted: Bool = true) {
         record.title = title
         record.category = category.rawValue
         record.date = date
         record.notes = notes.isEmpty ? nil : notes
+        record.isCompleted = isCompleted
         save()
+    }
+
+    func toggleMilestoneCompleted(_ record: CDMilestone, in context: NSManagedObjectContext) {
+        record.isCompleted.toggle()
+        try? context.save()
     }
 
     // MARK: - Today Stats

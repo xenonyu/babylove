@@ -24,7 +24,11 @@ struct MemoryView: View {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(milestones) { m in
-                                MilestoneCard(milestone: m)
+                                MilestoneCard(milestone: m) {
+                                    withAnimation(.spring(response: 0.35)) {
+                                        vm.toggleMilestoneCompleted(m, in: ctx)
+                                    }
+                                }
                                     .padding(.horizontal, 20)
                                     .contextMenu {
                                         Button {
@@ -102,41 +106,60 @@ struct MemoryView: View {
 
 // MARK: - Milestone Card
 struct MilestoneCard: View {
-    let milestone: CDMilestone
+    @ObservedObject var milestone: CDMilestone
+    var onToggleCompleted: (() -> Void)?
+
     private var category: MilestoneCategory {
         MilestoneCategory(rawValue: milestone.category ?? "") ?? .custom
     }
 
+    private var isCompleted: Bool { milestone.isCompleted }
+
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            // Category icon
-            ZStack {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color(hex: category.color).opacity(0.15))
-                    .frame(width: 52, height: 52)
-                Image(systemName: category.icon)
-                    .font(.system(size: 22, weight: .medium))
-                    .foregroundColor(Color(hex: category.color))
+            // Completion toggle button
+            Button {
+                onToggleCompleted?()
+            } label: {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color(hex: category.color).opacity(isCompleted ? 0.2 : 0.08))
+                        .frame(width: 52, height: 52)
+                    Image(systemName: isCompleted ? "checkmark.circle.fill" : category.icon)
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundColor(Color(hex: category.color).opacity(isCompleted ? 1.0 : 0.5))
+                }
             }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(milestone.title ?? "")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blTextPrimary)
+                        .foregroundColor(isCompleted ? .blTextPrimary : .blTextSecondary)
+                        .strikethrough(!isCompleted, color: .blTextSecondary.opacity(0.4))
                     Spacer()
-                    Text(category.displayName)
+                    Text(isCompleted ? "Achieved" : "Upcoming")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color(hex: category.color))
+                        .foregroundColor(isCompleted ? Color(hex: category.color) : .blTextSecondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color(hex: category.color).opacity(0.12))
+                        .background((isCompleted ? Color(hex: category.color) : Color.blTextSecondary).opacity(0.12))
                         .clipShape(Capsule())
                 }
 
-                Text(milestone.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
-                    .font(.system(size: 13))
-                    .foregroundColor(.blTextSecondary)
+                HStack(spacing: 6) {
+                    Text(category.displayName)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(hex: category.color))
+
+                    Text("·")
+                        .foregroundColor(.blTextSecondary)
+
+                    Text(milestone.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
+                        .font(.system(size: 13))
+                        .foregroundColor(.blTextSecondary)
+                }
 
                 if let notes = milestone.notes, !notes.isEmpty {
                     Text(notes)
@@ -159,10 +182,11 @@ struct AddMilestoneView: View {
     /// When non-nil, we are editing an existing record
     var editingRecord: CDMilestone?
 
-    @State private var title    = ""
+    @State private var title       = ""
     @State private var category: MilestoneCategory = .social
-    @State private var date     = Date()
-    @State private var notes    = ""
+    @State private var date        = Date()
+    @State private var notes       = ""
+    @State private var isCompleted = true
 
     private var isEditing: Bool { editingRecord != nil }
 
@@ -224,6 +248,21 @@ struct AddMilestoneView: View {
                                 .labelsHidden()
                         }
 
+                        // Status
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Status", systemImage: "flag.fill")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.blTextSecondary)
+                            HStack(spacing: 12) {
+                                statusButton(label: "Achieved", icon: "checkmark.circle.fill", selected: isCompleted) {
+                                    withAnimation(.spring(response: 0.3)) { isCompleted = true }
+                                }
+                                statusButton(label: "Upcoming", icon: "clock", selected: !isCompleted) {
+                                    withAnimation(.spring(response: 0.3)) { isCompleted = false }
+                                }
+                            }
+                        }
+
                         // Notes
                         VStack(alignment: .leading, spacing: 10) {
                             Label("Notes", systemImage: "note.text")
@@ -238,9 +277,9 @@ struct AddMilestoneView: View {
 
                         Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
                             if let record = editingRecord {
-                                vm.updateMilestone(record, title: title, category: category, date: date, notes: notes)
+                                vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
                             } else {
-                                vm.addMilestone(title: title, category: category, date: date, notes: notes)
+                                vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
                             }
                             dismiss()
                         }
@@ -268,5 +307,27 @@ struct AddMilestoneView: View {
         category = MilestoneCategory(rawValue: r.category ?? "") ?? .custom
         date = r.date ?? Date()
         notes = r.notes ?? ""
+        isCompleted = r.isCompleted
+    }
+
+    private func statusButton(label: String, icon: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .medium))
+                Text(label)
+                    .font(.system(size: 15, weight: .medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(selected ? Color.blPrimary.opacity(0.12) : Color.blSurface)
+            .foregroundColor(selected ? .blPrimary : .blTextSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(selected ? Color.blPrimary.opacity(0.3) : Color.clear, lineWidth: 1.5)
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
