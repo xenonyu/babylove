@@ -8,6 +8,7 @@ struct GrowthView: View {
     @State private var showLog = false
     @State private var selectedMetric: GrowthMetric = .weight
     @State private var recordToDelete: CDGrowthRecord?
+    @State private var recordToEdit: CDGrowthRecord?
 
     @FetchRequest(
         entity: CDGrowthRecord.entity(),
@@ -48,7 +49,14 @@ struct GrowthView: View {
                                 VStack(spacing: 0) {
                                     ForEach(Array(displayed.enumerated()), id: \.element.id) { index, r in
                                         growthRow(r)
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { recordToEdit = r }
                                             .contextMenu {
+                                                Button {
+                                                    recordToEdit = r
+                                                } label: {
+                                                    Label("Edit", systemImage: "pencil")
+                                                }
                                                 Button(role: .destructive) {
                                                     recordToDelete = r
                                                 } label: {
@@ -88,6 +96,9 @@ struct GrowthView: View {
         }
         .sheet(isPresented: $showLog) {
             GrowthLogView(vm: vm)
+        }
+        .sheet(item: $recordToEdit) { record in
+            GrowthLogView(vm: vm, editingRecord: record)
         }
         .alert("Delete Record?", isPresented: Binding(
             get: { recordToDelete != nil },

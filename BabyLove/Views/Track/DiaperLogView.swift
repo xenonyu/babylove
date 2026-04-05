@@ -4,10 +4,15 @@ struct DiaperLogView: View {
     @ObservedObject var vm: TrackViewModel
     @Environment(\.dismiss) var dismiss
 
+    /// When non-nil, we are editing an existing record
+    var editingRecord: CDDiaperRecord?
+
     @State private var diaperType: DiaperType = .wet
     @State private var notes = ""
     @State private var timestamp = Date()
     @State private var showTimePicker = false
+
+    private var isEditing: Bool { editingRecord != nil }
 
     var body: some View {
         NavigationStack {
@@ -93,8 +98,12 @@ struct DiaperLogView: View {
 
                     Spacer()
 
-                    Button("Log Diaper Change") {
-                        vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
+                    Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
+                        if let record = editingRecord {
+                            vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
+                        } else {
+                            vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
+                        }
                         dismiss()
                     }
                     .buttonStyle(BLPrimaryButton(color: .blDiaper))
@@ -103,13 +112,21 @@ struct DiaperLogView: View {
                 }
                 .padding(.top, 24)
             }
-            .navigationTitle("Log Diaper")
+            .navigationTitle(isEditing ? "Edit Diaper" : "Log Diaper")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
+            .onAppear { populateFromRecord() }
         }
+    }
+
+    private func populateFromRecord() {
+        guard let r = editingRecord else { return }
+        diaperType = DiaperType(rawValue: r.diaperType ?? "") ?? .wet
+        notes = r.notes ?? ""
+        timestamp = r.timestamp ?? Date()
     }
 }

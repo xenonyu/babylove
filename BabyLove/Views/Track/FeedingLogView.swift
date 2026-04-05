@@ -5,6 +5,9 @@ struct FeedingLogView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
+    /// When non-nil, we are editing an existing record
+    var editingRecord: CDFeedingRecord?
+
     @State private var feedType: FeedType = .breast
     @State private var side: BreastSide = .left
     @State private var duration: Double = 10
@@ -13,8 +16,9 @@ struct FeedingLogView: View {
     @State private var timestamp = Date()
     @State private var showTimePicker = false
 
+    private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
-    /// Max amount in display unit (300 ml ≈ 10 oz)
+    /// Max amount in display unit (300 ml ~ 10 oz)
     private var maxAmount: Double { unit == .metric ? 300 : 10 }
     private var amountStep: Double { unit == .metric ? 5 : 0.5 }
 
@@ -166,17 +170,29 @@ struct FeedingLogView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button("Log Feeding") {
+                        Button(isEditing ? "Update Feeding" : "Log Feeding") {
                             let amountML = unit.volumeToML(amount)
                             let hasDuration = feedType == .breast || feedType == .pump
-                            vm.logFeeding(
-                                type: feedType,
-                                side: hasDuration ? side : nil,
-                                durationMinutes: hasDuration ? Int(duration) : 0,
-                                amountML: amountML,
-                                notes: notes,
-                                timestamp: timestamp
-                            )
+                            if let record = editingRecord {
+                                vm.updateFeeding(
+                                    record,
+                                    type: feedType,
+                                    side: hasDuration ? side : nil,
+                                    durationMinutes: hasDuration ? Int(duration) : 0,
+                                    amountML: amountML,
+                                    notes: notes,
+                                    timestamp: timestamp
+                                )
+                            } else {
+                                vm.logFeeding(
+                                    type: feedType,
+                                    side: hasDuration ? side : nil,
+                                    durationMinutes: hasDuration ? Int(duration) : 0,
+                                    amountML: amountML,
+                                    notes: notes,
+                                    timestamp: timestamp
+                                )
+                            }
                             dismiss()
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
@@ -194,13 +210,24 @@ struct FeedingLogView: View {
                     .padding(24)
                 }
             }
-            .navigationTitle("Log Feeding")
+            .navigationTitle(isEditing ? "Edit Feeding" : "Log Feeding")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
+            .onAppear { populateFromRecord() }
         }
+    }
+
+    private func populateFromRecord() {
+        guard let r = editingRecord else { return }
+        feedType = FeedType(rawValue: r.feedType ?? "") ?? .breast
+        side = BreastSide(rawValue: r.breastSide ?? "") ?? .left
+        duration = Double(r.durationMinutes)
+        amount = unit.volumeFromML(r.amountML)
+        notes = r.notes ?? ""
+        timestamp = r.timestamp ?? Date()
     }
 }

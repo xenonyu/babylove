@@ -5,11 +5,15 @@ struct GrowthLogView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
+    /// When non-nil, we are editing an existing record
+    var editingRecord: CDGrowthRecord?
+
     @State private var weightKG = ""
     @State private var heightCM = ""
     @State private var headCM   = ""
     @State private var notes    = ""
 
+    private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
 
     /// At least one measurement must be a valid positive number
@@ -59,17 +63,16 @@ struct GrowthLogView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button("Save Measurements") {
+                        Button(isEditing ? "Update Measurements" : "Save Measurements") {
                             // Convert from display unit to metric for storage
                             let wKG = Double(weightKG).map { unit.weightToKG($0) }
                             let hCM = Double(heightCM).map { unit.lengthToCM($0) }
                             let hd  = Double(headCM).map { unit.lengthToCM($0) }
-                            vm.logGrowth(
-                                weightKG: wKG,
-                                heightCM: hCM,
-                                headCM: hd,
-                                notes: notes
-                            )
+                            if let record = editingRecord {
+                                vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, notes: notes)
+                            } else {
+                                vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, notes: notes)
+                            }
                             dismiss()
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
@@ -87,14 +90,26 @@ struct GrowthLogView: View {
                     .padding(24)
                 }
             }
-            .navigationTitle("Log Growth")
+            .navigationTitle(isEditing ? "Edit Growth" : "Log Growth")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
+            .onAppear { populateFromRecord() }
         }
+    }
+
+    private func populateFromRecord() {
+        guard let r = editingRecord else { return }
+        let w = unit.weightFromKG(r.weightKG)
+        let h = unit.lengthFromCM(r.heightCM)
+        let hc = unit.lengthFromCM(r.headCircumferenceCM)
+        weightKG = w > 0 ? String(format: "%.2f", w) : ""
+        heightCM = h > 0 ? String(format: "%.1f", h) : ""
+        headCM = hc > 0 ? String(format: "%.1f", hc) : ""
+        notes = r.notes ?? ""
     }
 
     private func measurementField(

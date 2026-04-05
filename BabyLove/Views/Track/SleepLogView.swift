@@ -4,11 +4,16 @@ struct SleepLogView: View {
     @ObservedObject var vm: TrackViewModel
     @Environment(\.dismiss) var dismiss
 
+    /// When non-nil, we are editing an existing record
+    var editingRecord: CDSleepRecord?
+
     @State private var startTime = Date().addingTimeInterval(-3600)
     @State private var endTime   = Date()
     @State private var location: SleepLocation = .crib
     @State private var notes = ""
     @State private var isOngoing = false
+
+    private var isEditing: Bool { editingRecord != nil }
 
     private var duration: Int {
         Int(endTime.timeIntervalSince(startTime) / 60)
@@ -25,16 +30,18 @@ struct SleepLogView: View {
                 ScrollView {
                     VStack(spacing: 24) {
 
-                        // Ongoing toggle
-                        Toggle(isOn: $isOngoing) {
-                            Label("Baby is sleeping now", systemImage: "moon.zzz.fill")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.blTextPrimary)
+                        // Ongoing toggle (only for new records)
+                        if !isEditing {
+                            Toggle(isOn: $isOngoing) {
+                                Label("Baby is sleeping now", systemImage: "moon.zzz.fill")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.blTextPrimary)
+                            }
+                            .tint(.blSleep)
+                            .padding(16)
+                            .background(Color.blSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
-                        .tint(.blSleep)
-                        .padding(16)
-                        .background(Color.blSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                         if !isOngoing {
                             // Duration summary
@@ -114,8 +121,10 @@ struct SleepLogView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(isOngoing ? "Start Sleep Timer" : "Log Sleep") {
-                            if isOngoing {
+                        Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
+                            if let record = editingRecord {
+                                vm.updateSleep(record, start: startTime, end: endTime, location: location, notes: notes)
+                            } else if isOngoing {
                                 _ = vm.startSleep(location: location, notes: notes)
                             } else {
                                 vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
@@ -128,13 +137,23 @@ struct SleepLogView: View {
                     .padding(24)
                 }
             }
-            .navigationTitle("Log Sleep")
+            .navigationTitle(isEditing ? "Edit Sleep" : "Log Sleep")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
+            .onAppear { populateFromRecord() }
         }
+    }
+
+    private func populateFromRecord() {
+        guard let r = editingRecord else { return }
+        startTime = r.startTime ?? Date().addingTimeInterval(-3600)
+        endTime = r.endTime ?? Date()
+        location = SleepLocation(rawValue: r.location ?? "") ?? .crib
+        notes = r.notes ?? ""
+        isOngoing = false
     }
 }

@@ -137,6 +137,65 @@ class TrackViewModel: ObservableObject {
         return (try? context.count(for: req)) ?? 0
     }
 
+    // MARK: - Update Feeding
+
+    func updateFeeding(_ record: CDFeedingRecord,
+                       type: FeedType,
+                       side: BreastSide? = nil,
+                       durationMinutes: Int = 0,
+                       amountML: Double = 0,
+                       notes: String = "",
+                       timestamp: Date) {
+        record.feedType = type.rawValue
+        record.breastSide = side?.rawValue
+        record.durationMinutes = Int16(durationMinutes)
+        record.amountML = amountML
+        record.timestamp = timestamp
+        record.notes = notes.isEmpty ? nil : notes
+        save()
+    }
+
+    // MARK: - Update Sleep
+
+    func updateSleep(_ record: CDSleepRecord,
+                     start: Date,
+                     end: Date?,
+                     location: SleepLocation,
+                     notes: String = "") {
+        record.startTime = start
+        record.endTime = end
+        record.location = location.rawValue
+        record.notes = notes.isEmpty ? nil : notes
+        save()
+    }
+
+    // MARK: - Update Diaper
+
+    func updateDiaper(_ record: CDDiaperRecord,
+                      type: DiaperType,
+                      notes: String = "",
+                      timestamp: Date) {
+        record.diaperType = type.rawValue
+        record.timestamp = timestamp
+        record.notes = notes.isEmpty ? nil : notes
+        save()
+    }
+
+    // MARK: - Update Growth
+
+    func updateGrowth(_ record: CDGrowthRecord,
+                      weightKG: Double? = nil,
+                      heightCM: Double? = nil,
+                      headCM: Double? = nil,
+                      notes: String = "") {
+        record.weightKG = weightKG ?? 0
+        record.heightCM = heightCM ?? 0
+        record.headCircumferenceCM = headCM ?? 0
+        record.date = record.date ?? Date()
+        record.notes = notes.isEmpty ? nil : notes
+        save()
+    }
+
     // MARK: - Delete
 
     func deleteObject(_ object: NSManagedObject) {

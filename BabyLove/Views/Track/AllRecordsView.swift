@@ -7,6 +7,7 @@ struct AllFeedingsView: View {
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDFeedingRecord?
+    @State private var recordToEdit: CDFeedingRecord?
 
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
@@ -27,10 +28,18 @@ struct AllFeedingsView: View {
                                 feedingRow(r)
                                     .listRowBackground(Color.blCard)
                                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture { recordToEdit = r }
                                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         Button(role: .destructive) { recordToDelete = r } label: {
                                             Label("Delete", systemImage: "trash")
                                         }
+                                    }
+                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                        Button { recordToEdit = r } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                        .tint(.blFeeding)
                                     }
                             }
                         } header: {
@@ -47,6 +56,9 @@ struct AllFeedingsView: View {
         }
         .navigationTitle("All Feedings")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $recordToEdit) { record in
+            FeedingLogView(vm: vm, editingRecord: record)
+        }
         .alert("Delete Record?", isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
@@ -122,6 +134,7 @@ struct AllSleepsView: View {
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDSleepRecord?
+    @State private var recordToEdit: CDSleepRecord?
 
     @FetchRequest(
         entity: CDSleepRecord.entity(),
@@ -142,10 +155,18 @@ struct AllSleepsView: View {
                                 sleepRow(r)
                                     .listRowBackground(Color.blCard)
                                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture { recordToEdit = r }
                                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         Button(role: .destructive) { recordToDelete = r } label: {
                                             Label("Delete", systemImage: "trash")
                                         }
+                                    }
+                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                        Button { recordToEdit = r } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                        .tint(.blSleep)
                                     }
                             }
                         } header: {
@@ -162,6 +183,9 @@ struct AllSleepsView: View {
         }
         .navigationTitle("All Sleep")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $recordToEdit) { record in
+            SleepLogView(vm: vm, editingRecord: record)
+        }
         .alert("Delete Record?", isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
@@ -242,6 +266,7 @@ struct AllDiapersView: View {
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDDiaperRecord?
+    @State private var recordToEdit: CDDiaperRecord?
 
     @FetchRequest(
         entity: CDDiaperRecord.entity(),
@@ -262,10 +287,18 @@ struct AllDiapersView: View {
                                 diaperRow(r)
                                     .listRowBackground(Color.blCard)
                                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture { recordToEdit = r }
                                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         Button(role: .destructive) { recordToDelete = r } label: {
                                             Label("Delete", systemImage: "trash")
                                         }
+                                    }
+                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                        Button { recordToEdit = r } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                        .tint(.blDiaper)
                                     }
                             }
                         } header: {
@@ -282,6 +315,9 @@ struct AllDiapersView: View {
         }
         .navigationTitle("All Diapers")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $recordToEdit) { record in
+            DiaperLogView(vm: vm, editingRecord: record)
+        }
         .alert("Delete Record?", isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }

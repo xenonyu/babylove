@@ -12,6 +12,11 @@ struct TrackView: View {
     @State private var showGrowthLog   = false
     @State private var recordToDelete: NSManagedObject?
 
+    // Edit states
+    @State private var feedingToEdit: CDFeedingRecord?
+    @State private var sleepToEdit: CDSleepRecord?
+    @State private var diaperToEdit: CDDiaperRecord?
+
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)]
@@ -63,6 +68,11 @@ struct TrackView: View {
                                 ForEach(recentFeedings.prefix(5)) { r in
                                     feedingRow(r)
                                         .contextMenu {
+                                            Button {
+                                                feedingToEdit = r
+                                            } label: {
+                                                Label("Edit", systemImage: "pencil")
+                                            }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
@@ -79,6 +89,11 @@ struct TrackView: View {
                                 ForEach(recentSleeps.prefix(5)) { r in
                                     sleepRow(r)
                                         .contextMenu {
+                                            Button {
+                                                sleepToEdit = r
+                                            } label: {
+                                                Label("Edit", systemImage: "pencil")
+                                            }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
@@ -95,6 +110,11 @@ struct TrackView: View {
                                 ForEach(recentDiapers.prefix(5)) { r in
                                     diaperRow(r)
                                         .contextMenu {
+                                            Button {
+                                                diaperToEdit = r
+                                            } label: {
+                                                Label("Edit", systemImage: "pencil")
+                                            }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
@@ -117,6 +137,16 @@ struct TrackView: View {
         .sheet(isPresented: $showSleepLog)   { SleepLogView(vm: vm) }
         .sheet(isPresented: $showDiaperLog)  { DiaperLogView(vm: vm) }
         .sheet(isPresented: $showGrowthLog)  { GrowthLogView(vm: vm) }
+        // Edit sheets
+        .sheet(item: $feedingToEdit) { record in
+            FeedingLogView(vm: vm, editingRecord: record)
+        }
+        .sheet(item: $sleepToEdit) { record in
+            SleepLogView(vm: vm, editingRecord: record)
+        }
+        .sheet(item: $diaperToEdit) { record in
+            DiaperLogView(vm: vm, editingRecord: record)
+        }
         .alert("Delete Record?", isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
