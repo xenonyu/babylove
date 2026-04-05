@@ -17,6 +17,12 @@ struct HomeView: View {
     @State private var feedingTimer: Timer?
     @State private var selectedDate: Date = Date()
 
+    // Global "last event" times — not filtered by selected day
+    @State private var globalLastFeedingTime: Date?
+    @State private var globalLastSleepEnd: Date?
+    @State private var globalLastSleepIsOngoing: Bool = false
+    @State private var globalLastDiaperTime: Date?
+
     // Initialize with today's predicate to avoid flashing all-time data
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
@@ -172,21 +178,20 @@ struct HomeView: View {
         return days == 1 ? "1d ago" : "\(days)d ago"
     }
 
-    /// Time since last feeding
+    /// Time since last feeding (global — not limited to selected day)
     private var feedingTimeSince: String {
-        Self.timeSinceText(from: todayFeedings.first?.timestamp)
+        Self.timeSinceText(from: globalLastFeedingTime)
     }
 
-    /// Time since last sleep ended (or "sleeping" if ongoing)
+    /// Time since last sleep ended (global), or "sleeping now" if ongoing
     private var sleepTimeSince: String {
-        guard let last = todaySleeps.first else { return "" }
-        if last.endTime == nil { return "sleeping now" }
-        return Self.timeSinceText(from: last.endTime)
+        if globalLastSleepIsOngoing { return "sleeping now" }
+        return Self.timeSinceText(from: globalLastSleepEnd)
     }
 
-    /// Time since last diaper change
+    /// Time since last diaper change (global)
     private var diaperTimeSince: String {
-        Self.timeSinceText(from: todayDiapers.first?.timestamp)
+        Self.timeSinceText(from: globalLastDiaperTime)
     }
 
     /// Diaper breakdown subtitle (e.g. "3💧 2💩")
@@ -322,6 +327,7 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .onAppear {
                 updatePredicates()
+                refreshGlobalLastTimes()
                 startSleepTimerIfNeeded()
                 startFeedingTimerIfNeeded()
             }
@@ -333,6 +339,7 @@ struct HomeView: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     updatePredicates()
+                    refreshGlobalLastTimes()
                     startSleepTimerIfNeeded()
                     startFeedingTimerIfNeeded()
                 } else if phase == .background {
@@ -340,7 +347,11 @@ struct HomeView: View {
                     stopFeedingTimer()
                 }
             }
+            .onChange(of: todayFeedings.count) { _, _ in refreshGlobalLastTimes() }
+            .onChange(of: todaySleeps.count) { _, _ in refreshGlobalLastTimes() }
+            .onChange(of: todayDiapers.count) { _, _ in refreshGlobalLastTimes() }
             .onChange(of: ongoingSleeps.count) { _, count in
+                refreshGlobalLastTimes()
                 if count > 0 {
                     startSleepTimerIfNeeded()
                 } else {
@@ -348,6 +359,7 @@ struct HomeView: View {
                 }
             }
             .onChange(of: ongoingFeedings.count) { _, count in
+                refreshGlobalLastTimes()
                 if count > 0 {
                     startFeedingTimerIfNeeded()
                 } else {
@@ -392,6 +404,43 @@ struct HomeView: View {
         } message: {
             Text("This record will be permanently removed.")
         }
+    }
+
+    // MARK: - Global Last-Event Fetch
+
+    /// Fetch the absolute most recent event for each category (across all days).
+    /// This ensures "time since last" is correct even at the start of a new day.
+    private func refreshGlobalLastTimes() {
+        let ctx = PersistenceController.shared.container.viewContext
+
+        // Last feeding (any day)
+        let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        feedReq.fetchLimit = 1
+        globalLastFeedingTime = (try? ctx.fetch(feedReq))?.first?.timestamp
+
+        // Last sleep (any day)
+        let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: false)]
+        sleepReq.fetchLimit = 1
+        if let lastSleep = (try? ctx.fetch(sleepReq))?.first {
+            if lastSleep.endTime == nil {
+                globalLastSleepEnd = lastSleep.startTime
+                globalLastSleepIsOngoing = true
+            } else {
+                globalLastSleepEnd = lastSleep.endTime
+                globalLastSleepIsOngoing = false
+            }
+        } else {
+            globalLastSleepEnd = nil
+            globalLastSleepIsOngoing = false
+        }
+
+        // Last diaper (any day)
+        let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+        diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        diaperReq.fetchLimit = 1
+        globalLastDiaperTime = (try? ctx.fetch(diaperReq))?.first?.timestamp
     }
 
     // MARK: - Sleep Timer
