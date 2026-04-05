@@ -131,6 +131,35 @@ struct GrowthView: View {
         return nil
     }
 
+    /// Calculate the baby's WHO percentile for a given metric using the latest record.
+    /// Returns nil if baby gender is .other, no data, or age out of WHO range.
+    private func whoPercentile(for metric: GrowthMetric) -> Int? {
+        guard let baby = appState.currentBaby, baby.gender != .other else { return nil }
+        guard let record = latestRecord(for: metric), let recordDate = record.date else { return nil }
+
+        let metricKey: String
+        let rawValue: Double
+        switch metric {
+        case .weight:
+            metricKey = "weight"
+            rawValue = record.weightKG
+        case .height:
+            metricKey = "height"
+            rawValue = record.heightCM
+        case .head:
+            metricKey = "head"
+            rawValue = record.headCircumferenceCM
+        }
+        guard rawValue > 0 else { return nil }
+
+        let ageMonths = recordDate.timeIntervalSince(baby.birthDate) / (30.4375 * 86400)
+        guard ageMonths >= 0 && ageMonths <= 24 else { return nil }
+
+        let table = WHOGrowthData.table(metric: metricKey, isBoy: baby.gender == .boy)
+        guard let pctl = table.percentile(atMonth: ageMonths, value: rawValue) else { return nil }
+        return Int(pctl.rounded())
+    }
+
     // MARK: - Chart Area
     private var chartArea: some View {
         VStack(spacing: 16) {
@@ -158,6 +187,9 @@ struct GrowthView: View {
         let latestWeight = latestRecord(for: .weight)
         let latestHeight = latestRecord(for: .height)
         let latestHead   = latestRecord(for: .head)
+        let weightPctl = whoPercentile(for: .weight)
+        let heightPctl = whoPercentile(for: .height)
+        let headPctl   = whoPercentile(for: .head)
 
         return HStack(spacing: 0) {
             // Weight
@@ -165,7 +197,8 @@ struct GrowthView: View {
                 value: latestWeight.map { String(format: "%.2f", unit.weightFromKG($0.weightKG)) },
                 label: unit.weightLabel,
                 icon: "scalemass.fill",
-                isSelected: selectedMetric == .weight
+                isSelected: selectedMetric == .weight,
+                percentile: weightPctl
             ) { selectedMetric = .weight }
 
             dividerLine
@@ -175,7 +208,8 @@ struct GrowthView: View {
                 value: latestHeight.map { String(format: "%.1f", unit.lengthFromCM($0.heightCM)) },
                 label: unit.heightLabel,
                 icon: "ruler.fill",
-                isSelected: selectedMetric == .height
+                isSelected: selectedMetric == .height,
+                percentile: heightPctl
             ) { selectedMetric = .height }
 
             dividerLine
@@ -185,7 +219,8 @@ struct GrowthView: View {
                 value: latestHead.map { String(format: "%.1f", unit.lengthFromCM($0.headCircumferenceCM)) },
                 label: "Head",
                 icon: "circle.dashed",
-                isSelected: selectedMetric == .head
+                isSelected: selectedMetric == .head,
+                percentile: headPctl
             ) { selectedMetric = .head }
         }
         .padding(.vertical, 16)
@@ -198,7 +233,7 @@ struct GrowthView: View {
             .frame(width: 1, height: 44)
     }
 
-    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, action: @escaping () -> Void) -> some View {
         Button(action: {
             withAnimation(.spring(response: 0.3)) { action() }
         }) {
@@ -215,10 +250,29 @@ struct GrowthView: View {
                 Text(label)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(isSelected ? .blGrowth : .blTextTertiary)
+
+                // WHO percentile badge
+                if let pctl = percentile {
+                    Text("P\(pctl)")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            Capsule().fill(percentileColor(pctl))
+                        )
+                }
             }
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
+    }
+
+    /// Color coding for percentile badges: green for normal, amber for watch, red for concern
+    private func percentileColor(_ pctl: Int) -> Color {
+        if pctl < 3 || pctl > 97 { return .blPrimary }       // Outside normal — coral/alert
+        if pctl < 15 || pctl > 85 { return .blGrowth }       // Worth watching — amber
+        return .blTeal                                         // Healthy range — teal
     }
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {

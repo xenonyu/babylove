@@ -36,6 +36,40 @@ struct WHOGrowthTable {
 
     /// Age range covered.
     var maxMonth: Int { rows.last?.month ?? 24 }
+
+    /// Estimate the baby's percentile (0–100) given their age in months and measurement value.
+    /// Uses linear interpolation between the known percentile boundaries (P3, P15, P50, P85, P97).
+    /// Returns nil if the age is out of range or data is unavailable.
+    func percentile(atMonth age: Double, value: Double) -> Double? {
+        // Known percentile anchors and their numeric values
+        let anchors: [(pctl: Double, key: WHOPercentile)] = [
+            (3,  .p3), (15, .p15), (50, .p50), (85, .p85), (97, .p97)
+        ]
+
+        // Look up interpolated WHO values at this age for each percentile
+        var points: [(pctl: Double, val: Double)] = []
+        for a in anchors {
+            if let v = self.value(atMonth: age, percentile: a.key) {
+                points.append((a.pctl, v))
+            }
+        }
+        guard points.count >= 2 else { return nil }
+
+        // If below P3 or above P97, clamp
+        if value <= points.first!.val { return max(1, points.first!.pctl) }
+        if value >= points.last!.val  { return min(99, points.last!.pctl) }
+
+        // Linear interpolation between the two bracketing percentile anchors
+        for i in 0..<(points.count - 1) {
+            let lo = points[i]
+            let hi = points[i + 1]
+            if value >= lo.val && value <= hi.val {
+                let frac = (value - lo.val) / (hi.val - lo.val)
+                return lo.pctl + (hi.pctl - lo.pctl) * frac
+            }
+        }
+        return 50 // Fallback: median
+    }
 }
 
 enum WHOPercentile: CaseIterable {
