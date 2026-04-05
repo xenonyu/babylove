@@ -46,6 +46,8 @@ struct DiaperLogView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityLabel("\(t.displayName) diaper")
+                                .accessibilityAddTraits(diaperType == t ? .isSelected : [])
                             }
                         }
                         .padding(.horizontal, 24)
@@ -76,10 +78,11 @@ struct DiaperLogView: View {
                         .buttonStyle(.plain)
 
                         if showTimePicker {
-                            DatePicker("", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                            DatePicker("Diaper change time", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
                                 .datePickerStyle(.compact)
                                 .tint(.blDiaper)
                                 .labelsHidden()
+                                .accessibilityLabel("Diaper change time")
                                 .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                     }

@@ -54,10 +54,11 @@ struct SleepLogView: View {
                                 Label("Fell Asleep", systemImage: "moon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
-                                DatePicker("", selection: $startTime, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                DatePicker("Fell asleep time", selection: $startTime, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
+                                    .accessibilityLabel("Fell asleep time")
                             }
 
                             if isEditing {
@@ -96,10 +97,11 @@ struct SleepLogView: View {
                                 Label("Start Time", systemImage: "moon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
-                                DatePicker("", selection: $startTime, in: ...endTime, displayedComponents: [.date, .hourAndMinute])
+                                DatePicker("Sleep start time", selection: $startTime, in: ...endTime, displayedComponents: [.date, .hourAndMinute])
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
+                                    .accessibilityLabel("Sleep start time")
                             }
 
                             // End time
@@ -107,10 +109,11 @@ struct SleepLogView: View {
                                 Label("Wake Time", systemImage: "sun.and.horizon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
-                                DatePicker("", selection: $endTime, in: startTime..., displayedComponents: [.date, .hourAndMinute])
+                                DatePicker("Wake up time", selection: $endTime, in: startTime..., displayedComponents: [.date, .hourAndMinute])
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
+                                    .accessibilityLabel("Wake up time")
                             }
                         }
 
@@ -138,6 +141,8 @@ struct SleepLogView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                     }
                                     .buttonStyle(.plain)
+                                    .accessibilityLabel(loc.displayName)
+                                    .accessibilityAddTraits(location == loc ? .isSelected : [])
                                 }
                             }
                         }

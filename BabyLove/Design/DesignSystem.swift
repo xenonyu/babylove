@@ -149,6 +149,8 @@ struct QuickLogCard: View {
             .blCard()
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Log \(label)")
+        .accessibilityHint("Double tap to record a new \(label.lowercased()) entry")
     }
 }
 
@@ -184,6 +186,13 @@ struct StatBadge: View {
     /// Shows how long since the last event (e.g. "1h 23m ago")
     var timeSince: String? = nil
 
+    private var accessibilityText: String {
+        var parts = ["\(value) \(label)"]
+        if let subtitle, !subtitle.isEmpty { parts.append(subtitle) }
+        if let timeSince, !timeSince.isEmpty { parts.append(timeSince) }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         VStack(spacing: 4) {
             Text(value)
@@ -207,6 +216,8 @@ struct StatBadge: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
         .blCard()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText)
     }
 }
 
@@ -261,25 +272,29 @@ struct BabyAvatarView: View {
     var size: CGFloat = 64
 
     var body: some View {
-        if let photoData = baby.photoData, let uiImage = UIImage(data: photoData) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .scaledToFill()
-                .frame(width: size, height: size)
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .stroke(Color(hex: baby.gender.color).opacity(0.3), lineWidth: size > 60 ? 2 : 1.5)
-                )
-        } else {
-            ZStack {
-                Circle()
-                    .fill(Color(hex: baby.gender.color).opacity(0.2))
+        Group {
+            if let photoData = baby.photoData, let uiImage = UIImage(data: photoData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: size, height: size)
-                Text(baby.gender.icon)
-                    .font(.system(size: size * 0.5))
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(Color(hex: baby.gender.color).opacity(0.3), lineWidth: size > 60 ? 2 : 1.5)
+                    )
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: baby.gender.color).opacity(0.2))
+                        .frame(width: size, height: size)
+                    Text(baby.gender.icon)
+                        .font(.system(size: size * 0.5))
+                }
             }
         }
+        .accessibilityLabel("\(baby.name)'s photo")
+        .accessibilityElement(children: .ignore)
     }
 }
 

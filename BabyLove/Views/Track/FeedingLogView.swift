@@ -78,6 +78,8 @@ struct FeedingLogView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                     }
                                     .buttonStyle(.plain)
+                                    .accessibilityLabel("\(t.displayName) feeding")
+                                    .accessibilityAddTraits(feedType == t ? .isSelected : [])
                                 }
                             }
                         }
@@ -103,6 +105,8 @@ struct FeedingLogView: View {
                                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                         }
                                         .buttonStyle(.plain)
+                                        .accessibilityLabel("\(s.displayName) side")
+                                        .accessibilityAddTraits(side == s ? .isSelected : [])
                                     }
                                 }
 
@@ -156,6 +160,8 @@ struct FeedingLogView: View {
                                     }
                                     Slider(value: $duration, in: 1...60, step: 1)
                                         .tint(.blFeeding)
+                                        .accessibilityLabel("Duration")
+                                        .accessibilityValue("\(Int(duration)) minutes")
                                 }
                             }
                         }
@@ -177,6 +183,8 @@ struct FeedingLogView: View {
                                 }
                                 Slider(value: $amount, in: 0...maxAmount, step: amountStep)
                                     .tint(.blFeeding)
+                                    .accessibilityLabel("Amount")
+                                    .accessibilityValue(unit == .metric ? "\(Int(amount)) milliliters" : String(format: "%.1f ounces", amount))
                             }
                         }
 
@@ -205,10 +213,11 @@ struct FeedingLogView: View {
                             .buttonStyle(.plain)
 
                             if showTimePicker {
-                                DatePicker("", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                DatePicker("Feeding time", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
                                     .datePickerStyle(.compact)
                                     .tint(.blFeeding)
                                     .labelsHidden()
+                                    .accessibilityLabel("Feeding time")
                                     .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }

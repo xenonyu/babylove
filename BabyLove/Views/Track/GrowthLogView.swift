@@ -79,10 +79,11 @@ struct GrowthLogView: View {
                             .buttonStyle(.plain)
 
                             if showDatePicker {
-                                DatePicker("", selection: $recordDate, in: ...Date(), displayedComponents: .date)
+                                DatePicker("Measurement date", selection: $recordDate, in: ...Date(), displayedComponents: .date)
                                     .datePickerStyle(.compact)
                                     .tint(.blGrowth)
                                     .labelsHidden()
+                                    .accessibilityLabel("Measurement date")
                                     .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }

@@ -548,6 +548,8 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.blSleep.opacity(0.3), lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Baby is sleeping, elapsed \(elapsedText)")
     }
 
     // MARK: - Feeding Timer
@@ -667,6 +669,8 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.blFeeding.opacity(0.3), lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Feeding in progress, elapsed \(feedingElapsedText)")
     }
 
     // MARK: - Date Navigation Bar
@@ -746,6 +750,8 @@ struct HomeView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel(isToday ? "Today" : "\(dayOfWeekText(date)) \(dayNumberText(date))")
+                            .accessibilityAddTraits(isSelected ? .isSelected : [])
                             .id(date)
                         }
                     }
@@ -1328,6 +1334,14 @@ struct TimeSinceRow: View {
     /// "time ago" is not meaningful — it just mirrors the time for quick scanning.
     var showTimeAgoHighlight: Bool = true
 
+    private var accessibilityText: String {
+        var parts = [title]
+        if !detail.isEmpty { parts.append(detail) }
+        parts.append("at \(timeLabel)")
+        if showTimeAgoHighlight && !timeAgo.isEmpty { parts.append(timeAgo) }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         HStack(spacing: 14) {
             ZStack {
@@ -1363,5 +1377,8 @@ struct TimeSinceRow: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText)
+        .accessibilityHint("Long press to edit or delete")
     }
 }

@@ -414,10 +414,11 @@ struct AddMilestoneView: View {
                             Label("Date", systemImage: "calendar")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            DatePicker("", selection: $date, in: ...Date(), displayedComponents: .date)
+                            DatePicker("Milestone date", selection: $date, in: ...Date(), displayedComponents: .date)
                                 .datePickerStyle(.compact)
                                 .tint(.blPrimary)
                                 .labelsHidden()
+                                .accessibilityLabel("Milestone date")
                         }
 
                         // Status
