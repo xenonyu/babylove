@@ -384,7 +384,10 @@ struct FeedingLogView: View {
         let req: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
         req.predicate = NSPredicate(format: "durationMinutes == 0 AND (feedType == %@ OR feedType == %@)",
                                     FeedType.breast.rawValue, FeedType.pump.rawValue)
-        req.fetchLimit = 1
+        // When editing, we need to fetch at least 2 results so that if the first
+        // result is the record being edited, we can still detect a second ongoing
+        // feeding. With fetchLimit=1 the duplicate could be masked.
+        req.fetchLimit = isEditing ? 2 : 1
         guard let results = try? ctx.fetch(req) else { return }
         if let editing = editingRecord {
             hasExistingOngoingFeeding = results.contains(where: { $0.objectID != editing.objectID })

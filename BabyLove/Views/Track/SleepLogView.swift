@@ -273,7 +273,10 @@ struct SleepLogView: View {
         let ctx = PersistenceController.shared.container.viewContext
         let req: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
         req.predicate = NSPredicate(format: "endTime == nil")
-        req.fetchLimit = 1
+        // When editing, we need to fetch at least 2 results so that if the first
+        // result is the record being edited, we can still detect a second ongoing
+        // sleep. With fetchLimit=1 the duplicate could be masked.
+        req.fetchLimit = isEditing ? 2 : 1
         guard let results = try? ctx.fetch(req) else { return }
         // If editing an ongoing sleep, that record itself shouldn't count
         if let editing = editingRecord {
