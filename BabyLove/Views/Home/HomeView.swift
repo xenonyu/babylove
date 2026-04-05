@@ -981,6 +981,17 @@ struct HomeView: View {
         return parts.joined(separator: " · ")
     }
 
+    /// For past dates, show the record time only (no misleading "Xh ago").
+    /// For today, show the relative "time ago" badge.
+    private func activityTimeAgo(from date: Date?) -> String {
+        guard let date else { return "" }
+        if isSelectedDateToday {
+            return Self.timeAgoText(from: date)
+        }
+        // Past date: show just the formatted time (no relative "ago")
+        return date.formatted(date: .omitted, time: .shortened)
+    }
+
     private var recentActivitySection: some View {
         VStack(spacing: 12) {
             BLSectionHeader(title: "Recent Activity")
@@ -994,8 +1005,9 @@ struct HomeView: View {
                         color: .blFeeding,
                         title: feedType?.displayName ?? "Feeding",
                         detail: feedingDetail(last),
-                        timeAgo: last.timestamp.map { Self.timeAgoText(from: $0) } ?? "",
-                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
+                        timeAgo: activityTimeAgo(from: last.timestamp),
+                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? "",
+                        showTimeAgoHighlight: isSelectedDateToday
                     )
                     if !todaySleeps.isEmpty || !todayDiapers.isEmpty {
                         Divider().padding(.leading, 70)
@@ -1013,10 +1025,13 @@ struct HomeView: View {
                         return ""
                     }()
                     let sleepAgo: String = {
-                        if last.endTime == nil {
+                        if last.endTime == nil && isSelectedDateToday {
                             return "Now"
+                        } else if last.endTime == nil {
+                            // Past ongoing sleep (shouldn't normally happen)
+                            return "Ongoing"
                         } else if let endTime = last.endTime {
-                            return Self.timeAgoText(from: endTime)
+                            return activityTimeAgo(from: endTime)
                         }
                         return ""
                     }()
@@ -1026,7 +1041,8 @@ struct HomeView: View {
                         title: "Sleep",
                         detail: sleepDetail,
                         timeAgo: sleepAgo,
-                        timeLabel: last.startTime?.formatted(date: .omitted, time: .shortened) ?? ""
+                        timeLabel: last.startTime?.formatted(date: .omitted, time: .shortened) ?? "",
+                        showTimeAgoHighlight: isSelectedDateToday
                     )
                     if !todayDiapers.isEmpty {
                         Divider().padding(.leading, 70)
@@ -1039,8 +1055,9 @@ struct HomeView: View {
                         color: .blDiaper,
                         title: dType?.displayName ?? "Diaper",
                         detail: dType?.icon ?? "",
-                        timeAgo: last.timestamp.map { Self.timeAgoText(from: $0) } ?? "",
-                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
+                        timeAgo: activityTimeAgo(from: last.timestamp),
+                        timeLabel: last.timestamp?.formatted(date: .omitted, time: .shortened) ?? "",
+                        showTimeAgoHighlight: isSelectedDateToday
                     )
                 }
             }
@@ -1058,6 +1075,10 @@ struct TimeSinceRow: View {
     let detail: String
     let timeAgo: String
     let timeLabel: String
+    /// When true (today), timeAgo is shown in the accent color as a prominent badge.
+    /// When false (past date), timeAgo is shown in a subdued style since relative
+    /// "time ago" is not meaningful — it just mirrors the time for quick scanning.
+    var showTimeAgoHighlight: Bool = true
 
     var body: some View {
         HStack(spacing: 14) {
@@ -1089,8 +1110,8 @@ struct TimeSinceRow: View {
             }
             Spacer()
             Text(timeAgo)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(color)
+                .font(.system(size: 14, weight: showTimeAgoHighlight ? .semibold : .medium))
+                .foregroundColor(showTimeAgoHighlight ? color : .blTextSecondary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
