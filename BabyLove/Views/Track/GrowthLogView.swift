@@ -12,6 +12,8 @@ struct GrowthLogView: View {
     @State private var heightCM = ""
     @State private var headCM   = ""
     @State private var notes    = ""
+    @State private var recordDate = Date()
+    @State private var showDatePicker = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -52,6 +54,39 @@ struct GrowthLogView: View {
                             placeholder: unit == .metric ? "e.g. 40.2" : "e.g. 15.8"
                         )
 
+                        // Date
+                        VStack(alignment: .leading, spacing: 10) {
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { showDatePicker.toggle() }
+                            } label: {
+                                HStack {
+                                    Label("Date", systemImage: "calendar")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                    Spacer()
+                                    Text(recordDate.formatted(date: .abbreviated, time: .omitted))
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(.blGrowth)
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(.blTextTertiary)
+                                        .rotationEffect(.degrees(showDatePicker ? 90 : 0))
+                                }
+                                .padding(14)
+                                .background(Color.blSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+
+                            if showDatePicker {
+                                DatePicker("", selection: $recordDate, in: ...Date(), displayedComponents: .date)
+                                    .datePickerStyle(.compact)
+                                    .tint(.blGrowth)
+                                    .labelsHidden()
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                        }
+
                         VStack(alignment: .leading, spacing: 10) {
                             Label("Notes", systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
@@ -69,9 +104,9 @@ struct GrowthLogView: View {
                             let hCM = Double(heightCM).map { unit.lengthToCM($0) }
                             let hd  = Double(headCM).map { unit.lengthToCM($0) }
                             if let record = editingRecord {
-                                vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, notes: notes)
+                                vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
                             } else {
-                                vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, notes: notes)
+                                vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
                             }
                             dismiss()
                         }
@@ -110,6 +145,7 @@ struct GrowthLogView: View {
         heightCM = h > 0 ? String(format: "%.1f", h) : ""
         headCM = hc > 0 ? String(format: "%.1f", hc) : ""
         notes = r.notes ?? ""
+        recordDate = r.date ?? Date()
     }
 
     private func measurementField(

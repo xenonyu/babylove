@@ -79,10 +79,11 @@ class TrackViewModel: ObservableObject {
     func logGrowth(weightKG: Double? = nil,
                    heightCM: Double? = nil,
                    headCM: Double? = nil,
+                   date: Date = Date(),
                    notes: String = "") {
         let record = CDGrowthRecord(context: ctx)
         record.id = UUID()
-        record.date = Date()
+        record.date = date
         if let w = weightKG { record.weightKG = w }
         if let h = heightCM { record.heightCM = h }
         if let hc = headCM  { record.headCircumferenceCM = hc }
@@ -187,13 +188,14 @@ class TrackViewModel: ObservableObject {
                       weightKG: Double? = nil,
                       heightCM: Double? = nil,
                       headCM: Double? = nil,
+                      date: Date = Date(),
                       notes: String = "") {
         // Preserve existing values when a field is not provided (nil),
         // but allow explicit zero to clear a measurement.
         record.weightKG = weightKG ?? record.weightKG
         record.heightCM = heightCM ?? record.heightCM
         record.headCircumferenceCM = headCM ?? record.headCircumferenceCM
-        record.date = record.date ?? Date()
+        record.date = date
         record.notes = notes.isEmpty ? nil : notes
         save()
     }
