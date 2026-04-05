@@ -804,10 +804,49 @@ struct HomeView: View {
 
     // MARK: - Weekly Summary
 
+    /// The actual number of days to use as divisor for the current 7-day window.
+    /// If the baby is younger than 7 days, we use their age instead to avoid
+    /// artificially low averages for new users. Always at least 1.
+    private var currentWeekActiveDays: Double {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let weekStart = cal.date(byAdding: .day, value: -7, to: today)!
+        // If we have a baby birth date, cap the window to days since birth
+        if let birth = baby?.birthDate {
+            let birthStart = cal.startOfDay(for: birth)
+            // How many days from the later of (weekStart, birthStart) to today
+            let effectiveStart = max(weekStart, birthStart)
+            let days = cal.dateComponents([.day], from: effectiveStart, to: today).day ?? 7
+            return Double(max(1, min(7, days)))
+        }
+        return 7.0
+    }
+
+    /// The actual number of days to use as divisor for the previous 7-day window.
+    private var prevWeekActiveDays: Double {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let prevWeekStart = cal.date(byAdding: .day, value: -14, to: today)!
+        let prevWeekEnd = cal.date(byAdding: .day, value: -7, to: today)!
+        if let birth = baby?.birthDate {
+            let birthStart = cal.startOfDay(for: birth)
+            // If baby wasn't born during the prev week, the full 7 days apply
+            // If baby was born during prev week, only count days since birth
+            if birthStart >= prevWeekEnd {
+                // Baby wasn't born yet during prev week — no valid data
+                return 7.0 // won't matter since prevWeek data will be empty
+            }
+            let effectiveStart = max(prevWeekStart, birthStart)
+            let days = cal.dateComponents([.day], from: effectiveStart, to: prevWeekEnd).day ?? 7
+            return Double(max(1, min(7, days)))
+        }
+        return 7.0
+    }
+
     /// Average feedings per day this week
     private var weekAvgFeedings: Double {
         guard !weekFeedings.isEmpty else { return 0 }
-        return Double(weekFeedings.count) / 7.0
+        return Double(weekFeedings.count) / currentWeekActiveDays
     }
 
     /// Average sleep hours per day this week
@@ -818,19 +857,19 @@ struct HomeView: View {
             let e = r.endTime ?? Date()
             return sum + Int(e.timeIntervalSince(s) / 60)
         }
-        return Double(totalMinutes) / 60.0 / 7.0
+        return Double(totalMinutes) / 60.0 / currentWeekActiveDays
     }
 
     /// Average diapers per day this week
     private var weekAvgDiapers: Double {
         guard !weekDiapers.isEmpty else { return 0 }
-        return Double(weekDiapers.count) / 7.0
+        return Double(weekDiapers.count) / currentWeekActiveDays
     }
 
     /// Average feedings per day previous week
     private var prevWeekAvgFeedings: Double {
         guard !prevWeekFeedings.isEmpty else { return 0 }
-        return Double(prevWeekFeedings.count) / 7.0
+        return Double(prevWeekFeedings.count) / prevWeekActiveDays
     }
 
     /// Average sleep hours per day previous week
@@ -841,13 +880,13 @@ struct HomeView: View {
             let e = r.endTime ?? Date()
             return sum + Int(e.timeIntervalSince(s) / 60)
         }
-        return Double(totalMinutes) / 60.0 / 7.0
+        return Double(totalMinutes) / 60.0 / prevWeekActiveDays
     }
 
     /// Average diapers per day previous week
     private var prevWeekAvgDiapers: Double {
         guard !prevWeekDiapers.isEmpty else { return 0 }
-        return Double(prevWeekDiapers.count) / 7.0
+        return Double(prevWeekDiapers.count) / prevWeekActiveDays
     }
 
     /// Returns a trend icon based on comparison (up, down, or steady)
@@ -859,9 +898,18 @@ struct HomeView: View {
         return ("equal", .blTextTertiary)
     }
 
+    /// Label for the weekly summary header, adjusted for babies younger than 7 days
+    private var weeklySummaryTitle: String {
+        let days = Int(currentWeekActiveDays)
+        if days < 7 {
+            return "Last \(days) Day\(days == 1 ? "" : "s")"
+        }
+        return "This Week"
+    }
+
     private var weeklySummaryCard: some View {
         VStack(spacing: 12) {
-            BLSectionHeader(title: "This Week")
+            BLSectionHeader(title: weeklySummaryTitle)
                 .padding(.horizontal, 20)
 
             VStack(spacing: 0) {
