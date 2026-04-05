@@ -215,125 +215,144 @@ struct SettingsView: View {
 
     private func exportAllData() {
         isExporting = true
-        let ctx = PersistenceController.shared.container.viewContext
+        // Capture values for use in background task
         let unit = appState.measurementUnit
         let babyName = appState.currentBaby?.name ?? "Baby"
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
 
-        do {
-            // Build CSV content with all record types in one file
-            var csv = "Record Type,Date,Time,Details,Notes\n"
+        Task.detached(priority: .userInitiated) {
+            // Use a dedicated background context so we don't block the main thread
+            let bgCtx = PersistenceController.shared.container.newBackgroundContext()
+            bgCtx.automaticallyMergesChangesFromParent = true
 
-            // Feeding records
-            let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
-            feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-            let feedings = try ctx.fetch(feedReq)
-            for r in feedings {
-                let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
-                let time = r.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
-                let feedType = FeedType(rawValue: r.feedType ?? "")?.displayName ?? r.feedType ?? ""
-                var details = [feedType]
-                if r.durationMinutes > 0 { details.append("\(r.durationMinutes) min") }
-                if r.amountML > 0 {
-                    let val = unit.volumeFromML(r.amountML)
-                    details.append(unit == .metric ? "\(Int(val)) \(unit.volumeLabel)" : String(format: "%.1f %@", val, unit.volumeLabel))
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
+            // Time-only formatter for use off main thread (Date.formatted is MainActor)
+            let timeFormatter = DateFormatter()
+            timeFormatter.dateStyle = .none
+            timeFormatter.timeStyle = .short
+
+            do {
+                let csv: String = try bgCtx.performAndWait {
+                    var csv = "Record Type,Date,Time,Details,Notes\n"
+
+                    // Feeding records
+                    let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+                    feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+                    let feedings = try bgCtx.fetch(feedReq)
+                    for r in feedings {
+                        let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
+                        let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
+                        let feedType = FeedType(rawValue: r.feedType ?? "")?.displayName ?? r.feedType ?? ""
+                        var details = [feedType]
+                        if r.durationMinutes > 0 { details.append("\(r.durationMinutes) min") }
+                        if r.amountML > 0 {
+                            let val = unit.volumeFromML(r.amountML)
+                            details.append(unit == .metric ? "\(Int(val)) \(unit.volumeLabel)" : String(format: "%.1f %@", val, unit.volumeLabel))
+                        }
+                        if let side = r.breastSide, !side.isEmpty {
+                            details.append(BreastSide(rawValue: side)?.displayName ?? side)
+                        }
+                        let notes = Self.csvEscape(r.notes)
+                        csv += "Feeding,\(date),\(time),\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
+                    }
+
+                    // Sleep records
+                    let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+                    sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: true)]
+                    let sleeps = try bgCtx.fetch(sleepReq)
+                    for r in sleeps {
+                        let date = r.startTime.map { dateFormatter.string(from: $0) } ?? ""
+                        let startTime = r.startTime.map { timeFormatter.string(from: $0) } ?? ""
+                        var details = [String]()
+                        if let loc = r.location, let sl = SleepLocation(rawValue: loc) {
+                            details.append(sl.displayName)
+                        }
+                        if let s = r.startTime, let e = r.endTime {
+                            let mins = Int(e.timeIntervalSince(s) / 60)
+                            let h = mins / 60, m = mins % 60
+                            details.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
+                            details.append("End: \(timeFormatter.string(from: e))")
+                        } else {
+                            details.append("Ongoing")
+                        }
+                        let notes = Self.csvEscape(r.notes)
+                        csv += "Sleep,\(date),\(startTime),\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
+                    }
+
+                    // Diaper records
+                    let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+                    diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+                    let diapers = try bgCtx.fetch(diaperReq)
+                    for r in diapers {
+                        let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
+                        let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
+                        let dType = DiaperType(rawValue: r.diaperType ?? "")?.displayName ?? r.diaperType ?? ""
+                        let notes = Self.csvEscape(r.notes)
+                        csv += "Diaper,\(date),\(time),\(dType),\(notes)\n"
+                    }
+
+                    // Growth records
+                    let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+                    growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+                    let growths = try bgCtx.fetch(growthReq)
+                    for r in growths {
+                        let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
+                        var details = [String]()
+                        if r.weightKG > 0 {
+                            let w = unit.weightFromKG(r.weightKG)
+                            details.append(String(format: "%.2f %@", w, unit.weightLabel))
+                        }
+                        if r.heightCM > 0 {
+                            let h = unit.lengthFromCM(r.heightCM)
+                            details.append(String(format: "%.1f %@ height", h, unit.heightLabel))
+                        }
+                        if r.headCircumferenceCM > 0 {
+                            let hc = unit.lengthFromCM(r.headCircumferenceCM)
+                            details.append(String(format: "%.1f %@ head", hc, unit.heightLabel))
+                        }
+                        let notes = Self.csvEscape(r.notes)
+                        csv += "Growth,\(date),,\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
+                    }
+
+                    // Milestones
+                    let mileReq: NSFetchRequest<CDMilestone> = CDMilestone.fetchRequest()
+                    mileReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+                    let milestones = try bgCtx.fetch(mileReq)
+                    for r in milestones {
+                        let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
+                        let title = Self.csvEscape(r.title)
+                        let cat = MilestoneCategory(rawValue: r.category ?? "")?.displayName ?? r.category ?? ""
+                        let status = r.isCompleted ? "Completed" : "In Progress"
+                        let notes = Self.csvEscape(r.notes)
+                        csv += "Milestone,\(date),,\(title) [\(cat)] (\(status)),\(notes)\n"
+                    }
+
+                    return csv
                 }
-                if let side = r.breastSide, !side.isEmpty {
-                    details.append(BreastSide(rawValue: side)?.displayName ?? side)
+
+                // Write to temp file (file I/O is also off main thread)
+                let fileDateStr = BLDateFormatters.isoDate.string(from: Date())
+                let fileName = "\(babyName)_BabyLove_Export_\(fileDateStr).csv"
+                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+                try csv.write(to: tempURL, atomically: true, encoding: .utf8)
+
+                await MainActor.run {
+                    exportFileURL = tempURL
+                    isExporting = false
+                    showExportShare = true
                 }
-                let notes = csvEscape(r.notes)
-                csv += "Feeding,\(date),\(time),\(csvEscape(details.joined(separator: "; "))),\(notes)\n"
+
+            } catch {
+                await MainActor.run {
+                    isExporting = false
+                    exportError = error.localizedDescription
+                    showExportError = true
+                }
             }
-
-            // Sleep records
-            let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
-            sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: true)]
-            let sleeps = try ctx.fetch(sleepReq)
-            for r in sleeps {
-                let date = r.startTime.map { dateFormatter.string(from: $0) } ?? ""
-                let startTime = r.startTime?.formatted(date: .omitted, time: .shortened) ?? ""
-                var details = [String]()
-                if let loc = r.location, let sl = SleepLocation(rawValue: loc) {
-                    details.append(sl.displayName)
-                }
-                if let s = r.startTime, let e = r.endTime {
-                    let mins = Int(e.timeIntervalSince(s) / 60)
-                    let h = mins / 60, m = mins % 60
-                    details.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
-                    details.append("End: \(e.formatted(date: .omitted, time: .shortened))")
-                } else {
-                    details.append("Ongoing")
-                }
-                let notes = csvEscape(r.notes)
-                csv += "Sleep,\(date),\(startTime),\(csvEscape(details.joined(separator: "; "))),\(notes)\n"
-            }
-
-            // Diaper records
-            let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
-            diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-            let diapers = try ctx.fetch(diaperReq)
-            for r in diapers {
-                let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
-                let time = r.timestamp?.formatted(date: .omitted, time: .shortened) ?? ""
-                let dType = DiaperType(rawValue: r.diaperType ?? "")?.displayName ?? r.diaperType ?? ""
-                let notes = csvEscape(r.notes)
-                csv += "Diaper,\(date),\(time),\(dType),\(notes)\n"
-            }
-
-            // Growth records
-            let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
-            growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-            let growths = try ctx.fetch(growthReq)
-            for r in growths {
-                let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
-                var details = [String]()
-                if r.weightKG > 0 {
-                    let w = unit.weightFromKG(r.weightKG)
-                    details.append(String(format: "%.2f %@", w, unit.weightLabel))
-                }
-                if r.heightCM > 0 {
-                    let h = unit.lengthFromCM(r.heightCM)
-                    details.append(String(format: "%.1f %@ height", h, unit.heightLabel))
-                }
-                if r.headCircumferenceCM > 0 {
-                    let hc = unit.lengthFromCM(r.headCircumferenceCM)
-                    details.append(String(format: "%.1f %@ head", hc, unit.heightLabel))
-                }
-                let notes = csvEscape(r.notes)
-                csv += "Growth,\(date),,\(csvEscape(details.joined(separator: "; "))),\(notes)\n"
-            }
-
-            // Milestones
-            let mileReq: NSFetchRequest<CDMilestone> = CDMilestone.fetchRequest()
-            mileReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-            let milestones = try ctx.fetch(mileReq)
-            for r in milestones {
-                let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
-                let title = csvEscape(r.title)
-                let cat = MilestoneCategory(rawValue: r.category ?? "")?.displayName ?? r.category ?? ""
-                let status = r.isCompleted ? "Completed" : "In Progress"
-                let notes = csvEscape(r.notes)
-                csv += "Milestone,\(date),,\(title) [\(cat)] (\(status)),\(notes)\n"
-            }
-
-            // Write to temp file
-            let fileName = "\(babyName)_BabyLove_Export_\(Self.fileDate()).csv"
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
-            try csv.write(to: tempURL, atomically: true, encoding: .utf8)
-
-            exportFileURL = tempURL
-            isExporting = false
-            showExportShare = true
-
-        } catch {
-            isExporting = false
-            exportError = error.localizedDescription
-            showExportError = true
         }
     }
 
-    private func csvEscape(_ value: String?) -> String {
+    private static func csvEscape(_ value: String?) -> String {
         guard let value, !value.isEmpty else { return "" }
         if value.contains(",") || value.contains("\"") || value.contains("\n") {
             return "\"\(value.replacingOccurrences(of: "\"", with: "\"\""))\""
