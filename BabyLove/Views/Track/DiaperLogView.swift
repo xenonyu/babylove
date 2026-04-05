@@ -30,6 +30,7 @@ struct DiaperLogView: View {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
                             ForEach(DiaperType.allCases, id: \.self) { t in
                                 Button {
+                                    Haptic.selection()
                                     withAnimation(.spring(response: 0.3)) { diaperType = t }
                                 } label: {
                                     VStack(spacing: 10) {
@@ -100,6 +101,7 @@ struct DiaperLogView: View {
                     Spacer()
 
                     Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
+                        Haptic.success()
                         if let record = editingRecord {
                             vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
                             appState.showToast("Diaper updated", icon: "pencil.circle.fill", color: .blDiaper)

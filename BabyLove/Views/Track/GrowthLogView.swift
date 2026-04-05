@@ -99,6 +99,7 @@ struct GrowthLogView: View {
                         }
 
                         Button(isEditing ? "Update Measurements" : "Save Measurements") {
+                            Haptic.success()
                             // Convert from display unit to metric for storage
                             let wKG = Double(weightKG).map { unit.weightToKG($0) }
                             let hCM = Double(heightCM).map { unit.lengthToCM($0) }

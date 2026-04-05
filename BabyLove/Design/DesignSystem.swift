@@ -1,4 +1,45 @@
 import SwiftUI
+import UIKit
+
+// MARK: - Haptic Feedback
+/// Lightweight haptic manager for tactile feedback on key interactions.
+/// Uses pre-prepared generators for minimal latency.
+enum Haptic {
+    /// Light tap — Quick Log card open, picker changes
+    static func light() {
+        let g = UIImpactFeedbackGenerator(style: .light)
+        g.prepare()
+        g.impactOccurred()
+    }
+
+    /// Medium tap — record saved, timer started
+    static func medium() {
+        let g = UIImpactFeedbackGenerator(style: .medium)
+        g.prepare()
+        g.impactOccurred()
+    }
+
+    /// Success notification — record saved / timer ended
+    static func success() {
+        let g = UINotificationFeedbackGenerator()
+        g.prepare()
+        g.notificationOccurred(.success)
+    }
+
+    /// Warning notification — delete confirmation shown
+    static func warning() {
+        let g = UINotificationFeedbackGenerator()
+        g.prepare()
+        g.notificationOccurred(.warning)
+    }
+
+    /// Selection tick — segment changes, date pills, filter chips
+    static func selection() {
+        let g = UISelectionFeedbackGenerator()
+        g.prepare()
+        g.selectionChanged()
+    }
+}
 
 // MARK: - Brand Colors
 extension Color {
@@ -85,7 +126,10 @@ struct QuickLogCard: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            Haptic.light()
+            action()
+        } label: {
             VStack(spacing: 10) {
                 ZStack {
                     Circle()

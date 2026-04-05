@@ -396,6 +396,7 @@ struct HomeView: View {
         )) {
             Button("Cancel", role: .cancel) { timelineRecordToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let record = timelineRecordToDelete {
                     withAnimation { vm.deleteObject(record, in: ctx) }
                 }
@@ -479,6 +480,7 @@ struct HomeView: View {
 
     private func endOngoingSleep() {
         guard let ongoing = ongoingSleep, let id = ongoing.id else { return }
+        Haptic.success()
         withAnimation(.spring(response: 0.4)) {
             vm.endSleepByID(id, context: ctx)
         }
@@ -584,6 +586,7 @@ struct HomeView: View {
 
     private func endOngoingFeeding() {
         guard let ongoing = ongoingFeeding, let id = ongoing.id else { return }
+        Haptic.success()
         withAnimation(.spring(response: 0.4)) {
             vm.endFeedingByID(id, context: ctx)
         }
@@ -725,6 +728,7 @@ struct HomeView: View {
                             let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
                             let isToday = Calendar.current.isDateInToday(date)
                             Button {
+                                Haptic.selection()
                                 withAnimation(.easeInOut(duration: 0.2)) { selectedDate = date }
                             } label: {
                                 VStack(spacing: 2) {

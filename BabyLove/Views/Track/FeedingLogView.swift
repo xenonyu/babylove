@@ -61,6 +61,7 @@ struct FeedingLogView: View {
                             HStack(spacing: 10) {
                                 ForEach(FeedType.allCases, id: \.self) { t in
                                     Button {
+                                        Haptic.selection()
                                         withAnimation(.spring(response: 0.3)) { feedType = t }
                                     } label: {
                                         VStack(spacing: 6) {
@@ -90,6 +91,7 @@ struct FeedingLogView: View {
                                 HStack(spacing: 10) {
                                     ForEach(BreastSide.allCases, id: \.self) { s in
                                         Button {
+                                            Haptic.selection()
                                             withAnimation(.spring(response: 0.3)) { side = s }
                                         } label: {
                                             Text(s.displayName)
@@ -224,6 +226,7 @@ struct FeedingLogView: View {
                         }
 
                         Button(buttonLabel) {
+                            Haptic.success()
                             let amountML = unit.volumeToML(amount)
                             let hasDuration = feedType == .breast || feedType == .pump
                             if let record = editingRecord {

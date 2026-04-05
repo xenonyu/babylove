@@ -106,6 +106,7 @@ struct GrowthView: View {
         )) {
             Button("Cancel", role: .cancel) { recordToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
                 }
@@ -235,6 +236,7 @@ struct GrowthView: View {
 
     private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, action: @escaping () -> Void) -> some View {
         Button(action: {
+            Haptic.selection()
             withAnimation(.spring(response: 0.3)) { action() }
         }) {
             VStack(spacing: 4) {

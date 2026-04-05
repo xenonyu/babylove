@@ -106,6 +106,7 @@ struct MemoryView: View {
                                 LazyVStack(spacing: 16) {
                                     ForEach(filteredMilestones, id: \.objectID) { m in
                                         MilestoneCard(milestone: m) {
+                                            Haptic.medium()
                                             withAnimation(.spring(response: 0.35)) {
                                                 vm.toggleMilestoneCompleted(m, in: ctx)
                                             }
@@ -160,6 +161,7 @@ struct MemoryView: View {
         )) {
             Button("Cancel", role: .cancel) { milestoneToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let m = milestoneToDelete {
                     withAnimation { vm.deleteObject(m, in: ctx) }
                 }
@@ -178,6 +180,7 @@ struct MemoryView: View {
                 ForEach(MilestoneFilter.allFilters, id: \.self) { filter in
                     let isSelected = selectedFilter == filter
                     Button {
+                        Haptic.selection()
                         withAnimation(.spring(response: 0.3)) {
                             selectedFilter = filter
                         }
@@ -445,6 +448,7 @@ struct AddMilestoneView: View {
                         }
 
                         Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
+                            Haptic.success()
                             if let record = editingRecord {
                                 vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
                                 appState.showToast("Milestone updated", icon: "pencil.circle.fill", color: .blPrimary)

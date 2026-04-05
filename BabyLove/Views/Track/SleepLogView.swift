@@ -122,6 +122,7 @@ struct SleepLogView: View {
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                                 ForEach(SleepLocation.allCases, id: \.self) { loc in
                                     Button {
+                                        Haptic.selection()
                                         withAnimation(.spring(response: 0.3)) { location = loc }
                                     } label: {
                                         VStack(spacing: 4) {
@@ -154,6 +155,7 @@ struct SleepLogView: View {
                         }
 
                         Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
+                            Haptic.success()
                             if let record = editingRecord {
                                 vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
                                 appState.showToast("Sleep updated", icon: "pencil.circle.fill", color: .blSleep)

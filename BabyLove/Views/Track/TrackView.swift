@@ -210,6 +210,7 @@ struct TrackView: View {
         )) {
             Button("Cancel", role: .cancel) { recordToDelete = nil }
             Button("Delete", role: .destructive) {
+                Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
                 }

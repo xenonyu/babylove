@@ -188,6 +188,7 @@ struct SettingsView: View {
         .alert("Reset All Data?", isPresented: $showResetAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Reset", role: .destructive) {
+                Haptic.warning()
                 resetAllData()
             }
         } message: {
