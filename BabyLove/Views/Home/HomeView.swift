@@ -13,6 +13,8 @@ struct HomeView: View {
     @State private var showGrowthLog   = false
     @State private var sleepElapsed: TimeInterval = 0
     @State private var sleepTimer: Timer?
+    @State private var feedingElapsed: TimeInterval = 0
+    @State private var feedingTimer: Timer?
 
     // Initialize with today's predicate to avoid flashing all-time data
     @FetchRequest(
@@ -41,6 +43,15 @@ struct HomeView: View {
     private var ongoingSleeps: FetchedResults<CDSleepRecord>
 
     private var ongoingSleep: CDSleepRecord? { ongoingSleeps.first }
+
+    // Ongoing feeding: durationMinutes == 0 AND feedType is breast/pump means timer is running
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "durationMinutes == 0 AND (feedType == %@ OR feedType == %@)", "breast", "pump")
+    )
+    private var ongoingFeedings: FetchedResults<CDFeedingRecord>
+
+    private var ongoingFeeding: CDFeedingRecord? { ongoingFeedings.first }
 
     private var baby: Baby? { appState.currentBaby }
 
@@ -155,6 +166,13 @@ struct HomeView: View {
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
+                        // Ongoing feeding banner
+                        if let ongoing = ongoingFeeding {
+                            ongoingFeedingBanner(ongoing)
+                                .padding(.horizontal, 20)
+                                .transition(.move(edge: .top).combined(with: .opacity))
+                        }
+
                         // Today stats
                         VStack(spacing: 12) {
                             BLSectionHeader(title: "Today's Summary")
@@ -220,13 +238,16 @@ struct HomeView: View {
             .onAppear {
                 updatePredicates()
                 startSleepTimerIfNeeded()
+                startFeedingTimerIfNeeded()
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     updatePredicates()
                     startSleepTimerIfNeeded()
+                    startFeedingTimerIfNeeded()
                 } else if phase == .background {
                     stopSleepTimer()
+                    stopFeedingTimer()
                 }
             }
             .onChange(of: ongoingSleeps.count) { _, count in
@@ -234,6 +255,13 @@ struct HomeView: View {
                     startSleepTimerIfNeeded()
                 } else {
                     stopSleepTimer()
+                }
+            }
+            .onChange(of: ongoingFeedings.count) { _, count in
+                if count > 0 {
+                    startFeedingTimerIfNeeded()
+                } else {
+                    stopFeedingTimer()
                 }
             }
         }
@@ -352,6 +380,123 @@ struct HomeView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.blSleep.opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Feeding Timer
+
+    private func startFeedingTimerIfNeeded() {
+        guard ongoingFeeding != nil, feedingTimer == nil else { return }
+        updateFeedingElapsed()
+        feedingTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            Task { @MainActor in updateFeedingElapsed() }
+        }
+    }
+
+    private func stopFeedingTimer() {
+        feedingTimer?.invalidate()
+        feedingTimer = nil
+    }
+
+    private func updateFeedingElapsed() {
+        guard let start = ongoingFeeding?.timestamp else {
+            feedingElapsed = 0
+            return
+        }
+        feedingElapsed = Date().timeIntervalSince(start)
+    }
+
+    private var feedingElapsedText: String {
+        let total = Int(feedingElapsed)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        if h > 0 {
+            return String(format: "%d:%02d:%02d", h, m, s)
+        }
+        return String(format: "%d:%02d", m, s)
+    }
+
+    private func endOngoingFeeding() {
+        guard let ongoing = ongoingFeeding, let id = ongoing.id else { return }
+        withAnimation(.spring(response: 0.4)) {
+            vm.endFeedingByID(id, context: ctx)
+        }
+        stopFeedingTimer()
+    }
+
+    @ViewBuilder
+    private func ongoingFeedingBanner(_ record: CDFeedingRecord) -> some View {
+        let feedType = FeedType(rawValue: record.feedType ?? "") ?? .breast
+        let side = BreastSide(rawValue: record.breastSide ?? "")
+
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                // Pulsing icon
+                ZStack {
+                    Circle()
+                        .fill(Color.blFeeding.opacity(0.2))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: feedType.icon)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.blFeeding)
+                        .symbolEffect(.pulse)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Feeding in progress")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    HStack(spacing: 4) {
+                        Text(feedType.displayName)
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextSecondary)
+                        if let side {
+                            Text("· \(side.displayName)")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                        if let start = record.timestamp {
+                            Text("· \(start.formatted(date: .omitted, time: .shortened))")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                    }
+                }
+
+                Spacer()
+
+                // Live timer
+                Text(feedingElapsedText)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.blFeeding)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+            }
+
+            Button {
+                endOngoingFeeding()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14, weight: .medium))
+                    Text("End Feeding")
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(Color.blFeeding)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background(Color.blFeeding.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.blFeeding.opacity(0.3), lineWidth: 1)
         )
     }
 

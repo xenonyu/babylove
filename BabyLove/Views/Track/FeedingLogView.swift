@@ -15,12 +15,25 @@ struct FeedingLogView: View {
     @State private var notes = ""
     @State private var timestamp = Date()
     @State private var showTimePicker = false
+    @State private var isTimerMode = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
     /// Max amount in display unit (300 ml ~ 10 oz)
     private var maxAmount: Double { unit == .metric ? 300 : 10 }
     private var amountStep: Double { unit == .metric ? 5 : 0.5 }
+
+    /// Whether the current feed type supports timer mode
+    private var supportsTimer: Bool {
+        feedType == .breast || feedType == .pump
+    }
+
+    /// Dynamic button label based on mode
+    private var buttonLabel: String {
+        if isEditing { return "Update Feeding" }
+        if isTimerMode && supportsTimer { return "Start Feeding Timer" }
+        return "Log Feeding"
+    }
 
     /// Formula/solid require amount > 0; breast/pump always valid (have duration)
     private var canSave: Bool {
@@ -89,19 +102,34 @@ struct FeedingLogView: View {
                                 }
                             }
 
-                            // Duration
-                            VStack(alignment: .leading, spacing: 10) {
-                                HStack {
-                                    Label("Duration", systemImage: "timer")
+                            // Timer mode toggle (only for new records)
+                            if !isEditing {
+                                Toggle(isOn: $isTimerMode) {
+                                    Label("Use Timer", systemImage: "timer")
                                         .font(.system(size: 15, weight: .semibold))
-                                        .foregroundColor(.blTextSecondary)
-                                    Spacer()
-                                    Text("\(Int(duration)) min")
-                                        .font(.system(size: 17, weight: .bold))
-                                        .foregroundColor(.blFeeding)
+                                        .foregroundColor(.blTextPrimary)
                                 }
-                                Slider(value: $duration, in: 1...60, step: 1)
-                                    .tint(.blFeeding)
+                                .tint(.blFeeding)
+                                .padding(16)
+                                .background(Color.blSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+
+                            // Duration (manual mode only)
+                            if !isTimerMode {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    HStack {
+                                        Label("Duration", systemImage: "timer")
+                                            .font(.system(size: 15, weight: .semibold))
+                                            .foregroundColor(.blTextSecondary)
+                                        Spacer()
+                                        Text("\(Int(duration)) min")
+                                            .font(.system(size: 17, weight: .bold))
+                                            .foregroundColor(.blFeeding)
+                                    }
+                                    Slider(value: $duration, in: 1...60, step: 1)
+                                        .tint(.blFeeding)
+                                }
                             }
                         }
 
@@ -170,7 +198,7 @@ struct FeedingLogView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(isEditing ? "Update Feeding" : "Log Feeding") {
+                        Button(buttonLabel) {
                             let amountML = unit.volumeToML(amount)
                             let hasDuration = feedType == .breast || feedType == .pump
                             if let record = editingRecord {
@@ -180,6 +208,14 @@ struct FeedingLogView: View {
                                     side: hasDuration ? side : nil,
                                     durationMinutes: hasDuration ? Int(duration) : 0,
                                     amountML: amountML,
+                                    notes: notes,
+                                    timestamp: timestamp
+                                )
+                            } else if isTimerMode && supportsTimer {
+                                // Start a feeding timer (ongoing record)
+                                _ = vm.startFeeding(
+                                    type: feedType,
+                                    side: side,
                                     notes: notes,
                                     timestamp: timestamp
                                 )
@@ -200,7 +236,13 @@ struct FeedingLogView: View {
                         .opacity(canSave ? 1 : 0.5)
                         .padding(.top, 8)
 
-                        if !canSave {
+                        if isTimerMode && supportsTimer && !isEditing {
+                            Text("Timer will run on the home screen — end it when done")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextSecondary)
+                                .frame(maxWidth: .infinity)
+                                .multilineTextAlignment(.center)
+                        } else if !canSave {
                             Text("Set the amount before saving")
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)

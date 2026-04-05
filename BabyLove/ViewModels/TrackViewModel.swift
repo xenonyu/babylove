@@ -27,6 +27,34 @@ class TrackViewModel: ObservableObject {
         save()
     }
 
+    // MARK: - Feeding Timer (Ongoing)
+
+    /// Start an ongoing breast/pump feeding. Saves with durationMinutes = 0 to indicate "in progress".
+    func startFeeding(type: FeedType, side: BreastSide? = nil, notes: String = "", timestamp: Date = Date()) -> CDFeedingRecord {
+        let record = CDFeedingRecord(context: ctx)
+        record.id = UUID()
+        record.timestamp = timestamp
+        record.feedType = type.rawValue
+        record.breastSide = side?.rawValue
+        record.durationMinutes = 0  // 0 = ongoing for breast/pump
+        record.amountML = 0
+        record.notes = notes.isEmpty ? nil : notes
+        save()
+        return record
+    }
+
+    /// End an ongoing feeding by ID, computing duration from timestamp to now.
+    func endFeedingByID(_ id: UUID, context: NSManagedObjectContext) {
+        let req: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        req.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        req.fetchLimit = 1
+        guard let record = (try? context.fetch(req))?.first,
+              let start = record.timestamp else { return }
+        let minutes = max(1, Int(Date().timeIntervalSince(start) / 60))
+        record.durationMinutes = Int16(minutes)
+        try? context.save()
+    }
+
     // MARK: - Sleep
 
     func startSleep(at startTime: Date = Date(), location: SleepLocation = .crib, notes: String = "") -> CDSleepRecord {
