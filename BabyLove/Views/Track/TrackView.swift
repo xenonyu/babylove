@@ -68,6 +68,33 @@ struct TrackView: View {
                         }
                         .padding(.horizontal, 20)
 
+                        // Empty state when no records exist yet
+                        if recentFeedings.isEmpty && recentSleeps.isEmpty && recentDiapers.isEmpty && recentGrowth.isEmpty {
+                            VStack(spacing: 16) {
+                                Spacer().frame(height: 20)
+                                Image(systemName: "heart.text.clipboard")
+                                    .font(.system(size: 48))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [.blPrimary, .blTeal],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                Text("No records yet")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.blTextPrimary)
+                                Text("Tap one of the buttons above to start\ntracking your baby's day")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.blTextSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .lineSpacing(3)
+                                Spacer().frame(height: 8)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 24)
+                        }
+
                         // Recent feedings
                         if !recentFeedings.isEmpty {
                             recentSection(title: "Feedings", color: .blFeeding, destination: AllFeedingsView()) {
