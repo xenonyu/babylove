@@ -116,7 +116,7 @@ struct SleepLogView: View {
 
                         Button(isOngoing ? "Start Sleep Timer" : "Log Sleep") {
                             if isOngoing {
-                                _ = vm.startSleep(location: location)
+                                _ = vm.startSleep(location: location, notes: notes)
                             } else {
                                 vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
                             }

@@ -1,7 +1,10 @@
 import CoreData
 
 struct PersistenceController: Sendable {
-    static let shared = PersistenceController()
+    static let shared: PersistenceController = {
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("--uitesting")
+        return PersistenceController(inMemory: isUITesting)
+    }()
 
     @MainActor
     static let preview: PersistenceController = {

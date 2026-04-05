@@ -28,11 +28,12 @@ class TrackViewModel: ObservableObject {
 
     // MARK: - Sleep
 
-    func startSleep(location: SleepLocation = .crib) -> CDSleepRecord {
+    func startSleep(location: SleepLocation = .crib, notes: String = "") -> CDSleepRecord {
         let record = CDSleepRecord(context: ctx)
         record.id = UUID()
         record.startTime = Date()
         record.location = location.rawValue
+        record.notes = notes.isEmpty ? nil : notes
         save()
         return record
     }
