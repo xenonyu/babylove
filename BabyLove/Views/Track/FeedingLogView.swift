@@ -133,10 +133,11 @@ struct FeedingLogView: View {
 
                         Button("Log Feeding") {
                             let amountML = unit.volumeToML(amount)
+                            let hasDuration = feedType == .breast || feedType == .pump
                             vm.logFeeding(
                                 type: feedType,
-                                side: (feedType == .breast || feedType == .pump) ? side : nil,
-                                durationMinutes: Int(duration),
+                                side: hasDuration ? side : nil,
+                                durationMinutes: hasDuration ? Int(duration) : 0,
                                 amountML: amountML,
                                 notes: notes
                             )
