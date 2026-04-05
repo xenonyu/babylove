@@ -22,6 +22,11 @@ struct SleepLogView: View {
         let h = duration / 60, m = duration % 60
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
     }
+    private var ongoingDurationText: String {
+        let mins = max(0, Int(Date().timeIntervalSince(startTime) / 60))
+        let h = mins / 60, m = mins % 60
+        return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+    }
 
     var body: some View {
         NavigationStack {
@@ -30,21 +35,47 @@ struct SleepLogView: View {
                 ScrollView {
                     VStack(spacing: 24) {
 
-                        // Ongoing toggle (only for new records)
-                        if !isEditing {
-                            Toggle(isOn: $isOngoing) {
-                                Label("Baby is sleeping now", systemImage: "moon.zzz.fill")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundColor(.blTextPrimary)
-                            }
-                            .tint(.blSleep)
-                            .padding(16)
-                            .background(Color.blSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        // Ongoing toggle
+                        Toggle(isOn: $isOngoing) {
+                            Label(isEditing ? "Still sleeping" : "Baby is sleeping now",
+                                  systemImage: "moon.zzz.fill")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.blTextPrimary)
                         }
+                        .tint(.blSleep)
+                        .padding(16)
+                        .background(Color.blSurface)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-                        if !isOngoing {
-                            // Duration summary
+                        if isOngoing {
+                            // Ongoing: show start time + live elapsed
+                            VStack(alignment: .leading, spacing: 10) {
+                                Label("Fell Asleep", systemImage: "moon.fill")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.blTextSecondary)
+                                DatePicker("", selection: $startTime, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                    .datePickerStyle(.compact)
+                                    .tint(.blSleep)
+                                    .labelsHidden()
+                            }
+
+                            if isEditing {
+                                HStack {
+                                    Spacer()
+                                    VStack(spacing: 4) {
+                                        Text(ongoingDurationText)
+                                            .font(.system(size: 36, weight: .bold))
+                                            .foregroundColor(.blSleep)
+                                        Text("sleeping…")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.blTextSecondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(.vertical, 8)
+                            }
+                        } else {
+                            // Finished: show duration + start/end pickers
                             HStack {
                                 Spacer()
                                 VStack(spacing: 4) {
@@ -123,9 +154,9 @@ struct SleepLogView: View {
 
                         Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
                             if let record = editingRecord {
-                                vm.updateSleep(record, start: startTime, end: endTime, location: location, notes: notes)
+                                vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
                             } else if isOngoing {
-                                _ = vm.startSleep(location: location, notes: notes)
+                                _ = vm.startSleep(at: startTime, location: location, notes: notes)
                             } else {
                                 vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
                             }
@@ -154,6 +185,6 @@ struct SleepLogView: View {
         endTime = r.endTime ?? Date()
         location = SleepLocation(rawValue: r.location ?? "") ?? .crib
         notes = r.notes ?? ""
-        isOngoing = false
+        isOngoing = (r.endTime == nil)
     }
 }
