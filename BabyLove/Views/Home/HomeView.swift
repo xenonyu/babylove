@@ -127,6 +127,28 @@ struct HomeView: View {
         todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
     }
 
+    /// Refresh the 7-day and 14-day weekly predicates so the weekly summary
+    /// stays accurate after a day-boundary crossing (e.g. app survives past midnight).
+    private func updateWeeklyPredicates() {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        guard let weekStart = cal.date(byAdding: .day, value: -7, to: today),
+              let prevWeekStart = cal.date(byAdding: .day, value: -14, to: today) else { return }
+
+        let weekStartNS = weekStart as NSDate
+        let prevWeekStartNS = prevWeekStart as NSDate
+
+        // Current week (last 7 days)
+        weekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@", weekStartNS)
+        weekSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@", weekStartNS)
+        weekDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", weekStartNS)
+
+        // Previous week (days -14 to -7)
+        prevWeekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", prevWeekStartNS, weekStartNS)
+        prevWeekSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@ AND startTime < %@", prevWeekStartNS, weekStartNS)
+        prevWeekDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", prevWeekStartNS, weekStartNS)
+    }
+
     /// Total feeding volume in ml for today (sum of all amountML values)
     private var totalFeedingVolumeML: Double {
         todayFeedings.reduce(0.0) { sum, r in sum + r.amountML }
@@ -331,6 +353,7 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .onAppear {
                 updatePredicates()
+                updateWeeklyPredicates()
                 refreshGlobalLastTimes()
                 refreshActiveDays()
                 startSleepTimerIfNeeded()
@@ -354,6 +377,8 @@ struct HomeView: View {
                     if today != lastActiveCalendarDay {
                         lastActiveCalendarDay = today
                         selectedDate = Date()
+                        // Weekly windows shifted — refresh their predicates
+                        updateWeeklyPredicates()
                     }
                     updatePredicates()
                     refreshGlobalLastTimes()
