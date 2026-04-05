@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var showFeedingLog  = false
     @State private var showSleepLog    = false
     @State private var showDiaperLog   = false
+    @State private var showGrowthLog   = false
     @State private var sleepElapsed: TimeInterval = 0
     @State private var sleepTimer: Timer?
 
@@ -146,16 +147,22 @@ struct HomeView: View {
                             BLSectionHeader(title: "Quick Log")
                                 .padding(.horizontal, 20)
 
-                            HStack(spacing: 12) {
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
                                 QuickLogCard(icon: "drop.fill",
                                              label: "Feeding",
                                              color: .blFeeding) { showFeedingLog = true }
-                                QuickLogCard(icon: "moon.fill",
+                                QuickLogCard(icon: "moon.zzz.fill",
                                              label: "Sleep",
                                              color: .blSleep) { showSleepLog = true }
                                 QuickLogCard(icon: "oval.fill",
                                              label: "Diaper",
                                              color: .blDiaper) { showDiaperLog = true }
+                                QuickLogCard(icon: "chart.bar.fill",
+                                             label: "Growth",
+                                             color: .blGrowth) { showGrowthLog = true }
                             }
                             .padding(.horizontal, 20)
                         }
@@ -201,6 +208,9 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showDiaperLog) {
             DiaperLogView(vm: vm)
+        }
+        .sheet(isPresented: $showGrowthLog) {
+            GrowthLogView(vm: vm)
         }
     }
 
