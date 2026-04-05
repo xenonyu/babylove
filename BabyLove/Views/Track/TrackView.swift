@@ -212,7 +212,21 @@ struct TrackView: View {
             Button("Delete", role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
+                    // Determine record type for a contextual toast message
+                    let (msg, icon, color): (String, String, Color) = {
+                        if obj is CDFeedingRecord {
+                            return ("Feeding deleted", "trash.fill", Color.blFeeding)
+                        } else if obj is CDSleepRecord {
+                            return ("Sleep deleted", "trash.fill", Color.blSleep)
+                        } else if obj is CDDiaperRecord {
+                            return ("Diaper deleted", "trash.fill", Color.blDiaper)
+                        } else if obj is CDGrowthRecord {
+                            return ("Growth record deleted", "trash.fill", Color.blGrowth)
+                        }
+                        return ("Record deleted", "trash.fill", Color.blPrimary)
+                    }()
                     withAnimation { vm.deleteObject(obj, in: ctx) }
+                    appState.showToast(msg, icon: icon, color: color)
                 }
                 recordToDelete = nil
             }

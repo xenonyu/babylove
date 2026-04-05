@@ -461,7 +461,19 @@ struct HomeView: View {
             Button("Delete", role: .destructive) {
                 Haptic.warning()
                 if let record = timelineRecordToDelete {
+                    // Determine record type for a contextual toast message
+                    let (msg, icon, color): (String, String, Color) = {
+                        if record is CDFeedingRecord {
+                            return ("Feeding deleted", "trash.fill", Color.blFeeding)
+                        } else if record is CDSleepRecord {
+                            return ("Sleep deleted", "trash.fill", Color.blSleep)
+                        } else if record is CDDiaperRecord {
+                            return ("Diaper deleted", "trash.fill", Color.blDiaper)
+                        }
+                        return ("Record deleted", "trash.fill", Color.blPrimary)
+                    }()
                     withAnimation { vm.deleteObject(record, in: ctx) }
+                    appState.showToast(msg, icon: icon, color: color)
                 }
                 timelineRecordToDelete = nil
             }

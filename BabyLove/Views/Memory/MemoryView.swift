@@ -2,6 +2,7 @@ import SwiftUI
 import CoreData
 
 struct MemoryView: View {
+    @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var showAddMilestone = false
@@ -164,6 +165,7 @@ struct MemoryView: View {
                 Haptic.warning()
                 if let m = milestoneToDelete {
                     withAnimation { vm.deleteObject(m, in: ctx) }
+                    appState.showToast("Milestone deleted", icon: "trash.fill", color: .blPrimary)
                 }
                 milestoneToDelete = nil
             }
