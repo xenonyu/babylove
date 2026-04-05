@@ -125,10 +125,22 @@ struct GrowthLogView: View {
                         }
 
                         Button(isEditing ? "Update Measurements" : "Save Measurements") {
-                            // Convert from display unit to metric for storage
-                            let wKG = Double(weightKG).map { unit.weightToKG($0) }
-                            let hCM = Double(heightCM).map { unit.lengthToCM($0) }
-                            let hd  = Double(headCM).map { unit.lengthToCM($0) }
+                            // Convert from display unit to metric for storage.
+                            // When editing, an empty field means the user intentionally
+                            // cleared that measurement → pass 0.0 so updateGrowth
+                            // overwrites the old value. When adding, nil means "not measured".
+                            let wKG: Double? = {
+                                if let v = Double(weightKG) { return unit.weightToKG(v) }
+                                return isEditing ? 0.0 : nil
+                            }()
+                            let hCM: Double? = {
+                                if let v = Double(heightCM) { return unit.lengthToCM(v) }
+                                return isEditing ? 0.0 : nil
+                            }()
+                            let hd: Double? = {
+                                if let v = Double(headCM) { return unit.lengthToCM(v) }
+                                return isEditing ? 0.0 : nil
+                            }()
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
