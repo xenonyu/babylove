@@ -16,6 +16,8 @@ struct HomeView: View {
     @State private var feedingElapsed: TimeInterval = 0
     @State private var feedingTimer: Timer?
     @State private var selectedDate: Date = Date()
+    /// Set of start-of-day dates that have at least one record (within the date range window)
+    @State private var activeDays: Set<Date> = []
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingTime: Date?
@@ -328,6 +330,7 @@ struct HomeView: View {
             .onAppear {
                 updatePredicates()
                 refreshGlobalLastTimes()
+                refreshActiveDays()
                 startSleepTimerIfNeeded()
                 startFeedingTimerIfNeeded()
             }
@@ -340,6 +343,7 @@ struct HomeView: View {
                 if phase == .active {
                     updatePredicates()
                     refreshGlobalLastTimes()
+                    refreshActiveDays()
                     startSleepTimerIfNeeded()
                     startFeedingTimerIfNeeded()
                 } else if phase == .background {
@@ -347,9 +351,9 @@ struct HomeView: View {
                     stopFeedingTimer()
                 }
             }
-            .onChange(of: todayFeedings.count) { _, _ in refreshGlobalLastTimes() }
-            .onChange(of: todaySleeps.count) { _, _ in refreshGlobalLastTimes() }
-            .onChange(of: todayDiapers.count) { _, _ in refreshGlobalLastTimes() }
+            .onChange(of: todayFeedings.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
+            .onChange(of: todaySleeps.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
+            .onChange(of: todayDiapers.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
             .onChange(of: ongoingSleeps.count) { _, count in
                 refreshGlobalLastTimes()
                 if count > 0 {
@@ -442,6 +446,52 @@ struct HomeView: View {
         diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         diaperReq.fetchLimit = 1
         globalLastDiaperTime = (try? ctx.fetch(diaperReq))?.first?.timestamp
+    }
+
+    // MARK: - Active Days Indicators
+
+    /// Refresh the set of days that have at least one record (feeding, sleep, or diaper)
+    /// within the date navigation range (last 14 days).
+    private func refreshActiveDays() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        guard let rangeStart = cal.date(byAdding: .day, value: -13, to: today) else { return }
+        let rangeStartNS = rangeStart as NSDate
+
+        var days = Set<Date>()
+
+        // Feeding timestamps
+        let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        feedReq.predicate = NSPredicate(format: "timestamp >= %@", rangeStartNS)
+        feedReq.propertiesToFetch = ["timestamp"]
+        if let results = try? ctx.fetch(feedReq) {
+            for r in results {
+                if let ts = r.timestamp { days.insert(cal.startOfDay(for: ts)) }
+            }
+        }
+
+        // Sleep start times
+        let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        sleepReq.predicate = NSPredicate(format: "startTime >= %@", rangeStartNS)
+        sleepReq.propertiesToFetch = ["startTime"]
+        if let results = try? ctx.fetch(sleepReq) {
+            for r in results {
+                if let st = r.startTime { days.insert(cal.startOfDay(for: st)) }
+            }
+        }
+
+        // Diaper timestamps
+        let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+        diaperReq.predicate = NSPredicate(format: "timestamp >= %@", rangeStartNS)
+        diaperReq.propertiesToFetch = ["timestamp"]
+        if let results = try? ctx.fetch(diaperReq) {
+            for r in results {
+                if let ts = r.timestamp { days.insert(cal.startOfDay(for: ts)) }
+            }
+        }
+
+        activeDays = days
     }
 
     // MARK: - Sleep Timer
@@ -731,6 +781,7 @@ struct HomeView: View {
                         ForEach(dateRange, id: \.self) { date in
                             let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
                             let isToday = Calendar.current.isDateInToday(date)
+                            let hasActivity = activeDays.contains(date)
                             Button {
                                 Haptic.selection()
                                 withAnimation(.easeInOut(duration: 0.2)) { selectedDate = date }
@@ -742,15 +793,20 @@ struct HomeView: View {
                                     Text(dayNumberText(date))
                                         .font(.system(size: 15, weight: isSelected ? .bold : .medium))
                                         .foregroundColor(isSelected ? .white : (isToday ? .blPrimary : .blTextPrimary))
+                                    // Activity indicator dot
+                                    Circle()
+                                        .fill(isSelected ? Color.white : Color.blPrimary)
+                                        .frame(width: 5, height: 5)
+                                        .opacity(hasActivity ? 1 : 0)
                                 }
-                                .frame(width: 40, height: 48)
+                                .frame(width: 40, height: 52)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                                         .fill(isSelected ? Color.blPrimary : Color.clear)
                                 )
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(isToday ? dateHeaderText : "\(dayOfWeekText(date)) \(dayNumberText(date))")
+                            .accessibilityLabel("\(isToday ? dateHeaderText : "\(dayOfWeekText(date)) \(dayNumberText(date))")\(hasActivity ? ", has activity" : "")")
                             .accessibilityAddTraits(isSelected ? .isSelected : [])
                             .id(date)
                         }
