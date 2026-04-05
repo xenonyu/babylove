@@ -348,16 +348,37 @@ struct SettingsView: View {
     }
 
     private func resetAllData() {
+        // 1. Cancel all pending notifications and reset reminder state
+        NotificationManager.shared.isEnabled = false  // cancels pending + writes UserDefaults
+        feedingReminderEnabled = false
+        feedingReminderInterval = 180
+
+        // 2. Clear baby profile from UserDefaults
         UserDefaults.standard.removeObject(forKey: "currentBaby")
         UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
-        // Clear CoreData
+
+        // 3. Batch-delete CoreData entities and merge into viewContext
+        //    NSBatchDeleteRequest bypasses the MOC — without merging,
+        //    @FetchRequest views hold stale objects that crash when faulted.
         let container = PersistenceController.shared.container
         let ctx = container.viewContext
         for entity in ["CDFeedingRecord", "CDSleepRecord", "CDDiaperRecord", "CDGrowthRecord", "CDMilestone"] {
             let req = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
             let delete = NSBatchDeleteRequest(fetchRequest: req)
-            try? container.persistentStoreCoordinator.execute(delete, with: ctx)
+            delete.resultType = .resultTypeObjectIDs
+            do {
+                let result = try container.persistentStoreCoordinator.execute(delete, with: ctx) as? NSBatchDeleteResult
+                if let objectIDs = result?.result as? [NSManagedObjectID], !objectIDs.isEmpty {
+                    let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: objectIDs]
+                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [ctx])
+                }
+            } catch {
+                // Fallback: reset the entire context if merge fails
+                ctx.reset()
+            }
         }
+
+        // 4. Navigate to onboarding
         withAnimation {
             appState.hasCompletedOnboarding = false
             appState.currentBaby = nil
