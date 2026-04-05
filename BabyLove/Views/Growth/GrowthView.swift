@@ -139,11 +139,16 @@ struct GrowthView: View {
                 latestMeasurementsCard
             }
 
-            // Simple bar chart
+            // Growth chart with WHO percentile curves
             if records.count > 1 {
-                SimpleLineChart(records: Array(records), metric: selectedMetric, unit: appState.measurementUnit)
-                    .frame(height: 220)
-                    .blCard()
+                SimpleLineChart(
+                    records: Array(records),
+                    metric: selectedMetric,
+                    unit: appState.measurementUnit,
+                    baby: appState.currentBaby
+                )
+                .frame(height: 260)
+                .blCard()
             }
         }
     }
@@ -275,28 +280,50 @@ struct GrowthView: View {
     }
 }
 
-// MARK: - Simple Line Chart
+// MARK: - Simple Line Chart with WHO Percentile Curves
 struct SimpleLineChart: View {
     let records: [CDGrowthRecord]
     let metric: GrowthView.GrowthMetric
     var unit: MeasurementUnit = .metric
+    var baby: Baby? = nil
 
     /// Left margin reserved for Y-axis labels
     private let yAxisWidth: CGFloat = 40
-    /// Bottom margin reserved for X-axis date labels
+    /// Bottom margin reserved for X-axis labels
     private let xAxisHeight: CGFloat = 24
 
-    /// Pairs of (date, value) filtered to non-zero values
-    private func dataPoints() -> [(date: Date, value: Double)] {
-        records.compactMap { r -> (Date, Double)? in
-            let v: Double
-            switch metric {
-            case .weight: v = unit.weightFromKG(r.weightKG)
-            case .height: v = unit.lengthFromCM(r.heightCM)
-            case .head:   v = unit.lengthFromCM(r.headCircumferenceCM)
+    /// Pairs of (ageInMonths, value) filtered to non-zero values
+    private func dataPoints() -> [(age: Double, value: Double, date: Date)] {
+        guard let birthDate = baby?.birthDate else {
+            // Fallback: use index-based if no baby
+            return records.enumerated().compactMap { i, r -> (Double, Double, Date)? in
+                let v = rawValue(for: r)
+                guard v > 0, let d = r.date else { return nil }
+                return (Double(i), v, d)
             }
+        }
+        return records.compactMap { r -> (Double, Double, Date)? in
+            let v = rawValue(for: r)
             guard v > 0, let d = r.date else { return nil }
-            return (d, v)
+            let ageMonths = d.timeIntervalSince(birthDate) / (30.4375 * 86400)
+            return (max(0, ageMonths), v, d)
+        }
+    }
+
+    /// Get raw value in storage units (kg/cm) for WHO comparison
+    private func rawValue(for r: CDGrowthRecord) -> Double {
+        switch metric {
+        case .weight: return r.weightKG
+        case .height: return r.heightCM
+        case .head:   return r.headCircumferenceCM
+        }
+    }
+
+    /// Convert storage value to display value
+    private func displayValue(_ raw: Double) -> Double {
+        switch metric {
+        case .weight: return unit.weightFromKG(raw)
+        case .height, .head: return unit.lengthFromCM(raw)
         }
     }
 
@@ -307,17 +334,33 @@ struct SimpleLineChart: View {
         }
     }
 
-    /// Format value for display — weight uses 2 decimals, others 1
     private func formatValue(_ v: Double) -> String {
-        metric == .weight ? String(format: "%.2f", v) : String(format: "%.1f", v)
+        metric == .weight ? String(format: "%.1f", v) : String(format: "%.0f", v)
     }
+
+    /// Whether WHO curves should be shown
+    private var showWHO: Bool {
+        baby != nil && baby?.gender != .other
+    }
+
+    /// WHO table for current metric + gender
+    private var whoTable: WHOGrowthTable? {
+        guard let baby = baby, baby.gender != .other else { return nil }
+        let metricKey: String
+        switch metric {
+        case .weight: metricKey = "weight"
+        case .height: metricKey = "height"
+        case .head:   metricKey = "head"
+        }
+        return WHOGrowthData.table(metric: metricKey, isBoy: baby.gender == .boy)
+    }
+
+    /// Percentiles to draw — outer bands + median
+    private let displayPercentiles: [WHOPercentile] = [.p3, .p15, .p50, .p85, .p97]
 
     var body: some View {
         let data = dataPoints()
-        guard data.count > 1,
-              let minV = data.map(\.value).min(),
-              let maxV = data.map(\.value).max(),
-              maxV > minV else {
+        guard data.count > 1 else {
             return AnyView(
                 Text("Not enough data")
                     .font(.system(size: 14))
@@ -326,35 +369,71 @@ struct SimpleLineChart: View {
             )
         }
 
-        // Add 10% vertical padding so dots aren't at edges
-        let padding = (maxV - minV) * 0.1
-        let chartMin = minV - padding
-        let chartMax = maxV + padding
+        // Determine chart bounds
+        let rawValues = data.map(\.value)
+        let ageMin = data.map(\.age).min()!
+        let ageMax = data.map(\.age).max()!
+
+        // If WHO available, expand Y range to include percentile bounds
+        var allValues = rawValues
+        if let table = whoTable {
+            let ageFloor = Int(ageMin)
+            let ageCeil = min(Int(ceil(ageMax)), table.maxMonth)
+            for m in ageFloor...ageCeil {
+                if let lo = table.value(atMonth: Double(m), percentile: .p3) { allValues.append(lo) }
+                if let hi = table.value(atMonth: Double(m), percentile: .p97) { allValues.append(hi) }
+            }
+        }
+
+        let rawMin = allValues.min()!
+        let rawMax = allValues.max()!
+        let padding = (rawMax - rawMin) * 0.08
+        let chartMin = rawMin - padding
+        let chartMax = rawMax + padding
         let chartRange = chartMax - chartMin
 
-        // Y-axis: 3 nice tick values
-        let yTicks = [minV, (minV + maxV) / 2, maxV]
+        // Age range for X axis
+        let agePadding = max((ageMax - ageMin) * 0.05, 0.5)
+        let xMin = max(0, ageMin - agePadding)
+        let xMax = ageMax + agePadding
+        let xRange = xMax - xMin
+
+        // Y-axis ticks in display units
+        let tickCount = 4
+        let yTicks = (0..<tickCount).map { i in
+            chartMin + chartRange * Double(i) / Double(tickCount - 1)
+        }
 
         return AnyView(
             VStack(spacing: 0) {
-                // Unit label above chart
-                HStack {
+                // Header: unit + WHO legend
+                HStack(spacing: 6) {
                     Text(unitLabel)
                         .font(.system(size: 10, weight: .medium))
                         .foregroundColor(.blTextTertiary)
                     Spacer()
+                    if showWHO {
+                        HStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(Color.blTeal.opacity(0.25))
+                                .frame(width: 12, height: 8)
+                            Text("WHO")
+                                .font(.system(size: 9, weight: .medium))
+                                .foregroundColor(.blTextTertiary)
+                        }
+                    }
                 }
-                .padding(.leading, 4)
-                .padding(.bottom, 2)
+                .padding(.horizontal, 4)
+                .padding(.bottom, 4)
 
                 HStack(alignment: .top, spacing: 0) {
-                    // Y-axis labels
+                    // Y-axis labels (display units)
                     GeometryReader { geo in
                         let h = geo.size.height
-                        ForEach(yTicks, id: \.self) { tick in
+                        ForEach(Array(yTicks.enumerated()), id: \.offset) { _, tick in
                             let yFrac = CGFloat((tick - chartMin) / chartRange)
                             let y = h - h * yFrac
-                            Text(formatValue(tick))
+                            Text(formatValue(displayValue(tick)))
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(.blTextTertiary)
                                 .frame(width: yAxisWidth - 4, alignment: .trailing)
@@ -367,27 +446,60 @@ struct SimpleLineChart: View {
                     GeometryReader { geo in
                         let w = geo.size.width
                         let h = geo.size.height
-                        let points = data.enumerated().map { i, dp in
-                            CGPoint(
-                                x: w * CGFloat(i) / CGFloat(data.count - 1),
-                                y: h - h * CGFloat((dp.value - chartMin) / chartRange)
-                            )
-                        }
 
-                        if let first = points.first, let last = points.last {
-                            ZStack {
-                                // Horizontal grid lines
-                                ForEach(yTicks, id: \.self) { tick in
-                                    let yFrac = CGFloat((tick - chartMin) / chartRange)
-                                    let y = h - h * yFrac
-                                    Path { p in
-                                        p.move(to: CGPoint(x: 0, y: y))
-                                        p.addLine(to: CGPoint(x: w, y: y))
-                                    }
-                                    .stroke(Color.blTextTertiary.opacity(0.15), style: StrokeStyle(lineWidth: 0.5, dash: [4, 3]))
+                        ZStack {
+                            // Grid lines
+                            ForEach(Array(yTicks.enumerated()), id: \.offset) { _, tick in
+                                let y = h - h * CGFloat((tick - chartMin) / chartRange)
+                                Path { p in
+                                    p.move(to: CGPoint(x: 0, y: y))
+                                    p.addLine(to: CGPoint(x: w, y: y))
+                                }
+                                .stroke(Color.blTextTertiary.opacity(0.12), style: StrokeStyle(lineWidth: 0.5, dash: [4, 3]))
+                            }
+
+                            // WHO percentile bands
+                            if let table = whoTable {
+                                // Shaded band: P3–P97 (outer)
+                                whoFillBand(table: table, lower: .p3, upper: .p97,
+                                            color: Color.blTeal.opacity(0.08),
+                                            w: w, h: h, chartMin: chartMin, chartRange: chartRange,
+                                            xMin: xMin, xRange: xRange)
+
+                                // Shaded band: P15–P85 (healthy range)
+                                whoFillBand(table: table, lower: .p15, upper: .p85,
+                                            color: Color.blTeal.opacity(0.10),
+                                            w: w, h: h, chartMin: chartMin, chartRange: chartRange,
+                                            xMin: xMin, xRange: xRange)
+
+                                // Percentile lines
+                                ForEach(Array(displayPercentiles.enumerated()), id: \.offset) { _, pctl in
+                                    whoLine(table: table, percentile: pctl,
+                                            w: w, h: h, chartMin: chartMin, chartRange: chartRange,
+                                            xMin: xMin, xRange: xRange)
                                 }
 
-                                // Gradient fill
+                                // Percentile labels on right edge
+                                ForEach(Array(displayPercentiles.enumerated()), id: \.offset) { _, pctl in
+                                    if let val = table.value(atMonth: xMax, percentile: pctl) {
+                                        let y = h - h * CGFloat((val - chartMin) / chartRange)
+                                        Text(pctl.label)
+                                            .font(.system(size: 7, weight: .medium))
+                                            .foregroundColor(.blTeal.opacity(0.7))
+                                            .position(x: w - 14, y: max(6, min(h - 6, y - 8)))
+                                    }
+                                }
+                            }
+
+                            // Baby's data: gradient fill
+                            let points = data.map { dp in
+                                CGPoint(
+                                    x: w * CGFloat((dp.age - xMin) / xRange),
+                                    y: h - h * CGFloat((dp.value - chartMin) / chartRange)
+                                )
+                            }
+
+                            if let first = points.first, let last = points.last {
                                 Path { p in
                                     p.move(to: CGPoint(x: first.x, y: h))
                                     points.forEach { p.addLine(to: $0) }
@@ -396,13 +508,13 @@ struct SimpleLineChart: View {
                                 }
                                 .fill(
                                     LinearGradient(
-                                        colors: [Color.blGrowth.opacity(0.2), Color.blGrowth.opacity(0.02)],
+                                        colors: [Color.blGrowth.opacity(0.25), Color.blGrowth.opacity(0.02)],
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )
                                 )
 
-                                // Line
+                                // Baby's line
                                 Path { p in
                                     p.move(to: first)
                                     points.dropFirst().forEach { p.addLine(to: $0) }
@@ -412,20 +524,18 @@ struct SimpleLineChart: View {
                                 // Dots + value labels
                                 ForEach(0..<points.count, id: \.self) { i in
                                     let pt = points[i]
-                                    // Value label above dot
-                                    Text(formatValue(data[i].value))
-                                        .font(.system(size: 9, weight: .semibold))
+                                    Text(formatValue(displayValue(data[i].value)))
+                                        .font(.system(size: 8, weight: .semibold))
                                         .foregroundColor(.blGrowth)
                                         .position(x: pt.x, y: pt.y - 12)
 
-                                    // Dot with white border
                                     Circle()
                                         .fill(Color.white)
-                                        .frame(width: 10, height: 10)
+                                        .frame(width: 9, height: 9)
                                         .position(pt)
                                     Circle()
                                         .fill(Color.blGrowth)
-                                        .frame(width: 7, height: 7)
+                                        .frame(width: 6, height: 6)
                                         .position(pt)
                                 }
                             }
@@ -433,38 +543,118 @@ struct SimpleLineChart: View {
                     }
                 }
 
-                // X-axis date labels
+                // X-axis: age in months
                 HStack(alignment: .top, spacing: 0) {
-                    // Spacer matching Y-axis width
                     Color.clear.frame(width: yAxisWidth, height: 1)
-
-                    // Date labels for first, middle, last
                     GeometryReader { geo in
-                        let indices = xAxisIndices(count: data.count)
-                        ForEach(indices, id: \.self) { i in
-                            let x = geo.size.width * CGFloat(i) / CGFloat(max(1, data.count - 1))
-                            let alignment: Alignment = i == 0 ? .leading : (i == data.count - 1 ? .trailing : .center)
-                            Text(shortDate(data[i].date))
+                        let w = geo.size.width
+                        // Show 3–5 age labels
+                        let labels = ageLabels(xMin: xMin, xMax: xMax)
+                        ForEach(Array(labels.enumerated()), id: \.offset) { _, age in
+                            let x = w * CGFloat((age - xMin) / xRange)
+                            Text(baby != nil ? "\(Int(age))m" : shortDate(data[min(Int(age), data.count - 1)].date))
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(.blTextTertiary)
-                                .frame(width: 50, alignment: alignment)
                                 .position(x: x, y: 8)
                         }
                     }
                 }
                 .frame(height: xAxisHeight)
             }
-            .padding(.top, 12)
+            .padding(.top, 10)
             .padding(.horizontal, 8)
             .padding(.bottom, 4)
         )
     }
 
-    /// Pick indices for X-axis labels: first, middle (if >2), last
-    private func xAxisIndices(count: Int) -> [Int] {
-        guard count > 0 else { return [] }
-        if count <= 2 { return Array(0..<count) }
-        return [0, count / 2, count - 1]
+    // MARK: - WHO Curve Helpers
+
+    /// Draw a filled band between two percentile curves
+    private func whoFillBand(table: WHOGrowthTable, lower: WHOPercentile, upper: WHOPercentile,
+                             color: Color,
+                             w: CGFloat, h: CGFloat, chartMin: Double, chartRange: Double,
+                             xMin: Double, xRange: Double) -> some View {
+        let steps = 25
+        let ageFloor = max(0, xMin)
+        let ageCeil = min(Double(table.maxMonth), xMin + xRange)
+        let stepSize = (ageCeil - ageFloor) / Double(steps)
+
+        return Path { p in
+            // Forward along upper
+            var firstPoint = true
+            for i in 0...steps {
+                let age = ageFloor + Double(i) * stepSize
+                if let val = table.value(atMonth: age, percentile: upper) {
+                    let x = w * CGFloat((age - xMin) / xRange)
+                    let y = h - h * CGFloat((val - chartMin) / chartRange)
+                    if firstPoint { p.move(to: CGPoint(x: x, y: y)); firstPoint = false }
+                    else { p.addLine(to: CGPoint(x: x, y: y)) }
+                }
+            }
+            // Backward along lower
+            for i in (0...steps).reversed() {
+                let age = ageFloor + Double(i) * stepSize
+                if let val = table.value(atMonth: age, percentile: lower) {
+                    let x = w * CGFloat((age - xMin) / xRange)
+                    let y = h - h * CGFloat((val - chartMin) / chartRange)
+                    p.addLine(to: CGPoint(x: x, y: y))
+                }
+            }
+            p.closeSubpath()
+        }
+        .fill(color)
+    }
+
+    /// Draw a single percentile curve line
+    private func whoLine(table: WHOGrowthTable, percentile: WHOPercentile,
+                         w: CGFloat, h: CGFloat, chartMin: Double, chartRange: Double,
+                         xMin: Double, xRange: Double) -> some View {
+        let steps = 25
+        let ageFloor = max(0, xMin)
+        let ageCeil = min(Double(table.maxMonth), xMin + xRange)
+        let stepSize = (ageCeil - ageFloor) / Double(steps)
+        let isMedian = percentile == .p50
+
+        return Path { p in
+            var firstPoint = true
+            for i in 0...steps {
+                let age = ageFloor + Double(i) * stepSize
+                if let val = table.value(atMonth: age, percentile: percentile) {
+                    let x = w * CGFloat((age - xMin) / xRange)
+                    let y = h - h * CGFloat((val - chartMin) / chartRange)
+                    if firstPoint { p.move(to: CGPoint(x: x, y: y)); firstPoint = false }
+                    else { p.addLine(to: CGPoint(x: x, y: y)) }
+                }
+            }
+        }
+        .stroke(
+            Color.blTeal.opacity(isMedian ? 0.6 : 0.3),
+            style: StrokeStyle(
+                lineWidth: isMedian ? 1.5 : 0.8,
+                dash: isMedian ? [] : [4, 3]
+            )
+        )
+    }
+
+    // MARK: - Axis Helpers
+
+    private func ageLabels(xMin: Double, xMax: Double) -> [Double] {
+        let range = xMax - xMin
+        let step: Double
+        if range <= 3 { step = 1 }
+        else if range <= 8 { step = 2 }
+        else if range <= 16 { step = 3 }
+        else { step = 6 }
+
+        let first = ceil(xMin / step) * step
+        var labels: [Double] = []
+        var v = first
+        while v <= xMax {
+            labels.append(v)
+            v += step
+        }
+        if labels.isEmpty { labels = [xMin, xMax] }
+        return labels
     }
 
     private func shortDate(_ date: Date) -> String {
