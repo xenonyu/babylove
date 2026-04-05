@@ -354,35 +354,46 @@ struct TrackView: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.blTextPrimary)
             Spacer()
-            // Show available measurements compactly
+            // Show available measurements compactly with labels to disambiguate
             if r.weightKG > 0 {
                 let w = unit.weightFromKG(r.weightKG)
-                Text(unit == .metric
-                     ? String(format: "%.1f %@", w, unit.weightLabel)
-                     : String(format: "%.1f %@", w, unit.weightLabel))
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.blGrowth)
+                growthMetricPill(
+                    icon: "scalemass.fill",
+                    text: String(format: "%.1f %@", w, unit.weightLabel)
+                )
             }
             if r.heightCM > 0 {
                 let h = unit.lengthFromCM(r.heightCM)
-                Text(unit == .metric
-                     ? String(format: "%.1f %@", h, unit.heightLabel)
-                     : String(format: "%.1f %@", h, unit.heightLabel))
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.blGrowth)
+                growthMetricPill(
+                    icon: "ruler.fill",
+                    text: String(format: "%.1f %@", h, unit.heightLabel)
+                )
             }
             if r.headCircumferenceCM > 0 {
                 let hc = unit.lengthFromCM(r.headCircumferenceCM)
-                Text(String(format: "%.1f %@", hc, unit.heightLabel))
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.blGrowth)
-                    .lineLimit(1)
+                growthMetricPill(
+                    icon: "circle.dashed",
+                    text: String(format: "%.1f %@", hc, unit.heightLabel)
+                )
             }
-            Text(r.date?.formatted(date: .abbreviated, time: .omitted) ?? "")
+            Text(r.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "—")
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+    }
+
+    /// Compact pill showing a growth metric with its icon for visual disambiguation.
+    private func growthMetricPill(icon: String, text: String) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.system(size: 10))
+                .foregroundColor(.blGrowth.opacity(0.7))
+            Text(text)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(.blGrowth)
+        }
+        .lineLimit(1)
     }
 }
