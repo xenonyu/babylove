@@ -1181,6 +1181,7 @@ struct HomeView: View {
         let title: String
         let detail: String
         let timeLabel: String
+        let notes: String?
         let record: RecordRef
     }
 
@@ -1192,13 +1193,14 @@ struct HomeView: View {
             guard let ts = r.timestamp else { continue }
             let ft = FeedType(rawValue: r.feedType ?? "")
             items.append(ActivityItem(
-                id: "f-\(r.id?.uuidString ?? UUID().uuidString)",
+                id: "f-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
                 date: ts,
                 icon: ft?.icon ?? "drop.fill",
                 color: .blFeeding,
                 title: ft?.displayName ?? "Feeding",
                 detail: feedingDetail(r),
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
+                notes: r.notes,
                 record: .feeding(r)
             ))
         }
@@ -1224,13 +1226,14 @@ struct HomeView: View {
             }()
             let isOngoing = r.endTime == nil
             items.append(ActivityItem(
-                id: "s-\(r.id?.uuidString ?? UUID().uuidString)",
+                id: "s-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
                 date: st,
                 icon: isOngoing ? "moon.fill" : "moon.zzz.fill",
                 color: .blSleep,
                 title: isOngoing ? "Sleep (in progress)" : "Sleep",
                 detail: detail,
                 timeLabel: st.formatted(date: .omitted, time: .shortened),
+                notes: r.notes,
                 record: .sleep(r)
             ))
         }
@@ -1243,13 +1246,14 @@ struct HomeView: View {
                 return "\(dt.icon) \(dt.displayName)"
             }()
             items.append(ActivityItem(
-                id: "d-\(r.id?.uuidString ?? UUID().uuidString)",
+                id: "d-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
                 date: ts,
                 icon: "oval.fill",
                 color: .blDiaper,
                 title: "Diaper",
                 detail: diaperDetail,
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
+                notes: r.notes,
                 record: .diaper(r)
             ))
         }
@@ -1292,6 +1296,7 @@ struct HomeView: View {
                         detail: item.detail,
                         timeAgo: timeAgo,
                         timeLabel: item.timeLabel,
+                        notes: item.notes,
                         showTimeAgoHighlight: isSelectedDateToday
                     )
                     .contextMenu {
@@ -1341,16 +1346,24 @@ struct TimeSinceRow: View {
     let detail: String
     let timeAgo: String
     let timeLabel: String
+    var notes: String?
     /// When true (today), timeAgo is shown in the accent color as a prominent badge.
     /// When false (past date), timeAgo is shown in a subdued style since relative
     /// "time ago" is not meaningful — it just mirrors the time for quick scanning.
     var showTimeAgoHighlight: Bool = true
+
+    /// Cleaned notes — nil if empty or whitespace-only
+    private var displayNotes: String? {
+        guard let notes, !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return notes.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     private var accessibilityText: String {
         var parts = [title]
         if !detail.isEmpty { parts.append(detail) }
         parts.append("at \(timeLabel)")
         if showTimeAgoHighlight && !timeAgo.isEmpty { parts.append(timeAgo) }
+        if let displayNotes { parts.append("note: \(displayNotes)") }
         return parts.joined(separator: ", ")
     }
 
@@ -1381,6 +1394,20 @@ struct TimeSinceRow: View {
                 Text(timeLabel)
                     .font(.system(size: 13))
                     .foregroundColor(.blTextSecondary)
+
+                // Show notes inline if present
+                if let displayNotes {
+                    HStack(spacing: 4) {
+                        Image(systemName: "note.text")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.blTextTertiary)
+                        Text(displayNotes)
+                            .font(.system(size: 12))
+                            .foregroundColor(.blTextTertiary)
+                            .lineLimit(1)
+                    }
+                    .padding(.top, 1)
+                }
             }
             Spacer()
             Text(timeAgo)
