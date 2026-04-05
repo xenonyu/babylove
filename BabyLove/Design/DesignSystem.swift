@@ -165,3 +165,31 @@ struct StatBadge: View {
         .blCard()
     }
 }
+
+// MARK: - Baby Avatar (reusable photo / fallback emoji)
+struct BabyAvatarView: View {
+    let baby: Baby
+    var size: CGFloat = 64
+
+    var body: some View {
+        if let photoData = baby.photoData, let uiImage = UIImage(data: photoData) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(Color(hex: baby.gender.color).opacity(0.3), lineWidth: size > 60 ? 2 : 1.5)
+                )
+        } else {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: baby.gender.color).opacity(0.2))
+                    .frame(width: size, height: size)
+                Text(baby.gender.icon)
+                    .font(.system(size: size * 0.5))
+            }
+        }
+    }
+}

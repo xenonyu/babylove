@@ -872,12 +872,16 @@ struct HomeView: View {
     private var babyHeroCard: some View {
         HStack(spacing: 16) {
             // Avatar
-            ZStack {
-                Circle()
-                    .fill(Color(hex: baby?.gender.color ?? "#FF7B6B").opacity(0.2))
-                    .frame(width: 64, height: 64)
-                Text(baby?.gender.icon ?? "🍼")
-                    .font(.system(size: 32))
+            if let baby {
+                BabyAvatarView(baby: baby, size: 64)
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color.blPrimary.opacity(0.2))
+                        .frame(width: 64, height: 64)
+                    Text("🍼")
+                        .font(.system(size: 32))
+                }
             }
 
             VStack(alignment: .leading, spacing: 4) {

@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreData
 import UniformTypeIdentifiers
+import PhotosUI
 
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
@@ -24,13 +25,7 @@ struct SettingsView: View {
                                 showEditBaby = true
                             } label: {
                                 HStack(spacing: 14) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color(hex: baby.gender.color).opacity(0.2))
-                                            .frame(width: 50, height: 50)
-                                        Text(baby.gender.icon)
-                                            .font(.system(size: 24))
-                                    }
+                                    BabyAvatarView(baby: baby, size: 50)
                                     VStack(alignment: .leading, spacing: 3) {
                                         Text(baby.name)
                                             .font(.system(size: 17, weight: .semibold))
@@ -308,12 +303,70 @@ struct EditBabyView: View {
     @State private var name: String = ""
     @State private var birthDate: Date = Date()
     @State private var gender: Baby.Gender = .girl
+    @State private var photoData: Data?
+    @State private var selectedPhoto: PhotosPickerItem?
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.blBackground.ignoresSafeArea()
                 Form {
+                    // Photo section
+                    Section {
+                        HStack {
+                            Spacer()
+                            VStack(spacing: 12) {
+                                // Current photo or placeholder
+                                if let photoData, let uiImage = UIImage(data: photoData) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 96, height: 96)
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.blPrimary.opacity(0.3), lineWidth: 2)
+                                        )
+                                } else {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color(hex: gender.color).opacity(0.2))
+                                            .frame(width: 96, height: 96)
+                                        Text(gender.icon)
+                                            .font(.system(size: 44))
+                                    }
+                                }
+
+                                PhotosPicker(selection: $selectedPhoto,
+                                             matching: .images,
+                                             photoLibrary: .shared()) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: photoData != nil ? "arrow.triangle.2.circlepath.camera" : "camera.fill")
+                                            .font(.system(size: 13, weight: .medium))
+                                        Text(photoData != nil ? "Change Photo" : "Add Photo")
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
+                                    .foregroundColor(.blPrimary)
+                                }
+
+                                if photoData != nil {
+                                    Button {
+                                        withAnimation(.spring(response: 0.3)) {
+                                            photoData = nil
+                                            selectedPhoto = nil
+                                        }
+                                    } label: {
+                                        Text("Remove Photo")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.blTextTertiary)
+                                    }
+                                }
+                            }
+                            Spacer()
+                        }
+                        .listRowBackground(Color.clear)
+                    }
+
                     Section("Baby's Name") {
                         TextField("Name", text: $name)
                     }
@@ -343,6 +396,7 @@ struct EditBabyView: View {
                         baby.name = name
                         baby.birthDate = birthDate
                         baby.gender = gender
+                        baby.photoData = photoData
                         appState.saveBaby(baby)
                         dismiss()
                     }
@@ -354,6 +408,23 @@ struct EditBabyView: View {
                     name = baby.name
                     birthDate = baby.birthDate
                     gender = baby.gender
+                    photoData = baby.photoData
+                }
+            }
+            .onChange(of: selectedPhoto) { _, newItem in
+                Task {
+                    if let newItem,
+                       let data = try? await newItem.loadTransferable(type: Data.self) {
+                        // Compress to JPEG to keep UserDefaults size reasonable
+                        if let uiImage = UIImage(data: data),
+                           let compressed = uiImage.jpegData(compressionQuality: 0.6) {
+                            await MainActor.run {
+                                withAnimation(.spring(response: 0.3)) {
+                                    photoData = compressed
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
