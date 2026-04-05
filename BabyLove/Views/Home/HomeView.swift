@@ -54,6 +54,52 @@ struct HomeView: View {
 
     private var ongoingFeeding: CDFeedingRecord? { ongoingFeedings.first }
 
+    // 7-day and 14-day records for weekly summary
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "timestamp >= %@",
+                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+    )
+    private var weekFeedings: FetchedResults<CDFeedingRecord>
+
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
+        predicate: NSPredicate(format: "startTime >= %@",
+                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+    )
+    private var weekSleeps: FetchedResults<CDSleepRecord>
+
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "timestamp >= %@",
+                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+    )
+    private var weekDiapers: FetchedResults<CDDiaperRecord>
+
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "timestamp >= %@ AND timestamp < %@",
+                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate,
+                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+    )
+    private var prevWeekFeedings: FetchedResults<CDFeedingRecord>
+
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
+        predicate: NSPredicate(format: "startTime >= %@ AND startTime < %@",
+                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate,
+                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+    )
+    private var prevWeekSleeps: FetchedResults<CDSleepRecord>
+
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "timestamp >= %@ AND timestamp < %@",
+                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate,
+                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+    )
+    private var prevWeekDiapers: FetchedResults<CDDiaperRecord>
+
     private var baby: Baby? { appState.currentBaby }
 
     private var isSelectedDateToday: Bool {
@@ -233,6 +279,11 @@ struct HomeView: View {
                                 }
                                 .padding(.horizontal, 20)
                             }
+                        }
+
+                        // Weekly summary (only on today view, only if there's any data)
+                        if isSelectedDateToday && (!weekFeedings.isEmpty || !weekSleeps.isEmpty || !weekDiapers.isEmpty) {
+                            weeklySummaryCard
                         }
 
                         // Recent activity or empty state
@@ -652,6 +703,168 @@ struct HomeView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "d"
         return formatter.string(from: date)
+    }
+
+    // MARK: - Weekly Summary
+
+    /// Average feedings per day this week
+    private var weekAvgFeedings: Double {
+        guard !weekFeedings.isEmpty else { return 0 }
+        return Double(weekFeedings.count) / 7.0
+    }
+
+    /// Average sleep hours per day this week
+    private var weekAvgSleepHours: Double {
+        guard !weekSleeps.isEmpty else { return 0 }
+        let totalMinutes = weekSleeps.reduce(0) { sum, r in
+            guard let s = r.startTime else { return sum }
+            let e = r.endTime ?? Date()
+            return sum + Int(e.timeIntervalSince(s) / 60)
+        }
+        return Double(totalMinutes) / 60.0 / 7.0
+    }
+
+    /// Average diapers per day this week
+    private var weekAvgDiapers: Double {
+        guard !weekDiapers.isEmpty else { return 0 }
+        return Double(weekDiapers.count) / 7.0
+    }
+
+    /// Average feedings per day previous week
+    private var prevWeekAvgFeedings: Double {
+        guard !prevWeekFeedings.isEmpty else { return 0 }
+        return Double(prevWeekFeedings.count) / 7.0
+    }
+
+    /// Average sleep hours per day previous week
+    private var prevWeekAvgSleepHours: Double {
+        guard !prevWeekSleeps.isEmpty else { return 0 }
+        let totalMinutes = prevWeekSleeps.reduce(0) { sum, r in
+            guard let s = r.startTime else { return sum }
+            let e = r.endTime ?? Date()
+            return sum + Int(e.timeIntervalSince(s) / 60)
+        }
+        return Double(totalMinutes) / 60.0 / 7.0
+    }
+
+    /// Average diapers per day previous week
+    private var prevWeekAvgDiapers: Double {
+        guard !prevWeekDiapers.isEmpty else { return 0 }
+        return Double(prevWeekDiapers.count) / 7.0
+    }
+
+    /// Returns a trend icon based on comparison (up, down, or steady)
+    private static func trendIcon(current: Double, previous: Double) -> (icon: String, color: Color) {
+        guard previous > 0 else { return ("equal", .blTextTertiary) }
+        let diff = (current - previous) / previous
+        if diff > 0.1 { return ("arrow.up.right", .blFeeding) }
+        if diff < -0.1 { return ("arrow.down.right", .blTeal) }
+        return ("equal", .blTextTertiary)
+    }
+
+    private var weeklySummaryCard: some View {
+        VStack(spacing: 12) {
+            BLSectionHeader(title: "This Week")
+                .padding(.horizontal, 20)
+
+            VStack(spacing: 0) {
+                // Row 1: Feedings
+                if !weekFeedings.isEmpty {
+                    weeklyRow(
+                        icon: "drop.fill",
+                        color: .blFeeding,
+                        title: "Feedings",
+                        value: String(format: "%.1f", weekAvgFeedings),
+                        unit: "/day",
+                        total: "\(weekFeedings.count) total",
+                        current: weekAvgFeedings,
+                        previous: prevWeekAvgFeedings
+                    )
+                }
+
+                if !weekFeedings.isEmpty && !weekSleeps.isEmpty {
+                    Divider().padding(.leading, 60)
+                }
+
+                // Row 2: Sleep
+                if !weekSleeps.isEmpty {
+                    weeklyRow(
+                        icon: "moon.zzz.fill",
+                        color: .blSleep,
+                        title: "Sleep",
+                        value: String(format: "%.1fh", weekAvgSleepHours),
+                        unit: "/day",
+                        total: "\(weekSleeps.count) naps",
+                        current: weekAvgSleepHours,
+                        previous: prevWeekAvgSleepHours
+                    )
+                }
+
+                if (!weekFeedings.isEmpty || !weekSleeps.isEmpty) && !weekDiapers.isEmpty {
+                    Divider().padding(.leading, 60)
+                }
+
+                // Row 3: Diapers
+                if !weekDiapers.isEmpty {
+                    weeklyRow(
+                        icon: "oval.fill",
+                        color: .blDiaper,
+                        title: "Diapers",
+                        value: String(format: "%.1f", weekAvgDiapers),
+                        unit: "/day",
+                        total: "\(weekDiapers.count) total",
+                        current: weekAvgDiapers,
+                        previous: prevWeekAvgDiapers
+                    )
+                }
+            }
+            .blCard()
+            .padding(.horizontal, 20)
+        }
+    }
+
+    @ViewBuilder
+    private func weeklyRow(icon: String, color: Color, title: String, value: String, unit: String, total: String, current: Double, previous: Double) -> some View {
+        let trend = Self.trendIcon(current: current, previous: previous)
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(color.opacity(0.12))
+                    .frame(width: 36, height: 36)
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(color)
+            }
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.blTextPrimary)
+                Text(total)
+                    .font(.system(size: 11))
+                    .foregroundColor(.blTextTertiary)
+            }
+
+            Spacer()
+
+            HStack(spacing: 4) {
+                Text(value)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundColor(color)
+                Text(unit)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.blTextTertiary)
+            }
+
+            if previous > 0 {
+                Image(systemName: trend.icon)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(trend.color)
+                    .frame(width: 18)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Baby Hero Card
