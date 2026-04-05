@@ -9,5 +9,7 @@
   "[04/05 23:08] ## ✅ 迭代 #8 完成！\n\n### 改进：修复 Today's Summary 不包含进行中睡眠时长的 bug\n\n**问题**（优先级 #4 — 数据准确性）：\n\n- **根因**：`totalSleepMinutes` 计算中，`gu",
   "[04/05 23:14] ## ✅ 迭代 #9 完成！\n\n### 改进：添加 \"Time Since Last\" 时间指示器到首页 Recent Activity\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\nHomeView 的 \"Recent Act",
   "[04/05 23:17] ## ✅ 迭代 #10 完成！\n\n### 改进：修复 Formula/Solid 喂养记录保存幽灵时长的 bug\n\n**问题**（优先级 #4 — 数据准确性）：\n\n- **根因**：`FeedingLogView` 中 `duration",
-  "[04/05 23:21] ## ✅ 迭代 #10 完成！\n\n### 改进：添加 \"See All\" 完整记录历史浏览功能\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：TrackView 的喂食、睡眠、尿布三个板块各自只显示 `pref"
+  "[04/05 23:21] ## ✅ 迭代 #10 完成！\n\n### 改进：添加 \"See All\" 完整记录历史浏览功能\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：TrackView 的喂食、睡眠、尿布三个板块各自只显示 `pref",
+  "[04/05 23:26] ## ✅ 迭代 #11 完成！\n\n### 改进：修复 Growth 记录列表缺少头围显示 + 改进标签\n\n**问题**（优先级 #4 — 数据准确性）：\n\n- **根因**：`GrowthView.swift` 的 `growthRow()",
+  "[04/05 23:31] ## ✅ 迭代 #12 完成！\n\n### 改进：添加相对日期标注到 TrackView 记录行\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：TrackView 的 `feedingRow`、`sleepRow"
 ]

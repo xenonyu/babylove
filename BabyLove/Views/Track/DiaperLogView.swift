@@ -6,6 +6,8 @@ struct DiaperLogView: View {
 
     @State private var diaperType: DiaperType = .wet
     @State private var notes = ""
+    @State private var timestamp = Date()
+    @State private var showTimePicker = false
 
     var body: some View {
         NavigationStack {
@@ -42,6 +44,40 @@ struct DiaperLogView: View {
                         .padding(.horizontal, 24)
                     }
 
+                    // Time
+                    VStack(alignment: .leading, spacing: 10) {
+                        Button {
+                            withAnimation(.spring(response: 0.3)) { showTimePicker.toggle() }
+                        } label: {
+                            HStack {
+                                Label("Time", systemImage: "clock.fill")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.blTextSecondary)
+                                Spacer()
+                                Text(timestamp.formatted(date: .omitted, time: .shortened))
+                                    .font(.system(size: 15, weight: .medium))
+                                    .foregroundColor(.blDiaper)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.blTextTertiary)
+                                    .rotationEffect(.degrees(showTimePicker ? 90 : 0))
+                            }
+                            .padding(14)
+                            .background(Color.blSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+
+                        if showTimePicker {
+                            DatePicker("", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                .datePickerStyle(.compact)
+                                .tint(.blDiaper)
+                                .labelsHidden()
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+                    }
+                    .padding(.horizontal, 24)
+
                     // Notes
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Notes (optional)")
@@ -58,7 +94,7 @@ struct DiaperLogView: View {
                     Spacer()
 
                     Button("Log Diaper Change") {
-                        vm.logDiaper(type: diaperType, notes: notes)
+                        vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
                         dismiss()
                     }
                     .buttonStyle(BLPrimaryButton(color: .blDiaper))

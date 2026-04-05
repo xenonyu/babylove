@@ -10,6 +10,8 @@ struct FeedingLogView: View {
     @State private var duration: Double = 10
     @State private var amount: Double = 0
     @State private var notes = ""
+    @State private var timestamp = Date()
+    @State private var showTimePicker = false
 
     private var unit: MeasurementUnit { appState.measurementUnit }
     /// Max amount in display unit (300 ml ≈ 10 oz)
@@ -119,6 +121,39 @@ struct FeedingLogView: View {
                             }
                         }
 
+                        // Time
+                        VStack(alignment: .leading, spacing: 10) {
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { showTimePicker.toggle() }
+                            } label: {
+                                HStack {
+                                    Label("Time", systemImage: "clock.fill")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                    Spacer()
+                                    Text(timestamp.formatted(date: .omitted, time: .shortened))
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(.blFeeding)
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(.blTextTertiary)
+                                        .rotationEffect(.degrees(showTimePicker ? 90 : 0))
+                                }
+                                .padding(14)
+                                .background(Color.blSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+
+                            if showTimePicker {
+                                DatePicker("", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                    .datePickerStyle(.compact)
+                                    .tint(.blFeeding)
+                                    .labelsHidden()
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                        }
+
                         // Notes
                         VStack(alignment: .leading, spacing: 10) {
                             Label("Notes (optional)", systemImage: "note.text")
@@ -139,7 +174,8 @@ struct FeedingLogView: View {
                                 side: hasDuration ? side : nil,
                                 durationMinutes: hasDuration ? Int(duration) : 0,
                                 amountML: amountML,
-                                notes: notes
+                                notes: notes,
+                                timestamp: timestamp
                             )
                             dismiss()
                         }

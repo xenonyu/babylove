@@ -136,6 +136,16 @@
     "swift-dependencies" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/SettingsView.swiftdeps",
     "swiftmodule" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
   },
+  "/Users/yaxinli/xym/babylove/BabyLove/Views/Track/AllRecordsView.swift" : {
+    "const-values" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.swiftconstvalues",
+    "dependencies" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.d",
+    "diagnostics" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.dia",
+    "index-unit-output-path" : "/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.o",
+    "llvm-bc" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.bc",
+    "object" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.o",
+    "swift-dependencies" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView.swiftdeps",
+    "swiftmodule" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/AllRecordsView~partial.swiftmodule"
+  },
   "/Users/yaxinli/xym/babylove/BabyLove/Views/Track/DiaperLogView.swift" : {
     "const-values" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/DiaperLogView.swiftconstvalues",
     "dependencies" : "/Users/yaxinli/xym/babylove/build/BabyLove.build/Debug-iphoneos/BabyLove.build/Objects-normal/arm64/DiaperLogView.d",

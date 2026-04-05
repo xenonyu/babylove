@@ -14,10 +14,11 @@ class TrackViewModel: ObservableObject {
                     side: BreastSide? = nil,
                     durationMinutes: Int = 0,
                     amountML: Double = 0,
-                    notes: String = "") {
+                    notes: String = "",
+                    timestamp: Date = Date()) {
         let record = CDFeedingRecord(context: ctx)
         record.id = UUID()
-        record.timestamp = Date()
+        record.timestamp = timestamp
         record.feedType = type.rawValue
         record.breastSide = side?.rawValue
         record.durationMinutes = Int16(durationMinutes)
@@ -64,10 +65,10 @@ class TrackViewModel: ObservableObject {
 
     // MARK: - Diaper
 
-    func logDiaper(type: DiaperType, notes: String = "") {
+    func logDiaper(type: DiaperType, notes: String = "", timestamp: Date = Date()) {
         let record = CDDiaperRecord(context: ctx)
         record.id = UUID()
-        record.timestamp = Date()
+        record.timestamp = timestamp
         record.diaperType = type.rawValue
         record.notes = notes.isEmpty ? nil : notes
         save()
