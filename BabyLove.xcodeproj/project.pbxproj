@@ -18,6 +18,7 @@
 		41C2FB55751928475AC650E8 /* MainTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6356131A5FD91F90E155E48E /* MainTabUITests.swift */; };
 		4B4EEB45620FA1FB22FD2728 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4203D6FB43A35070B595AC39 /* OnboardingUITests.swift */; };
 		4D535A22FEAF4778CD240D2F /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502AD43E02D7DDBE8A6C1584 /* PhotosUI.framework */; };
+		532A69CB3E1B6240CFB25DC9 /* AllRecordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB27CB76740F08E9C4B67907 /* AllRecordsView.swift */; };
 		560B20B87D81AD2F8F35FDBB /* DiaperLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C95F233B930ADB06E9B9859 /* DiaperLogView.swift */; };
 		61E71EBFFCABEC19A453112F /* MemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673B4B9F6094D50AD5A2AA08 /* MemoryView.swift */; };
 		65D637F6C833D948660A8A50 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B584E212EAEC77D4BE5A0CC4 /* PersistenceController.swift */; };
@@ -85,6 +86,7 @@
 		BC310D7FE3E975FA5F3BEF2A /* TrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackView.swift; sourceTree = "<group>"; };
 		CC24EB6F25EFF04C69355F9C /* BabyLoveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyLoveApp.swift; sourceTree = "<group>"; };
 		D1CCD6F89702EF474129316C /* Baby.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Baby.swift; sourceTree = "<group>"; };
+		DB27CB76740F08E9C4B67907 /* AllRecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllRecordsView.swift; sourceTree = "<group>"; };
 		E30F645A03C655447715B8A3 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		F839C827D77ACEFAE44D8F76 /* TrackingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingModels.swift; sourceTree = "<group>"; };
 		FC15279BB5BDEFB55581EDCC /* GrowthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthView.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 		10A2A7F7C86D1A92B58B6870 /* Track */ = {
 			isa = PBXGroup;
 			children = (
+				DB27CB76740F08E9C4B67907 /* AllRecordsView.swift */,
 				8C95F233B930ADB06E9B9859 /* DiaperLogView.swift */,
 				7FCECAE45648C1C42C3C9F7D /* FeedingLogView.swift */,
 				053E5A82A50B226040E832BD /* GrowthLogView.swift */,
@@ -403,6 +406,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				532A69CB3E1B6240CFB25DC9 /* AllRecordsView.swift in Sources */,
 				37FB93695ED51D9575591280 /* AppState.swift in Sources */,
 				802D5EEDE2F253B7E9B351A4 /* Baby.swift in Sources */,
 				A309EDB311E378B0141DD6DF /* BabyLove.xcdatamodeld in Sources */,

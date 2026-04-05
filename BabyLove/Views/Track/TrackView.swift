@@ -59,7 +59,7 @@ struct TrackView: View {
 
                         // Recent feedings
                         if !recentFeedings.isEmpty {
-                            recentSection(title: "Feedings", color: .blFeeding) {
+                            recentSection(title: "Feedings", color: .blFeeding, destination: AllFeedingsView()) {
                                 ForEach(recentFeedings.prefix(5)) { r in
                                     feedingRow(r)
                                         .contextMenu {
@@ -75,7 +75,7 @@ struct TrackView: View {
 
                         // Recent sleeps
                         if !recentSleeps.isEmpty {
-                            recentSection(title: "Sleep", color: .blSleep) {
+                            recentSection(title: "Sleep", color: .blSleep, destination: AllSleepsView()) {
                                 ForEach(recentSleeps.prefix(5)) { r in
                                     sleepRow(r)
                                         .contextMenu {
@@ -91,7 +91,7 @@ struct TrackView: View {
 
                         // Recent diapers
                         if !recentDiapers.isEmpty {
-                            recentSection(title: "Diapers", color: .blDiaper) {
+                            recentSection(title: "Diapers", color: .blDiaper, destination: AllDiapersView()) {
                                 ForEach(recentDiapers.prefix(5)) { r in
                                     diaperRow(r)
                                         .contextMenu {
@@ -135,10 +135,20 @@ struct TrackView: View {
 
     // MARK: - Recent Section
     @ViewBuilder
-    private func recentSection<Content: View>(title: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
+    private func recentSection<Content: View, Dest: View>(title: String, color: Color, destination: Dest, @ViewBuilder content: () -> Content) -> some View {
         VStack(spacing: 12) {
-            BLSectionHeader(title: title)
-                .padding(.horizontal, 20)
+            HStack {
+                Text(title)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.blTextPrimary)
+                Spacer()
+                NavigationLink(destination: destination) {
+                    Text("See All")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.blPrimary)
+                }
+            }
+            .padding(.horizontal, 20)
             VStack(spacing: 0) { content() }
                 .blCard()
                 .padding(.horizontal, 20)
