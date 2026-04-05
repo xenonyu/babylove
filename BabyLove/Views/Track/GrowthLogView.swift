@@ -55,9 +55,10 @@ struct GrowthLogView: View {
                         }
 
                         Button("Save Measurements") {
-                            let wKG = Double(weightKG)
-                            let hCM = Double(heightCM)
-                            let hd  = Double(headCM)
+                            // Convert from display unit to metric for storage
+                            let wKG = Double(weightKG).map { unit.weightToKG($0) }
+                            let hCM = Double(heightCM).map { unit.lengthToCM($0) }
+                            let hd  = Double(headCM).map { unit.lengthToCM($0) }
                             vm.logGrowth(
                                 weightKG: wKG,
                                 heightCM: hCM,

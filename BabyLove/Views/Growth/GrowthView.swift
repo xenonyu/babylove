@@ -96,7 +96,7 @@ struct GrowthView: View {
 
             // Simple bar chart
             if records.count > 1 {
-                SimpleLineChart(records: Array(records), metric: selectedMetric)
+                SimpleLineChart(records: Array(records), metric: selectedMetric, unit: appState.measurementUnit)
                     .frame(height: 180)
                     .blCard()
             }
@@ -108,7 +108,7 @@ struct GrowthView: View {
         return Group {
             if selectedMetric == .weight {
                 VStack(spacing: 4) {
-                    Text(String(format: "%.2f", r.weightKG))
+                    Text(String(format: "%.2f", unit.weightFromKG(r.weightKG)))
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.blGrowth)
                     Text(unit.weightLabel)
@@ -117,7 +117,7 @@ struct GrowthView: View {
                 }
             } else if selectedMetric == .height {
                 VStack(spacing: 4) {
-                    Text(String(format: "%.1f", r.heightCM))
+                    Text(String(format: "%.1f", unit.lengthFromCM(r.heightCM)))
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.blGrowth)
                     Text(unit.heightLabel)
@@ -126,7 +126,7 @@ struct GrowthView: View {
                 }
             } else {
                 VStack(spacing: 4) {
-                    Text(String(format: "%.1f", r.headCircumferenceCM))
+                    Text(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM)))
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.blGrowth)
                     Text(unit.heightLabel)
@@ -138,7 +138,8 @@ struct GrowthView: View {
     }
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {
-        HStack(spacing: 14) {
+        let unit = appState.measurementUnit
+        return HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Color.blGrowth.opacity(0.15))
@@ -153,12 +154,12 @@ struct GrowthView: View {
                     .foregroundColor(.blTextPrimary)
                 HStack(spacing: 10) {
                     if r.weightKG > 0 {
-                        Text("\(String(format: "%.2f", r.weightKG)) kg")
+                        Text("\(String(format: "%.2f", unit.weightFromKG(r.weightKG))) \(unit.weightLabel)")
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }
                     if r.heightCM > 0 {
-                        Text("\(String(format: "%.1f", r.heightCM)) cm")
+                        Text("\(String(format: "%.1f", unit.lengthFromCM(r.heightCM))) \(unit.heightLabel)")
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }
@@ -194,13 +195,14 @@ struct GrowthView: View {
 struct SimpleLineChart: View {
     let records: [CDGrowthRecord]
     let metric: GrowthView.GrowthMetric
+    var unit: MeasurementUnit = .metric
 
     private func values() -> [Double] {
         records.map { r in
             switch metric {
-            case .weight: return r.weightKG
-            case .height: return r.heightCM
-            case .head:   return r.headCircumferenceCM
+            case .weight: return unit.weightFromKG(r.weightKG)
+            case .height: return unit.lengthFromCM(r.heightCM)
+            case .head:   return unit.lengthFromCM(r.headCircumferenceCM)
             }
         }.filter { $0 > 0 }
     }

@@ -55,4 +55,36 @@ enum MeasurementUnit: String, CaseIterable {
         case .imperial: return "Imperial (lbs, in)"
         }
     }
+
+    // MARK: - Unit Conversion (storage is always metric)
+
+    /// Convert user-entered weight to kg for storage
+    func weightToKG(_ value: Double) -> Double {
+        self == .metric ? value : value / 2.20462
+    }
+
+    /// Convert stored kg to display unit
+    func weightFromKG(_ kg: Double) -> Double {
+        self == .metric ? kg : kg * 2.20462
+    }
+
+    /// Convert user-entered length to cm for storage
+    func lengthToCM(_ value: Double) -> Double {
+        self == .metric ? value : value * 2.54
+    }
+
+    /// Convert stored cm to display unit
+    func lengthFromCM(_ cm: Double) -> Double {
+        self == .metric ? cm : cm / 2.54
+    }
+
+    /// Convert user-entered volume to ml for storage
+    func volumeToML(_ value: Double) -> Double {
+        self == .metric ? value : value * 29.5735
+    }
+
+    /// Convert stored ml to display unit
+    func volumeFromML(_ ml: Double) -> Double {
+        self == .metric ? ml : ml / 29.5735
+    }
 }
