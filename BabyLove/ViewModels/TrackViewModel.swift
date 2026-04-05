@@ -25,6 +25,10 @@ class TrackViewModel: ObservableObject {
         record.amountML = amountML
         record.notes = notes.isEmpty ? nil : notes
         save()
+        // Schedule next feeding reminder based on this feeding's timestamp
+        Task { @MainActor in
+            NotificationManager.shared.scheduleFeedingReminder(afterFeedingAt: timestamp)
+        }
     }
 
     // MARK: - Feeding Timer (Ongoing)
@@ -53,6 +57,10 @@ class TrackViewModel: ObservableObject {
         let minutes = max(1, Int(Date().timeIntervalSince(start) / 60))
         record.durationMinutes = Int16(minutes)
         try? context.save()
+        // Schedule next feeding reminder from now (when the feeding ended)
+        Task { @MainActor in
+            NotificationManager.shared.scheduleFeedingReminder(afterFeedingAt: Date())
+        }
     }
 
     // MARK: - Sleep
@@ -202,6 +210,10 @@ class TrackViewModel: ObservableObject {
         record.timestamp = timestamp
         record.notes = notes.isEmpty ? nil : notes
         save()
+        // Re-schedule feeding reminder based on updated timestamp
+        Task { @MainActor in
+            NotificationManager.shared.scheduleFeedingReminder(afterFeedingAt: timestamp)
+        }
     }
 
     // MARK: - Update Sleep

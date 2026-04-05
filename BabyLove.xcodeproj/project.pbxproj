@@ -35,6 +35,7 @@
 		C7CCEF8ED59DDBA809C1A502 /* SleepLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87860DF03AD4B3B60EA4CEF3 /* SleepLogView.swift */; };
 		D199000C4589D1FE528D163E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709C21D5EB7D4BCDACEA7C19 /* SettingsView.swift */; };
 		D837CB4B6B05AD3B6841267D /* BabyModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49262E70FA0EB20482A2D08E /* BabyModelTests.swift */; };
+		E1BC5BD29CA4EECD35BF09F9 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A72234E4851883D2FB0D4C /* NotificationManager.swift */; };
 		E4DD6FFDEA470A7A0F9EC169 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B73E8B5F2D9845C9A03918C7 /* Photos.framework */; };
 		EE21A30A5CCA94EE8D3306A3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D3DD30D2D961910E0BFD57 /* HomeView.swift */; };
 /* End PBXBuildFile section */
@@ -85,6 +86,7 @@
 		B584E212EAEC77D4BE5A0CC4 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		B73E8B5F2D9845C9A03918C7 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		BC310D7FE3E975FA5F3BEF2A /* TrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackView.swift; sourceTree = "<group>"; };
+		C0A72234E4851883D2FB0D4C /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		CC24EB6F25EFF04C69355F9C /* BabyLoveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyLoveApp.swift; sourceTree = "<group>"; };
 		D1CCD6F89702EF474129316C /* Baby.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Baby.swift; sourceTree = "<group>"; };
 		DB27CB76740F08E9C4B67907 /* AllRecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllRecordsView.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 		45448F3398670DC86EA078EE /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C0A72234E4851883D2FB0D4C /* NotificationManager.swift */,
 				B584E212EAEC77D4BE5A0CC4 /* PersistenceController.swift */,
 			);
 			path = Services;
@@ -422,6 +425,7 @@
 				12073B6064D9A934FDD4541B /* GrowthView.swift in Sources */,
 				EE21A30A5CCA94EE8D3306A3 /* HomeView.swift in Sources */,
 				61E71EBFFCABEC19A453112F /* MemoryView.swift in Sources */,
+				E1BC5BD29CA4EECD35BF09F9 /* NotificationManager.swift in Sources */,
 				6862115DF96AC5FA28BFCA24 /* OnboardingView.swift in Sources */,
 				65D637F6C833D948660A8A50 /* PersistenceController.swift in Sources */,
 				D199000C4589D1FE528D163E /* SettingsView.swift in Sources */,

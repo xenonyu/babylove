@@ -13,6 +13,11 @@ struct SettingsView: View {
     @State private var exportError: String?
     @State private var showExportError = false
 
+    // Feeding reminder state
+    @State private var feedingReminderEnabled = NotificationManager.shared.isEnabled
+    @State private var feedingReminderInterval = NotificationManager.shared.intervalMinutes
+    @State private var notificationDenied = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -61,6 +66,52 @@ struct SettingsView: View {
                         }
                     } header: {
                         Text("Measurements")
+                    }
+
+                    // Feeding reminders
+                    Section {
+                        Toggle(isOn: $feedingReminderEnabled) {
+                            Label("Feeding Reminders", systemImage: "bell.badge.fill")
+                        }
+                        .tint(.blFeeding)
+                        .onChange(of: feedingReminderEnabled) { _, enabled in
+                            Task { @MainActor in
+                                if enabled {
+                                    let granted = await NotificationManager.shared.requestPermission()
+                                    if granted {
+                                        NotificationManager.shared.isEnabled = true
+                                        // Schedule from now if turning on
+                                        NotificationManager.shared.scheduleFeedingReminder()
+                                    } else {
+                                        feedingReminderEnabled = false
+                                        notificationDenied = true
+                                    }
+                                } else {
+                                    NotificationManager.shared.isEnabled = false
+                                }
+                            }
+                        }
+
+                        if feedingReminderEnabled {
+                            Picker(selection: $feedingReminderInterval) {
+                                ForEach(NotificationManager.ReminderInterval.options) { opt in
+                                    Text(opt.label).tag(opt.id)
+                                }
+                            } label: {
+                                Label("Interval", systemImage: "clock.arrow.circlepath")
+                            }
+                            .onChange(of: feedingReminderInterval) { _, newVal in
+                                NotificationManager.shared.intervalMinutes = newVal
+                                // Re-schedule with new interval
+                                NotificationManager.shared.scheduleFeedingReminder()
+                            }
+                        }
+                    } header: {
+                        Text("Reminders")
+                    } footer: {
+                        Text(feedingReminderEnabled
+                             ? "You'll get a reminder after each feeding based on the interval above."
+                             : "Get notified when it's time for the next feeding.")
                     }
 
                     // Data export
@@ -117,6 +168,14 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+            .task {
+                // Sync toggle with actual notification permission
+                let status = await NotificationManager.shared.authorizationStatus()
+                if status == .denied && feedingReminderEnabled {
+                    feedingReminderEnabled = false
+                    NotificationManager.shared.isEnabled = false
+                }
+            }
         }
         .sheet(isPresented: $showEditBaby) {
             EditBabyView()
@@ -133,6 +192,16 @@ struct SettingsView: View {
             }
         } message: {
             Text("This will permanently delete all tracking records and baby profiles. This action cannot be undone.")
+        }
+        .alert("Notifications Disabled", isPresented: $notificationDenied) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Please enable notifications in Settings to receive feeding reminders.")
         }
         .alert("Export Failed", isPresented: $showExportError) {
             Button("OK", role: .cancel) {}
