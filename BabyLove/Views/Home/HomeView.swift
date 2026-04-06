@@ -172,11 +172,12 @@ struct HomeView: View {
 
         let weekStartNS = weekStart as NSDate
         let prevWeekStartNS = prevWeekStart as NSDate
+        let todayEndNS = cal.date(byAdding: .day, value: 1, to: today)! as NSDate
 
-        // Current week (last 7 days)
-        weekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@", weekStartNS)
-        weekSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@", weekStartNS)
-        weekDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", weekStartNS)
+        // Current week (last 7 days up to end of today — excludes future-dated records)
+        weekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", weekStartNS, todayEndNS)
+        weekSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@ AND startTime < %@", weekStartNS, todayEndNS)
+        weekDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", weekStartNS, todayEndNS)
 
         // Previous week (days -14 to -7)
         prevWeekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", prevWeekStartNS, weekStartNS)
