@@ -280,14 +280,31 @@ struct TrackView: View {
         return time
     }
 
+    /// Whether a feeding record represents an ongoing timer (breast/pump with durationMinutes == 0).
+    private static func isFeedingOngoing(_ r: CDFeedingRecord) -> Bool {
+        let ft = FeedType(rawValue: r.feedType ?? "")
+        let isTimerType = ft == .breast || ft == .pump
+        return isTimerType && r.durationMinutes == 0
+    }
+
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
         let unit = appState.measurementUnit
+        let isOngoing = Self.isFeedingOngoing(r)
         return HStack {
             Text(FeedType(rawValue: r.feedType ?? "")?.displayName ?? "Feeding")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.blTextPrimary)
+            if isOngoing {
+                Text("In Progress")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Color.blFeeding)
+                    .clipShape(Capsule())
+            }
             Spacer()
-            if r.durationMinutes > 0 {
+            if !isOngoing && r.durationMinutes > 0 {
                 Text("\(r.durationMinutes)m")
                     .font(.system(size: 14))
                     .foregroundColor(.blFeeding)

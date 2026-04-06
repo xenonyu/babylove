@@ -77,25 +77,49 @@ struct AllFeedingsView: View {
         }
     }
 
+    /// Whether a feeding record represents an ongoing timer (breast/pump with durationMinutes == 0).
+    private static func isFeedingOngoing(_ r: CDFeedingRecord) -> Bool {
+        let ft = FeedType(rawValue: r.feedType ?? "")
+        let isTimerType = ft == .breast || ft == .pump
+        return isTimerType && r.durationMinutes == 0
+    }
+
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
         let unit = appState.measurementUnit
+        let isOngoing = Self.isFeedingOngoing(r)
         return HStack(spacing: 12) {
             let feedType = FeedType(rawValue: r.feedType ?? "")
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.blFeeding.opacity(0.15))
+                    .fill(Color.blFeeding.opacity(isOngoing ? 0.25 : 0.15))
                     .frame(width: 40, height: 40)
                 Image(systemName: feedType?.icon ?? "drop.fill")
                     .font(.system(size: 16))
                     .foregroundColor(.blFeeding)
+                    .symbolEffect(.pulse, isActive: isOngoing)
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(feedType?.displayName ?? "Feeding")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.blTextPrimary)
+                HStack(spacing: 6) {
+                    Text(feedType?.displayName ?? "Feeding")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                    if isOngoing {
+                        Text("In Progress")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.blFeeding)
+                            .clipShape(Capsule())
+                    }
+                }
                 HStack(spacing: 8) {
-                    if r.durationMinutes > 0 {
+                    if isOngoing {
+                        Text("Timer running")
+                            .font(.system(size: 13))
+                            .foregroundColor(.blFeeding)
+                    } else if r.durationMinutes > 0 {
                         Text("\(r.durationMinutes) min")
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
