@@ -1690,10 +1690,12 @@ struct HomeView: View {
                 Text(baby?.name ?? "Baby")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(.blTextPrimary)
-                Text(baby?.ageText ?? "")
+                // Show baby's age at the selected date, not always today
+                Text(heroAgeText)
                     .font(.system(size: 15))
                     .foregroundColor(.blTextSecondary)
-                Text(Date().formatted(date: .complete, time: .omitted))
+                // Show the selected date, not always today
+                Text(selectedDate.formatted(date: .complete, time: .omitted))
                     .font(.system(size: 12))
                     .foregroundColor(.blTextTertiary)
             }
@@ -1707,13 +1709,25 @@ struct HomeView: View {
         .accessibilityLabel(babyHeroAccessibilityLabel)
     }
 
+    /// Age text for the hero card — shows baby's age at the selected date.
+    /// When viewing a past date, this reflects how old the baby was on that day.
+    private var heroAgeText: String {
+        guard let baby else { return "" }
+        if isSelectedDateToday {
+            return baby.ageText
+        } else {
+            return baby.ageText(at: selectedDate)
+        }
+    }
+
     private var babyHeroAccessibilityLabel: String {
         var parts: [String] = []
         parts.append(baby?.name ?? "Baby")
-        if let ageText = baby?.ageText, !ageText.isEmpty {
-            parts.append(baby?.localizedAge ?? ageText)
+        if let baby {
+            let ageStr = isSelectedDateToday ? baby.localizedAge : baby.ageText(at: selectedDate)
+            if !ageStr.isEmpty { parts.append(ageStr) }
         }
-        parts.append(Date().formatted(date: .complete, time: .omitted))
+        parts.append(selectedDate.formatted(date: .complete, time: .omitted))
         return parts.joined(separator: ", ")
     }
 
