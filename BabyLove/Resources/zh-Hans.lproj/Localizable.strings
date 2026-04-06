@@ -100,6 +100,12 @@
 "settings.reset.title"                = "重置所有数据？";
 "settings.reset.confirm"              = "重置";
 "settings.reset.message"              = "这将永久删除所有追踪记录和宝宝资料，此操作不可撤销。";
+"settings.reset.countFeedings %lld"   = "%lld 条喂食记录";
+"settings.reset.countSleeps %lld"     = "%lld 条睡眠记录";
+"settings.reset.countDiapers %lld"    = "%lld 条换尿布记录";
+"settings.reset.countGrowth %lld"     = "%lld 条生长测量";
+"settings.reset.countMilestones %lld" = "%lld 个里程碑";
+"settings.reset.detailedMessage %@"   = "这将永久删除%@，宝宝资料也将被移除，此操作不可撤销。";
 "settings.notifications.disabled"     = "通知已关闭";
 "settings.openSettings"               = "打开设置";
 "settings.notifications.enableMessage" = "请在设置中开启通知权限，以接收喂食提醒。";

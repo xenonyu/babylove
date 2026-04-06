@@ -85,8 +85,8 @@ enum MeasurementUnit: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .metric:   return "Metric (kg, cm)"
-        case .imperial: return "Imperial (lbs, in)"
+        case .metric:   return String(localized: "units.metric")
+        case .imperial: return String(localized: "units.imperial")
         }
     }
 

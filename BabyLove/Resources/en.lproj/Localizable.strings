@@ -100,6 +100,12 @@
 "settings.reset.title"                = "Reset All Data?";
 "settings.reset.confirm"              = "Reset";
 "settings.reset.message"              = "This will permanently delete all tracking records and baby profiles. This action cannot be undone.";
+"settings.reset.countFeedings %lld"   = "%lld feedings";
+"settings.reset.countSleeps %lld"     = "%lld sleep sessions";
+"settings.reset.countDiapers %lld"    = "%lld diaper changes";
+"settings.reset.countGrowth %lld"     = "%lld growth measurements";
+"settings.reset.countMilestones %lld" = "%lld milestones";
+"settings.reset.detailedMessage %@"   = "This will permanently delete %@. Your baby profile will also be removed. This cannot be undone.";
 "settings.notifications.disabled"     = "Notifications Disabled";
 "settings.openSettings"               = "Open Settings";
 "settings.notifications.enableMessage" = "Please enable notifications in Settings to receive feeding reminders.";

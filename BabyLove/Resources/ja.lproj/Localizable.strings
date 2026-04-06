@@ -100,6 +100,12 @@
 "settings.reset.title"                = "全データをリセットしますか？";
 "settings.reset.confirm"              = "リセット";
 "settings.reset.message"              = "すべての記録と赤ちゃんのプロフィールが完全に削除されます。この操作は取り消せません。";
+"settings.reset.countFeedings %lld"   = "授乳記録%lld件";
+"settings.reset.countSleeps %lld"     = "睡眠記録%lld件";
+"settings.reset.countDiapers %lld"    = "おむつ記録%lld件";
+"settings.reset.countGrowth %lld"     = "成長記録%lld件";
+"settings.reset.countMilestones %lld" = "マイルストーン%lld件";
+"settings.reset.detailedMessage %@"   = "%@が完全に削除されます。赤ちゃんのプロフィールも削除されます。この操作は取り消せません。";
 "settings.notifications.disabled"     = "通知が無効です";
 "settings.openSettings"               = "設定を開く";
 "settings.notifications.enableMessage" = "授乳リマインダーを受け取るには、設定で通知を有効にしてください。";

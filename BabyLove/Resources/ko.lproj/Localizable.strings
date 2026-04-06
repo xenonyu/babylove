@@ -100,6 +100,12 @@
 "settings.reset.title"                = "모든 데이터를 초기화하시겠습니까?";
 "settings.reset.confirm"              = "초기화";
 "settings.reset.message"              = "모든 기록과 아기 프로필이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.";
+"settings.reset.countFeedings %lld"   = "수유 기록 %lld건";
+"settings.reset.countSleeps %lld"     = "수면 기록 %lld건";
+"settings.reset.countDiapers %lld"    = "기저귀 기록 %lld건";
+"settings.reset.countGrowth %lld"     = "성장 측정 %lld건";
+"settings.reset.countMilestones %lld" = "마일스톤 %lld건";
+"settings.reset.detailedMessage %@"   = "%@이(가) 영구적으로 삭제됩니다. 아기 프로필도 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다.";
 "settings.notifications.disabled"     = "알림이 비활성화됨";
 "settings.openSettings"               = "설정 열기";
 "settings.notifications.enableMessage" = "수유 알림을 받으려면 설정에서 알림을 활성화해 주세요.";

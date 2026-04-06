@@ -18,6 +18,8 @@ struct SettingsView: View {
     @State private var feedingReminderEnabled = NotificationManager.shared.isEnabled
     @State private var feedingReminderInterval = NotificationManager.shared.intervalMinutes
     @State private var notificationDenied = false
+    /// Pre-computed message shown in the reset confirmation dialog
+    @State private var resetConfirmMessage = ""
 
     var body: some View {
         NavigationStack {
@@ -156,6 +158,7 @@ struct SettingsView: View {
                     // Danger zone
                     Section {
                         Button(role: .destructive) {
+                            resetConfirmMessage = buildResetConfirmMessage()
                             showResetAlert = true
                         } label: {
                             Label(String(localized: "settings.resetAllData"), systemImage: "trash.fill")
@@ -193,7 +196,7 @@ struct SettingsView: View {
                 resetAllData()
             }
         } message: {
-            Text(String(localized: "settings.reset.message"))
+            Text(resetConfirmMessage)
         }
         .alert(String(localized: "settings.notifications.disabled"), isPresented: $notificationDenied) {
             Button(String(localized: "settings.openSettings")) {
@@ -208,7 +211,7 @@ struct SettingsView: View {
         .alert(String(localized: "settings.export.failed"), isPresented: $showExportError) {
             Button(String(localized: "common.ok"), role: .cancel) {}
         } message: {
-            Text(exportError ?? "An unknown error occurred.")
+            Text(exportError ?? NSLocalizedString("settings.export.unknownError", comment: ""))
         }
     }
 
@@ -393,6 +396,61 @@ struct SettingsView: View {
 
     private static func fileDate() -> String {
         BLDateFormatters.isoDate.string(from: Date())
+    }
+
+    /// Build a detailed confirmation message showing how many records will be deleted.
+    /// Helps parents make an informed decision before irreversible data loss.
+    private func buildResetConfirmMessage() -> String {
+        let viewCtx = PersistenceController.shared.container.viewContext
+
+        func count(entity: String) -> Int {
+            let req = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+            return (try? viewCtx.count(for: req)) ?? 0
+        }
+
+        let feedings   = count(entity: "CDFeedingRecord")
+        let sleeps     = count(entity: "CDSleepRecord")
+        let diapers    = count(entity: "CDDiaperRecord")
+        let growths    = count(entity: "CDGrowthRecord")
+        let milestones = count(entity: "CDMilestone")
+        let total = feedings + sleeps + diapers + growths + milestones
+
+        // If no records at all, show the generic message
+        guard total > 0 else {
+            return String(localized: "settings.reset.message")
+        }
+
+        // Build a list of non-zero record counts
+        var parts: [String] = []
+        if feedings > 0 {
+            parts.append(String(format: NSLocalizedString("settings.reset.countFeedings %lld", comment: ""), feedings))
+        }
+        if sleeps > 0 {
+            parts.append(String(format: NSLocalizedString("settings.reset.countSleeps %lld", comment: ""), sleeps))
+        }
+        if diapers > 0 {
+            parts.append(String(format: NSLocalizedString("settings.reset.countDiapers %lld", comment: ""), diapers))
+        }
+        if growths > 0 {
+            parts.append(String(format: NSLocalizedString("settings.reset.countGrowth %lld", comment: ""), growths))
+        }
+        if milestones > 0 {
+            parts.append(String(format: NSLocalizedString("settings.reset.countMilestones %lld", comment: ""), milestones))
+        }
+
+        // Join naturally: "A, B, and C"
+        let andStr = NSLocalizedString("home.summary.and", comment: "")
+        let commaAndStr = NSLocalizedString("home.summary.commaAnd", comment: "")
+        let joined: String
+        if parts.count == 1 {
+            joined = parts[0]
+        } else if parts.count == 2 {
+            joined = "\(parts[0])\(andStr)\(parts[1])"
+        } else {
+            joined = "\(parts[0..<(parts.count - 1)].joined(separator: ", "))\(commaAndStr)\(parts[parts.count - 1])"
+        }
+
+        return String(format: NSLocalizedString("settings.reset.detailedMessage %@", comment: ""), joined)
     }
 
     private func resetAllData() {
