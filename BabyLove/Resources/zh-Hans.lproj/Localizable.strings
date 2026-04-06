@@ -564,3 +564,11 @@
 "a11y.diaperTypeOption %@"   = "%@尿布";
 "a11y.filterBadge %@ %lld"   = "%@，%lld 条记录";
 "a11y.dateHasActivity"       = "，有记录";
+"a11y.inProgress"            = "进行中";
+"a11y.ongoing"               = "进行中";
+"a11y.startedAt %@"          = "开始于 %@";
+"a11y.timeRange %@ %@"      = "%@ 到 %@";
+"a11y.growthMeasurement"     = "生长测量";
+"a11y.weight %@"             = "体重 %@";
+"a11y.height %@"             = "身高 %@";
+"a11y.headCircumference %@"  = "头围 %@";

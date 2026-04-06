@@ -564,3 +564,11 @@
 "a11y.diaperTypeOption %@"   = "%@おむつ";
 "a11y.filterBadge %@ %lld"   = "%@、%lld件の記録";
 "a11y.dateHasActivity"       = "、記録あり";
+"a11y.inProgress"            = "進行中";
+"a11y.ongoing"               = "継続中";
+"a11y.startedAt %@"          = "%@ に開始";
+"a11y.timeRange %@ %@"      = "%@ から %@";
+"a11y.growthMeasurement"     = "成長記録";
+"a11y.weight %@"             = "体重 %@";
+"a11y.height %@"             = "身長 %@";
+"a11y.headCircumference %@"  = "頭囲 %@";

@@ -564,3 +564,11 @@
 "a11y.diaperTypeOption %@"   = "%@ 기저귀";
 "a11y.filterBadge %@ %lld"   = "%@, %lld개 기록";
 "a11y.dateHasActivity"       = ", 기록 있음";
+"a11y.inProgress"            = "진행 중";
+"a11y.ongoing"               = "진행 중";
+"a11y.startedAt %@"          = "%@에 시작";
+"a11y.timeRange %@ %@"      = "%@부터 %@까지";
+"a11y.growthMeasurement"     = "성장 측정";
+"a11y.weight %@"             = "체중 %@";
+"a11y.height %@"             = "신장 %@";
+"a11y.headCircumference %@"  = "머리둘레 %@";

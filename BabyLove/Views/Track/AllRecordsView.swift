@@ -180,9 +180,9 @@ struct AllFeedingsView: View {
         let isOngoing = Self.isFeedingOngoing(r)
         let feedType = FeedType(rawValue: r.feedType ?? "")
         let a11yLabel: String = {
-            var parts = [feedType?.displayName ?? "Feeding"]
+            var parts = [feedType?.displayName ?? NSLocalizedString("home.feeding", comment: "")]
             if isOngoing {
-                parts.append("in progress")
+                parts.append(NSLocalizedString("a11y.inProgress", comment: ""))
             } else if r.durationMinutes > 0 {
                 parts.append(DurationFormat.standard(r.durationMinutes))
             }
@@ -196,10 +196,10 @@ struct AllFeedingsView: View {
                 parts.append(BreastSide(rawValue: side)?.displayName ?? side)
             }
             if let t = r.timestamp {
-                parts.append("at \(t.formatted(date: .omitted, time: .shortened))")
+                parts.append(String(format: NSLocalizedString("a11y.at %@", comment: ""), t.formatted(date: .omitted, time: .shortened)))
             }
             if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
-                parts.append("note: \(notes)")
+                parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
             }
             return parts.joined(separator: ", ")
         }()
@@ -216,7 +216,7 @@ struct AllFeedingsView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text(feedType?.displayName ?? "Feeding")
+                    Text(feedType?.displayName ?? NSLocalizedString("home.feeding", comment: ""))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
                     if isOngoing {
@@ -443,23 +443,22 @@ struct AllSleepsView: View {
     private func sleepRow(_ r: CDSleepRecord) -> some View {
         let locationName: String = {
             if let loc = r.location, let sl = SleepLocation(rawValue: loc) { return sl.displayName }
-            return "Sleep"
+            return NSLocalizedString("home.sleep", comment: "")
         }()
         let a11yLabel: String = {
             var parts = [locationName]
             if let s = r.startTime, let e = r.endTime {
                 let mins = Int(e.timeIntervalSince(s) / 60)
-                let h = mins / 60, m = mins % 60
-                parts.append(h > 0 ? "\(h) hours \(m) minutes" : "\(m) minutes")
-                parts.append("\(s.formatted(date: .omitted, time: .shortened)) to \(e.formatted(date: .omitted, time: .shortened))")
+                parts.append(DurationFormat.fromMinutes(mins))
+                parts.append(String(format: NSLocalizedString("a11y.timeRange %@ %@", comment: ""), s.formatted(date: .omitted, time: .shortened), e.formatted(date: .omitted, time: .shortened)))
             } else {
-                parts.append("ongoing")
+                parts.append(NSLocalizedString("a11y.ongoing", comment: ""))
                 if let s = r.startTime {
-                    parts.append("started at \(s.formatted(date: .omitted, time: .shortened))")
+                    parts.append(String(format: NSLocalizedString("a11y.startedAt %@", comment: ""), s.formatted(date: .omitted, time: .shortened)))
                 }
             }
             if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
-                parts.append("note: \(notes)")
+                parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
             }
             return parts.joined(separator: ", ")
         }()
@@ -686,12 +685,12 @@ struct AllDiapersView: View {
     private func diaperRow(_ r: CDDiaperRecord) -> some View {
         let diaperType = DiaperType(rawValue: r.diaperType ?? "")
         let a11yLabel: String = {
-            var parts = ["\(diaperType?.displayName ?? "Diaper") diaper"]
+            var parts = [String(format: NSLocalizedString("a11y.diaperTypeOption %@", comment: ""), diaperType?.displayName ?? NSLocalizedString("track.diaper", comment: ""))]
             if let t = r.timestamp {
-                parts.append("at \(t.formatted(date: .omitted, time: .shortened))")
+                parts.append(String(format: NSLocalizedString("a11y.at %@", comment: ""), t.formatted(date: .omitted, time: .shortened)))
             }
             if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
-                parts.append("note: \(notes)")
+                parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
             }
             return parts.joined(separator: ", ")
         }()
@@ -705,7 +704,7 @@ struct AllDiapersView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(diaperType?.displayName ?? "Diaper")
+                Text(diaperType?.displayName ?? NSLocalizedString("track.diaper", comment: ""))
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(.blTextPrimary)
                 if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
@@ -827,15 +826,15 @@ struct AllGrowthView: View {
         let unit = appState.measurementUnit
         let baby = appState.currentBaby
         let a11yLabel: String = {
-            var parts = ["Growth measurement"]
+            var parts = [NSLocalizedString("a11y.growthMeasurement", comment: "")]
             if r.weightKG > 0 {
-                parts.append(String(format: "weight %.2f %@", unit.weightFromKG(r.weightKG), unit.weightLabel))
+                parts.append(String(format: NSLocalizedString("a11y.weight %@", comment: ""), String(format: "%.2f %@", unit.weightFromKG(r.weightKG), unit.weightLabel)))
             }
             if r.heightCM > 0 {
-                parts.append(String(format: "height %.1f %@", unit.lengthFromCM(r.heightCM), unit.heightLabel))
+                parts.append(String(format: NSLocalizedString("a11y.height %@", comment: ""), String(format: "%.1f %@", unit.lengthFromCM(r.heightCM), unit.heightLabel)))
             }
             if r.headCircumferenceCM > 0 {
-                parts.append(String(format: "head %.1f %@", unit.lengthFromCM(r.headCircumferenceCM), unit.heightLabel))
+                parts.append(String(format: NSLocalizedString("a11y.headCircumference %@", comment: ""), String(format: "%.1f %@", unit.lengthFromCM(r.headCircumferenceCM), unit.heightLabel)))
             }
             if let baby, let date = r.date {
                 parts.append(String(format: NSLocalizedString("a11y.atAge %@", comment: ""), baby.ageText(at: date)))
@@ -844,7 +843,7 @@ struct AllGrowthView: View {
                 parts.append(DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none))
             }
             if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
-                parts.append("note: \(notes)")
+                parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
             }
             return parts.joined(separator: ", ")
         }()

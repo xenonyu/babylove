@@ -539,3 +539,11 @@
 "a11y.diaperTypeOption %@"   = "%@ diaper";
 "a11y.filterBadge %@ %lld"   = "%@, %lld records";
 "a11y.dateHasActivity"       = ", has activity";
+"a11y.inProgress"            = "in progress";
+"a11y.ongoing"               = "ongoing";
+"a11y.startedAt %@"          = "started at %@";
+"a11y.timeRange %@ %@"      = "%@ to %@";
+"a11y.growthMeasurement"     = "Growth measurement";
+"a11y.weight %@"             = "weight %@";
+"a11y.height %@"             = "height %@";
+"a11y.headCircumference %@"  = "head circumference %@";
