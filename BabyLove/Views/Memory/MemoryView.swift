@@ -319,7 +319,7 @@ struct MilestoneCard: View {
                     }
                 }
 
-                if let notes = milestone.notes, !notes.isEmpty {
+                if let notes = milestone.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
                     Text(notes)
                         .font(.system(size: 14))
                         .foregroundColor(.blTextSecondary)

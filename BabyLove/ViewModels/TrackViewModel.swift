@@ -11,6 +11,12 @@ class TrackViewModel: ObservableObject {
         self.ctx = context
     }
 
+    /// Trim whitespace/newlines; return nil if result is empty.
+    private func trimmedOrNil(_ s: String) -> String? {
+        let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
+    }
+
     // MARK: - Feeding
 
     @discardableResult
@@ -27,7 +33,7 @@ class TrackViewModel: ObservableObject {
         record.breastSide = side?.rawValue
         record.durationMinutes = Int16(durationMinutes)
         record.amountML = amountML
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         let ok = save()
         if ok {
             // Schedule next feeding reminder based on this feeding's timestamp
@@ -50,7 +56,7 @@ class TrackViewModel: ObservableObject {
         record.breastSide = side?.rawValue
         record.durationMinutes = 0  // 0 = ongoing for breast/pump
         record.amountML = 0
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -82,7 +88,7 @@ class TrackViewModel: ObservableObject {
         record.id = UUID()
         record.startTime = startTime
         record.location = location.rawValue
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -109,7 +115,7 @@ class TrackViewModel: ObservableObject {
         record.startTime = start
         record.endTime = end
         record.location = location.rawValue
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -121,7 +127,7 @@ class TrackViewModel: ObservableObject {
         record.id = UUID()
         record.timestamp = timestamp
         record.diaperType = type.rawValue
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -139,7 +145,7 @@ class TrackViewModel: ObservableObject {
         if let w = weightKG { record.weightKG = w }
         if let h = heightCM { record.heightCM = h }
         if let hc = headCM  { record.headCircumferenceCM = hc }
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -156,7 +162,7 @@ class TrackViewModel: ObservableObject {
         m.title = title
         m.category = category.rawValue
         m.date = date
-        m.notes = notes.isEmpty ? nil : notes
+        m.notes = trimmedOrNil(notes)
         m.isCompleted = isCompleted
         return save()
     }
@@ -171,7 +177,7 @@ class TrackViewModel: ObservableObject {
         record.title = title
         record.category = category.rawValue
         record.date = date
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         record.isCompleted = isCompleted
         return save()
     }
@@ -228,7 +234,7 @@ class TrackViewModel: ObservableObject {
         record.durationMinutes = Int16(durationMinutes)
         record.amountML = amountML
         record.timestamp = timestamp
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         let ok = save()
         if ok {
             // Re-schedule feeding reminder based on updated timestamp
@@ -250,7 +256,7 @@ class TrackViewModel: ObservableObject {
         record.startTime = start
         record.endTime = end
         record.location = location.rawValue
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -263,7 +269,7 @@ class TrackViewModel: ObservableObject {
                       timestamp: Date) -> Bool {
         record.diaperType = type.rawValue
         record.timestamp = timestamp
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 
@@ -282,7 +288,7 @@ class TrackViewModel: ObservableObject {
         record.heightCM = heightCM ?? record.heightCM
         record.headCircumferenceCM = headCM ?? record.headCircumferenceCM
         record.date = date
-        record.notes = notes.isEmpty ? nil : notes
+        record.notes = trimmedOrNil(notes)
         return save()
     }
 

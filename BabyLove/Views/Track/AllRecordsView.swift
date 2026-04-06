@@ -151,7 +151,7 @@ struct AllFeedingsView: View {
                             .foregroundColor(.blTextSecondary)
                     }
                 }
-                if let notes = r.notes, !notes.isEmpty {
+                if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
                     Text(notes)
                         .font(.system(size: 12))
                         .foregroundColor(.blTextTertiary)
@@ -303,7 +303,7 @@ struct AllSleepsView: View {
                 .font(.system(size: 13))
                 .foregroundColor(.blTextSecondary)
 
-                if let notes = r.notes, !notes.isEmpty {
+                if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
                     Text(notes)
                         .font(.system(size: 12))
                         .foregroundColor(.blTextTertiary)
@@ -420,7 +420,7 @@ struct AllDiapersView: View {
                 Text(diaperType?.displayName ?? "Diaper")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(.blTextPrimary)
-                if let notes = r.notes, !notes.isEmpty {
+                if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
                     Text(notes)
                         .font(.system(size: 12))
                         .foregroundColor(.blTextTertiary)
@@ -561,7 +561,7 @@ struct AllGrowthView: View {
                         )
                     }
                 }
-                if let notes = r.notes, !notes.isEmpty {
+                if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
                     Text(notes)
                         .font(.system(size: 12))
                         .foregroundColor(.blTextTertiary)
