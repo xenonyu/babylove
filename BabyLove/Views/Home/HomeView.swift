@@ -274,6 +274,37 @@ struct HomeView: View {
         return "\(m)m"
     }
 
+    /// Subtitle for the sleep stat badge: nap count + longest nap info
+    private var sleepSubtitle: String {
+        let count = todaySleeps.count
+        guard count > 0 else { return "" }
+        var parts: [String] = []
+        // Nap/session count
+        parts.append(count == 1 ? "1 nap" : "\(count) naps")
+        // Longest nap duration (helps parents spot patterns)
+        if count > 1 {
+            let cal = Calendar.current
+            let dayStart = cal.startOfDay(for: selectedDate)
+            guard let dayEnd = cal.date(byAdding: .day, value: 1, to: dayStart) else { return parts.joined(separator: " · ") }
+            let longestMinutes = todaySleeps.reduce(0) { best, r in
+                guard let s = r.startTime else { return best }
+                let e = r.endTime ?? Date()
+                let clippedStart = max(s, dayStart)
+                let clippedEnd = min(e, dayEnd)
+                guard clippedEnd > clippedStart else { return best }
+                let mins = Int(clippedEnd.timeIntervalSince(clippedStart) / 60)
+                return max(best, mins)
+            }
+            if longestMinutes > 0 {
+                let h = longestMinutes / 60
+                let m = longestMinutes % 60
+                let longestText = h > 0 ? "\(h)h \(m)m" : "\(m)m"
+                parts.append("longest \(longestText)")
+            }
+        }
+        return parts.joined(separator: " · ")
+    }
+
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
@@ -313,9 +344,10 @@ struct HomeView: View {
                                           color: .blFeeding,
                                           subtitle: feedingVolumeSubtitle,
                                           timeSince: isSelectedDateToday ? feedingTimeSince : nil)
-                                StatBadge(value: sleepText.isEmpty ? "0m" : sleepText,
+                                StatBadge(value: sleepText,
                                           label: "Sleep",
                                           color: .blSleep,
+                                          subtitle: sleepSubtitle,
                                           timeSince: isSelectedDateToday ? sleepTimeSince : nil)
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: "Diapers",
