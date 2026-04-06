@@ -1228,6 +1228,28 @@ struct HomeView: View {
         return Double(weekFeedings.count) / currentWeekActiveDays
     }
 
+    /// Total feeding volume in ml for the current week (formula + pump amountML only)
+    private var weekTotalVolumeML: Double {
+        weekFeedings.reduce(0.0) { sum, r in sum + r.amountML }
+    }
+
+    /// Average daily feeding volume in ml this week (for bottle-feeding parents)
+    private var weekAvgVolumeMlPerDay: Double {
+        guard weekTotalVolumeML > 0 else { return 0 }
+        return weekTotalVolumeML / currentWeekActiveDays
+    }
+
+    /// Total feeding volume in ml for the previous week
+    private var prevWeekTotalVolumeML: Double {
+        prevWeekFeedings.reduce(0.0) { sum, r in sum + r.amountML }
+    }
+
+    /// Average daily feeding volume in ml previous week
+    private var prevWeekAvgVolumeMlPerDay: Double {
+        guard prevWeekTotalVolumeML > 0 else { return 0 }
+        return prevWeekTotalVolumeML / prevWeekActiveDays
+    }
+
     /// Average sleep hours per day this week
     /// Note: Ongoing sessions (endTime == nil) are skipped so the running
     /// timer doesn't inflate the weekly average — consistent with prevWeek.
@@ -1296,7 +1318,7 @@ struct HomeView: View {
                 .padding(.horizontal, 20)
 
             VStack(spacing: 0) {
-                // Row 1: Feedings
+                // Row 1: Feedings (count)
                 if !weekFeedings.isEmpty {
                     weeklyRow(
                         icon: "drop.fill",
@@ -1307,6 +1329,30 @@ struct HomeView: View {
                         total: "\(weekFeedings.count) total",
                         current: weekAvgFeedings,
                         previous: prevWeekAvgFeedings
+                    )
+                }
+
+                // Row 1b: Feeding Volume (only shown when there's bottle/pump volume data)
+                if weekTotalVolumeML > 0 {
+                    Divider().padding(.leading, 60)
+                    let unit = appState.measurementUnit
+                    let avgDisplay = unit.volumeFromML(weekAvgVolumeMlPerDay)
+                    let totalDisplay = unit.volumeFromML(weekTotalVolumeML)
+                    let valueText = unit == .metric
+                        ? "\(Int(avgDisplay.rounded()))"
+                        : String(format: "%.1f", avgDisplay)
+                    let totalText = unit == .metric
+                        ? "\(Int(totalDisplay.rounded())) \(unit.volumeLabel) total"
+                        : String(format: "%.0f %@ total", totalDisplay, unit.volumeLabel)
+                    weeklyRow(
+                        icon: "cross.vial.fill",
+                        color: .blFeeding,
+                        title: "Volume",
+                        value: valueText,
+                        unit: "\(unit.volumeLabel)/day",
+                        total: totalText,
+                        current: weekAvgVolumeMlPerDay,
+                        previous: prevWeekAvgVolumeMlPerDay
                     )
                 }
 
