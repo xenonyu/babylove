@@ -15,6 +15,8 @@ struct HomeView: View {
     @State private var sleepTimer: Timer?
     @State private var feedingElapsed: TimeInterval = 0
     @State private var feedingTimer: Timer?
+    @State private var showEndSleepConfirm = false
+    @State private var showEndFeedingConfirm = false
     @State private var selectedDate: Date = Date()
     /// Tracks the calendar day when the view was last active, so we can detect day-boundary crossings
     @State private var lastActiveCalendarDay: Date = Calendar.current.startOfDay(for: Date())
@@ -561,6 +563,25 @@ struct HomeView: View {
         } message: {
             Text("This record will be permanently removed.")
         }
+        // End sleep timer confirmation
+        .alert("End Sleep?", isPresented: $showEndSleepConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("End Sleep") {
+                endOngoingSleep()
+            }
+        } message: {
+            Text("Record \(elapsedText) of sleep for \(appState.currentBaby?.name ?? "baby")?")
+        }
+        // End feeding timer confirmation
+        .alert("End Feeding?", isPresented: $showEndFeedingConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("End Feeding") {
+                endOngoingFeeding()
+            }
+        } message: {
+            let feedType = FeedType(rawValue: ongoingFeeding?.feedType ?? "")?.displayName ?? "Feeding"
+            Text("Record \(feedingElapsedText) of \(feedType.lowercased()) for \(appState.currentBaby?.name ?? "baby")?")
+        }
     }
 
     // MARK: - Global Last-Event Fetch
@@ -742,7 +763,8 @@ struct HomeView: View {
             }
 
             Button {
-                endOngoingSleep()
+                Haptic.medium()
+                showEndSleepConfirm = true
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "sun.and.horizon.fill")
@@ -869,7 +891,8 @@ struct HomeView: View {
             }
 
             Button {
-                endOngoingFeeding()
+                Haptic.medium()
+                showEndFeedingConfirm = true
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
