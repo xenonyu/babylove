@@ -532,9 +532,15 @@ struct EditBabyView: View {
                 Task {
                     if let newItem,
                        let data = try? await newItem.loadTransferable(type: Data.self) {
-                        // Compress to JPEG to keep UserDefaults size reasonable
+                        // Downscale to avatar size then compress as JPEG.
+                        // The avatar is shown at most 96pt (≈288px @3x).
+                        // Keeping max dimension at 300px ensures the stored
+                        // Data stays well under UserDefaults practical limits
+                        // (~50–80 KB instead of potentially >1 MB for a full-
+                        // resolution camera photo).
                         if let uiImage = UIImage(data: data),
-                           let compressed = uiImage.jpegData(compressionQuality: 0.6) {
+                           let resized = Self.downsample(uiImage, maxDimension: 300),
+                           let compressed = resized.jpegData(compressionQuality: 0.8) {
                             await MainActor.run {
                                 withAnimation(.spring(response: 0.3)) {
                                     photoData = compressed
@@ -544,6 +550,25 @@ struct EditBabyView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+extension EditBabyView {
+    /// Resize a UIImage so that its longest side is at most `maxDimension` points.
+    /// Returns nil only when the graphics context cannot be created (extremely rare).
+    static func downsample(_ image: UIImage, maxDimension: CGFloat) -> UIImage? {
+        let size = image.size
+        guard size.width > 0, size.height > 0 else { return nil }
+        let longestSide = max(size.width, size.height)
+        // Already small enough — return as-is
+        guard longestSide > maxDimension else { return image }
+        let scale = maxDimension / longestSide
+        let newSize = CGSize(width: (size.width * scale).rounded(),
+                             height: (size.height * scale).rounded())
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: newSize))
         }
     }
 }
