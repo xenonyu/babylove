@@ -244,7 +244,7 @@ struct SettingsView: View {
                         let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
                         let feedType = FeedType(rawValue: r.feedType ?? "")?.displayName ?? r.feedType ?? ""
                         var details = [feedType]
-                        if r.durationMinutes > 0 { details.append("\(r.durationMinutes) min") }
+                        if r.durationMinutes > 0 { details.append(DurationFormat.standard(r.durationMinutes)) }
                         if r.amountML > 0 {
                             let val = unit.volumeFromML(r.amountML)
                             details.append(unit == .metric ? "\(Int(val)) \(unit.volumeLabel)" : String(format: "%.1f %@", val, unit.volumeLabel))

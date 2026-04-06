@@ -133,7 +133,7 @@ struct AllFeedingsView: View {
                             .font(.system(size: 13))
                             .foregroundColor(.blFeeding)
                     } else if r.durationMinutes > 0 {
-                        Text("\(r.durationMinutes) min")
+                        Text(DurationFormat.standard(r.durationMinutes))
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }

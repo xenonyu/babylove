@@ -318,7 +318,7 @@ struct TrackView: View {
                 // Detail line: duration, amount, side
                 HStack(spacing: 8) {
                     if !isOngoing && r.durationMinutes > 0 {
-                        Text("\(r.durationMinutes) min")
+                        Text(DurationFormat.standard(r.durationMinutes))
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }

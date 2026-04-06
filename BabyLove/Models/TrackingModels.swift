@@ -185,3 +185,26 @@ enum SleepLocation: String, CaseIterable, Codable {
         }
     }
 }
+
+// MARK: - Duration Formatting
+
+/// Human-readable duration from raw minutes.
+/// Returns "Xh Ym" for ≥60 min, "X min" otherwise.
+/// Compact variant (for tight layouts): "Xh Ym" / "Xm".
+enum DurationFormat {
+    /// Standard: "45 min", "1h 30m", "2h"
+    static func standard(_ minutes: Int16) -> String {
+        let m = Int(minutes)
+        guard m >= 60 else { return "\(m) min" }
+        let h = m / 60, rem = m % 60
+        return rem > 0 ? "\(h)h \(rem)m" : "\(h)h"
+    }
+
+    /// Compact: "45m", "1h 30m", "2h"
+    static func compact(_ minutes: Int16) -> String {
+        let m = Int(minutes)
+        guard m >= 60 else { return "\(m)m" }
+        let h = m / 60, rem = m % 60
+        return rem > 0 ? "\(h)h \(rem)m" : "\(h)h"
+    }
+}

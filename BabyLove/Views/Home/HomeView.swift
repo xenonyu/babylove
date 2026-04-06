@@ -1407,7 +1407,7 @@ struct HomeView: View {
         if Self.isFeedingOngoing(r) {
             parts.append("Ongoing")
         } else if r.durationMinutes > 0 {
-            parts.append("\(r.durationMinutes)m")
+            parts.append(DurationFormat.compact(r.durationMinutes))
         }
         if r.amountML > 0 {
             let display = unit.volumeFromML(r.amountML)
