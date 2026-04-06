@@ -176,12 +176,15 @@ struct HomeView: View {
 
         // Current week (last 7 days up to end of today — excludes future-dated records)
         weekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", weekStartNS, todayEndNS)
-        weekSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@ AND startTime < %@", weekStartNS, todayEndNS)
+        // Overlap predicate: include sleeps that started before the period ends
+        // AND (ended after the period starts OR are still ongoing). This captures
+        // cross-midnight sessions that start before the week boundary but end during it.
+        weekSleeps.nsPredicate   = NSPredicate(format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)", todayEndNS, weekStartNS)
         weekDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", weekStartNS, todayEndNS)
 
         // Previous week (days -14 to -7)
         prevWeekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", prevWeekStartNS, weekStartNS)
-        prevWeekSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@ AND startTime < %@", prevWeekStartNS, weekStartNS)
+        prevWeekSleeps.nsPredicate   = NSPredicate(format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)", weekStartNS, prevWeekStartNS)
         prevWeekDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", prevWeekStartNS, weekStartNS)
     }
 
@@ -1435,13 +1438,22 @@ struct HomeView: View {
     /// Average sleep hours per day this week
     /// Note: Ongoing sessions (endTime == nil) are skipped so the running
     /// timer doesn't inflate the weekly average — consistent with prevWeek.
+    /// Sleep durations are clamped to the week boundaries so cross-boundary
+    /// sessions only contribute the portion that falls within this week.
     private var weekAvgSleepHours: Double {
         guard !weekSleeps.isEmpty else { return 0 }
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        guard let periodStart = cal.date(byAdding: .day, value: -7, to: today),
+              let periodEnd = cal.date(byAdding: .day, value: 1, to: today) else { return 0 }
         let completedSleeps = weekSleeps.filter { $0.endTime != nil }
         guard !completedSleeps.isEmpty else { return 0 }
         let totalMinutes = completedSleeps.reduce(0) { sum, r in
             guard let s = r.startTime, let e = r.endTime else { return sum }
-            return sum + Int(e.timeIntervalSince(s) / 60)
+            let clampedStart = max(s, periodStart)
+            let clampedEnd = min(e, periodEnd)
+            guard clampedEnd > clampedStart else { return sum }
+            return sum + Int(clampedEnd.timeIntervalSince(clampedStart) / 60)
         }
         return Double(totalMinutes) / 60.0 / currentWeekActiveDays
     }
@@ -1461,11 +1473,19 @@ struct HomeView: View {
     /// Average sleep hours per day previous week
     /// Note: Ongoing sessions (endTime == nil) are skipped because historical
     /// averages must not use the current time as a stand-in end time.
+    /// Sleep durations are clamped to the previous week boundaries.
     private var prevWeekAvgSleepHours: Double {
         guard !prevWeekSleeps.isEmpty else { return 0 }
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        guard let periodStart = cal.date(byAdding: .day, value: -14, to: today),
+              let periodEnd = cal.date(byAdding: .day, value: -7, to: today) else { return 0 }
         let totalMinutes = prevWeekSleeps.reduce(0) { sum, r in
             guard let s = r.startTime, let e = r.endTime else { return sum }
-            return sum + Int(e.timeIntervalSince(s) / 60)
+            let clampedStart = max(s, periodStart)
+            let clampedEnd = min(e, periodEnd)
+            guard clampedEnd > clampedStart else { return sum }
+            return sum + Int(clampedEnd.timeIntervalSince(clampedStart) / 60)
         }
         return Double(totalMinutes) / 60.0 / prevWeekActiveDays
     }
