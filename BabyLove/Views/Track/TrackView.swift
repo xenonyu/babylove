@@ -47,22 +47,22 @@ struct TrackView: View {
                     VStack(spacing: 24) {
                         // Quick log grid
                         VStack(spacing: 12) {
-                            BLSectionHeader(title: "Log Activity")
+                            BLSectionHeader(title: String(localized: "track.logActivity"))
                             LazyVGrid(columns: [
                                 GridItem(.flexible()),
                                 GridItem(.flexible())
                             ], spacing: 12) {
                                 QuickLogCard(icon: "drop.fill",
-                                             label: "Feeding",
+                                             label: String(localized: "track.feeding"),
                                              color: .blFeeding) { showFeedingLog = true }
                                 QuickLogCard(icon: "moon.zzz.fill",
-                                             label: "Sleep",
+                                             label: String(localized: "track.sleep"),
                                              color: .blSleep) { showSleepLog = true }
                                 QuickLogCard(icon: "oval.fill",
-                                             label: "Diaper",
+                                             label: String(localized: "track.diaper"),
                                              color: .blDiaper) { showDiaperLog = true }
                                 QuickLogCard(icon: "chart.bar.fill",
-                                             label: "Growth",
+                                             label: String(localized: "track.growth"),
                                              color: .blGrowth) { showGrowthLog = true }
                             }
                         }
@@ -81,10 +81,10 @@ struct TrackView: View {
                                             endPoint: .bottomTrailing
                                         )
                                     )
-                                Text("No records yet")
+                                Text(String(localized: "track.noRecordsYet"))
                                     .font(.system(size: 20, weight: .bold))
                                     .foregroundColor(.blTextPrimary)
-                                Text("Tap one of the buttons above to start\ntracking your baby's day")
+                                Text(String(localized: "track.tapToStart"))
                                     .font(.system(size: 15))
                                     .foregroundColor(.blTextSecondary)
                                     .multilineTextAlignment(.center)
@@ -97,7 +97,7 @@ struct TrackView: View {
 
                         // Recent feedings
                         if !recentFeedings.isEmpty {
-                            recentSection(title: "Feedings", color: .blFeeding, destination: AllFeedingsView()) {
+                            recentSection(title: String(localized: "track.feedings"), color: .blFeeding, destination: AllFeedingsView()) {
                                 ForEach(recentFeedings.prefix(5)) { r in
                                     feedingRow(r)
                                         .contentShape(Rectangle())
@@ -106,12 +106,12 @@ struct TrackView: View {
                                             Button {
                                                 feedingToEdit = r
                                             } label: {
-                                                Label("Edit", systemImage: "pencil")
+                                                Label(String(localized: "track.edit"), systemImage: "pencil")
                                             }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
-                                                Label("Delete", systemImage: "trash")
+                                                Label(String(localized: "track.delete"), systemImage: "trash")
                                             }
                                         }
                                 }
@@ -120,7 +120,7 @@ struct TrackView: View {
 
                         // Recent sleeps
                         if !recentSleeps.isEmpty {
-                            recentSection(title: "Sleep", color: .blSleep, destination: AllSleepsView()) {
+                            recentSection(title: String(localized: "track.sleepSection"), color: .blSleep, destination: AllSleepsView()) {
                                 ForEach(recentSleeps.prefix(5)) { r in
                                     sleepRow(r)
                                         .contentShape(Rectangle())
@@ -129,12 +129,12 @@ struct TrackView: View {
                                             Button {
                                                 sleepToEdit = r
                                             } label: {
-                                                Label("Edit", systemImage: "pencil")
+                                                Label(String(localized: "track.edit"), systemImage: "pencil")
                                             }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
-                                                Label("Delete", systemImage: "trash")
+                                                Label(String(localized: "track.delete"), systemImage: "trash")
                                             }
                                         }
                                 }
@@ -143,7 +143,7 @@ struct TrackView: View {
 
                         // Recent diapers
                         if !recentDiapers.isEmpty {
-                            recentSection(title: "Diapers", color: .blDiaper, destination: AllDiapersView()) {
+                            recentSection(title: String(localized: "track.diapers"), color: .blDiaper, destination: AllDiapersView()) {
                                 ForEach(recentDiapers.prefix(5)) { r in
                                     diaperRow(r)
                                         .contentShape(Rectangle())
@@ -152,12 +152,12 @@ struct TrackView: View {
                                             Button {
                                                 diaperToEdit = r
                                             } label: {
-                                                Label("Edit", systemImage: "pencil")
+                                                Label(String(localized: "track.edit"), systemImage: "pencil")
                                             }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
-                                                Label("Delete", systemImage: "trash")
+                                                Label(String(localized: "track.delete"), systemImage: "trash")
                                             }
                                         }
                                 }
@@ -166,7 +166,7 @@ struct TrackView: View {
 
                         // Recent growth
                         if !recentGrowth.isEmpty {
-                            recentSection(title: "Growth", color: .blGrowth, destination: AllGrowthView()) {
+                            recentSection(title: String(localized: "track.growthSection"), color: .blGrowth, destination: AllGrowthView()) {
                                 ForEach(recentGrowth.prefix(5)) { r in
                                     growthRow(r)
                                         .contentShape(Rectangle())
@@ -175,12 +175,12 @@ struct TrackView: View {
                                             Button {
                                                 growthToEdit = r
                                             } label: {
-                                                Label("Edit", systemImage: "pencil")
+                                                Label(String(localized: "track.edit"), systemImage: "pencil")
                                             }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
-                                                Label("Delete", systemImage: "trash")
+                                                Label(String(localized: "track.delete"), systemImage: "trash")
                                             }
                                         }
                                 }
@@ -192,7 +192,7 @@ struct TrackView: View {
                     .padding(.top, 16)
                 }
             }
-            .navigationTitle("Track")
+            .navigationTitle(String(localized: "track.title"))
             .navigationBarTitleDisplayMode(.large)
         }
         .sheet(isPresented: $showFeedingLog) { FeedingLogView(vm: vm) }
@@ -212,26 +212,26 @@ struct TrackView: View {
         .sheet(item: $growthToEdit) { record in
             GrowthLogView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(String(localized: "track.deleteRecord"), isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "common.cancel"), role: .cancel) { recordToDelete = nil }
+            Button(String(localized: "track.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     // Determine record type for a contextual toast message
                     let (msg, icon, color): (String, String, Color) = {
                         if obj is CDFeedingRecord {
-                            return ("Feeding deleted", "trash.fill", Color.blFeeding)
+                            return (String(localized: "track.feedingDeleted"), "trash.fill", Color.blFeeding)
                         } else if obj is CDSleepRecord {
-                            return ("Sleep deleted", "trash.fill", Color.blSleep)
+                            return (String(localized: "track.sleepDeleted"), "trash.fill", Color.blSleep)
                         } else if obj is CDDiaperRecord {
-                            return ("Diaper deleted", "trash.fill", Color.blDiaper)
+                            return (String(localized: "track.diaperDeleted"), "trash.fill", Color.blDiaper)
                         } else if obj is CDGrowthRecord {
-                            return ("Growth record deleted", "trash.fill", Color.blGrowth)
+                            return (String(localized: "track.growthDeleted"), "trash.fill", Color.blGrowth)
                         }
-                        return ("Record deleted", "trash.fill", Color.blPrimary)
+                        return (String(localized: "track.recordDeleted"), "trash.fill", Color.blPrimary)
                     }()
                     withAnimation { vm.deleteObject(obj, in: ctx) }
                     appState.showToast(msg, icon: icon, color: color)
@@ -239,7 +239,7 @@ struct TrackView: View {
                 recordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(String(localized: "track.deleteConfirmMsg"))
         }
     }
 
@@ -253,7 +253,7 @@ struct TrackView: View {
                     .foregroundColor(.blTextPrimary)
                 Spacer()
                 NavigationLink(destination: destination) {
-                    Text("See All")
+                    Text(String(localized: "track.seeAll"))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.blPrimary)
                 }
@@ -302,11 +302,11 @@ struct TrackView: View {
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text(feedType?.displayName ?? "Feeding")
+                    Text(feedType?.displayName ?? String(localized: "track.feeding"))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
                     if isOngoing {
-                        Text("In Progress")
+                        Text(String(localized: "track.inProgress"))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 7)
@@ -362,12 +362,12 @@ struct TrackView: View {
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.blTextPrimary)
                     } else {
-                        Text("Sleep")
+                        Text(String(localized: "track.sleep"))
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.blTextPrimary)
                     }
                     if r.endTime == nil {
-                        Text("In Progress")
+                        Text(String(localized: "track.inProgress"))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 7)
@@ -406,7 +406,7 @@ struct TrackView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blSleep)
             } else {
-                Text("Ongoing")
+                Text(String(localized: "track.ongoing"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blSleep)
             }
@@ -427,7 +427,7 @@ struct TrackView: View {
                         Text(dtype.icon)
                             .font(.system(size: 14))
                     }
-                    Text(dtype?.displayName ?? "Diaper")
+                    Text(dtype?.displayName ?? String(localized: "track.diaper"))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
                 }
@@ -453,7 +453,7 @@ struct TrackView: View {
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text("Growth")
+                    Text(String(localized: "track.growth"))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
                     // Baby's age at this measurement

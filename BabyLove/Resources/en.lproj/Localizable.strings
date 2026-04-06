@@ -215,3 +215,29 @@
 "editBaby.namePlaceholder"  = "Name";
 "editBaby.birthday"         = "Birthday";
 "editBaby.gender"           = "Gender";
+
+/* ===== Track View ===== */
+"track.title"            = "Track";
+"track.logActivity"      = "Log Activity";
+"track.feeding"          = "Feeding";
+"track.sleep"            = "Sleep";
+"track.diaper"           = "Diaper";
+"track.growth"           = "Growth";
+"track.noRecordsYet"     = "No records yet";
+"track.tapToStart"       = "Tap one of the buttons above to start\ntracking your baby's day";
+"track.feedings"         = "Feedings";
+"track.sleepSection"     = "Sleep";
+"track.diapers"          = "Diapers";
+"track.growthSection"    = "Growth";
+"track.seeAll"           = "See All";
+"track.edit"             = "Edit";
+"track.delete"           = "Delete";
+"track.deleteRecord"     = "Delete Record?";
+"track.deleteConfirmMsg" = "This record will be permanently removed.";
+"track.inProgress"       = "In Progress";
+"track.ongoing"          = "Ongoing";
+"track.feedingDeleted"   = "Feeding deleted";
+"track.sleepDeleted"     = "Sleep deleted";
+"track.diaperDeleted"    = "Diaper deleted";
+"track.growthDeleted"    = "Growth record deleted";
+"track.recordDeleted"    = "Record deleted";

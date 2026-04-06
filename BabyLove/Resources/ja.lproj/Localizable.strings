@@ -215,3 +215,29 @@
 "editBaby.namePlaceholder"  = "名前";
 "editBaby.birthday"         = "誕生日";
 "editBaby.gender"           = "性別";
+
+/* ===== Track View ===== */
+"track.title"            = "記録";
+"track.logActivity"      = "アクティビティを記録";
+"track.feeding"          = "授乳";
+"track.sleep"            = "睡眠";
+"track.diaper"           = "おむつ";
+"track.growth"           = "成長";
+"track.noRecordsYet"     = "まだ記録がありません";
+"track.tapToStart"       = "上のボタンをタップして\n赤ちゃんの一日を記録しましょう";
+"track.feedings"         = "授乳";
+"track.sleepSection"     = "睡眠";
+"track.diapers"          = "おむつ";
+"track.growthSection"    = "成長";
+"track.seeAll"           = "すべて見る";
+"track.edit"             = "編集";
+"track.delete"           = "削除";
+"track.deleteRecord"     = "記録を削除しますか？";
+"track.deleteConfirmMsg" = "この記録は完全に削除されます。";
+"track.inProgress"       = "進行中";
+"track.ongoing"          = "進行中";
+"track.feedingDeleted"   = "授乳記録を削除しました";
+"track.sleepDeleted"     = "睡眠記録を削除しました";
+"track.diaperDeleted"    = "おむつ記録を削除しました";
+"track.growthDeleted"    = "成長記録を削除しました";
+"track.recordDeleted"    = "記録を削除しました";

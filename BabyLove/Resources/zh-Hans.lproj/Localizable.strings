@@ -215,3 +215,29 @@
 "editBaby.namePlaceholder"  = "名字";
 "editBaby.birthday"         = "出生日期";
 "editBaby.gender"           = "性别";
+
+/* ===== Track View ===== */
+"track.title"            = "记录";
+"track.logActivity"      = "记录活动";
+"track.feeding"          = "喂食";
+"track.sleep"            = "睡眠";
+"track.diaper"           = "换尿布";
+"track.growth"           = "生长";
+"track.noRecordsYet"     = "暂无记录";
+"track.tapToStart"       = "点击上方按钮，开始\n记录宝宝的一天";
+"track.feedings"         = "喂食";
+"track.sleepSection"     = "睡眠";
+"track.diapers"          = "尿布";
+"track.growthSection"    = "生长";
+"track.seeAll"           = "查看全部";
+"track.edit"             = "编辑";
+"track.delete"           = "删除";
+"track.deleteRecord"     = "删除记录？";
+"track.deleteConfirmMsg" = "此记录将被永久删除。";
+"track.inProgress"       = "进行中";
+"track.ongoing"          = "进行中";
+"track.feedingDeleted"   = "喂食记录已删除";
+"track.sleepDeleted"     = "睡眠记录已删除";
+"track.diaperDeleted"    = "尿布记录已删除";
+"track.growthDeleted"    = "生长记录已删除";
+"track.recordDeleted"    = "记录已删除";

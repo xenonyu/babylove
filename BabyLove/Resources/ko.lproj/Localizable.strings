@@ -215,3 +215,29 @@
 "editBaby.namePlaceholder"  = "이름";
 "editBaby.birthday"         = "생년월일";
 "editBaby.gender"           = "성별";
+
+/* ===== Track View ===== */
+"track.title"            = "기록";
+"track.logActivity"      = "활동 기록";
+"track.feeding"          = "수유";
+"track.sleep"            = "수면";
+"track.diaper"           = "기저귀";
+"track.growth"           = "성장";
+"track.noRecordsYet"     = "아직 기록이 없어요";
+"track.tapToStart"       = "위의 버튼을 눌러\n아기의 하루를 기록해 보세요";
+"track.feedings"         = "수유";
+"track.sleepSection"     = "수면";
+"track.diapers"          = "기저귀";
+"track.growthSection"    = "성장";
+"track.seeAll"           = "모두 보기";
+"track.edit"             = "편집";
+"track.delete"           = "삭제";
+"track.deleteRecord"     = "기록을 삭제할까요?";
+"track.deleteConfirmMsg" = "이 기록은 영구적으로 삭제됩니다.";
+"track.inProgress"       = "진행 중";
+"track.ongoing"          = "진행 중";
+"track.feedingDeleted"   = "수유 기록 삭제됨";
+"track.sleepDeleted"     = "수면 기록 삭제됨";
+"track.diaperDeleted"    = "기저귀 기록 삭제됨";
+"track.growthDeleted"    = "성장 기록 삭제됨";
+"track.recordDeleted"    = "기록 삭제됨";
