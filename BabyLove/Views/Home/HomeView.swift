@@ -756,6 +756,8 @@ struct HomeView: View {
 
     private func endOngoingSleep() {
         guard let ongoing = ongoingSleep, let id = ongoing.id else { return }
+        // Capture duration before ending so the toast can report it
+        let durationText = Self.humanReadableDuration(sleepElapsed)
         var ok = false
         withAnimation(.spring(response: 0.4)) {
             ok = vm.endSleepByID(id, context: ctx)
@@ -763,7 +765,7 @@ struct HomeView: View {
         if ok {
             Haptic.success()
             stopSleepTimer()
-            appState.showToast("Sleep ended", icon: "sun.and.horizon.fill", color: .blSleep)
+            appState.showToast("Sleep ended · \(durationText)", icon: "sun.and.horizon.fill", color: .blSleep)
         } else {
             Haptic.error()
             appState.showToast("Save failed — try again", icon: "exclamationmark.triangle.fill", color: .red)
@@ -921,6 +923,8 @@ struct HomeView: View {
 
     private func endOngoingFeeding() {
         guard let ongoing = ongoingFeeding, let id = ongoing.id else { return }
+        // Capture duration before ending so the toast can report it
+        let durationText = Self.humanReadableDuration(feedingElapsed)
         var ok = false
         withAnimation(.spring(response: 0.4)) {
             ok = vm.endFeedingByID(id, context: ctx)
@@ -928,7 +932,7 @@ struct HomeView: View {
         if ok {
             Haptic.success()
             stopFeedingTimer()
-            appState.showToast("Feeding ended", icon: "checkmark.circle.fill", color: .blFeeding)
+            appState.showToast("Feeding ended · \(durationText)", icon: "checkmark.circle.fill", color: .blFeeding)
         } else {
             Haptic.error()
             appState.showToast("Save failed — try again", icon: "exclamationmark.triangle.fill", color: .red)
