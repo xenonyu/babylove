@@ -7,10 +7,12 @@ struct OnboardingView: View {
     @State private var birthDate = Date()
     @State private var gender: Baby.Gender = .girl
     @State private var showDatePicker = false
+    @FocusState private var isNameFieldFocused: Bool
 
     var body: some View {
         ZStack {
             Color.blBackground.ignoresSafeArea()
+                .onTapGesture { isNameFieldFocused = false }
 
             VStack(spacing: 0) {
                 // Progress dots
@@ -24,19 +26,30 @@ struct OnboardingView: View {
                 }
                 .padding(.top, 60)
 
-                Spacer()
+                if page == 1 {
+                    // Page 1 uses ScrollView so the keyboard doesn't hide the
+                    // gender picker or Continue button on smaller screens.
+                    ScrollView {
+                        Spacer(minLength: 32)
+                        babyInfoPage
+                        Spacer(minLength: 32)
+                    }
+                    .scrollDismissesKeyboard(.interactively)
+                } else {
+                    Spacer()
 
-                switch page {
-                case 0: welcomePage
-                case 1: babyInfoPage
-                default: allSetPage
+                    switch page {
+                    case 0:  welcomePage
+                    default: allSetPage
+                    }
+
+                    Spacer()
                 }
-
-                Spacer()
 
                 // Next button
                 if page < 2 {
                     Button(page == 0 ? "Get Started" : "Continue") {
+                        isNameFieldFocused = false
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                             page += 1
                         }
@@ -91,6 +104,9 @@ struct OnboardingView: View {
                     .foregroundColor(.blTextSecondary)
                 TextField("e.g. Emma, Oliver…", text: $babyName)
                     .font(.system(size: 17))
+                    .focused($isNameFieldFocused)
+                    .submitLabel(.done)
+                    .onSubmit { isNameFieldFocused = false }
                     .padding(16)
                     .background(Color.blSurface)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))

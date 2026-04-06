@@ -1,5 +1,4 @@
 [
-  "[04/06 05:08] ## ✅ 迭代 #53 完成！\n\n### 改进：Home Day Timeline 显示记录备注 + 修复 Timeline ID 稳定性\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n1. **备注不可见**：用户在喂食/睡眠",
   "[04/06 05:23] ## ✅ 迭代 #54 完成！\n\n### 改进：Home 日期导航条添加活动指示点（Activity Indicator Dots）\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：Home 页面的 14 天日期",
   "[04/06 05:29] ## ✅ 迭代 #55 完成！\n\n### 改进：修复 Reset All Data 批量删除不同步 + 通知未取消的 Bug\n\n**问题**（优先级 #1 — 潜在崩溃 + #4 — 数据完整性）：\n\n1. **CoreData 脏数据崩溃",
   "[04/06 05:37] ## ✅ 迭代 #56 完成！\n\n### 改进：CoreData 保存错误处理 + 用户可见错误反馈\n\n**问题**（优先级 #1 — 数据完整性 / 潜在数据丢失）：\n\n- **根因**：`TrackViewModel.save()` 使",
@@ -28,5 +27,6 @@
   "[04/06 07:48] ## ✅ 迭代 #79 完成！\n\n### 改进：修复 HomeView/TrackView/MemoryView 删除操作缺少 Toast 通知的 UX 一致性 Bug\n\n**问题**（优先级 #3 — UI/UX 一致性）：\n\n- **根",
   "[04/06 07:55] ## ✅ 迭代 #80 完成！\n\n### 改进：修复 GrowthView 删除无 Toast 通知 + 记录列表隐藏超限条目的 UX Bug\n\n**问题**（优先级 #3 — UI/UX 一致性）：\n\n1. **删除无反馈**：Growt",
   "[04/06 07:58] ## ✅ 迭代 #81 完成！\n\n### 改进：修复 Track 标签页生长记录中身高与头围无法区分的 UX Bug\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：`TrackView` 的 `growthRo",
-  "[04/06 08:03] ## ✅ 迭代 #82 完成！\n\n### 改进：修复 DiaperLogView 缺少 ScrollView 导致键盘遮挡保存按钮的 UX Bug\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：`DiaperL"
+  "[04/06 08:03] ## ✅ 迭代 #82 完成！\n\n### 改进：修复 DiaperLogView 缺少 ScrollView 导致键盘遮挡保存按钮的 UX Bug\n\n**问题**（优先级 #3 — UI/UX 体验）：\n\n- **根因**：`DiaperL",
+  "[04/06 08:07] ## ✅ 迭代 #83 完成！\n\n### 改进：修复 EditBabyView 缺少键盘关闭处理的 UX 一致性 Bug\n\n**问题**（优先级 #3 — UI/UX 一致性）：\n\n- **根因**：`EditBabyView`（Setti"
 ]
