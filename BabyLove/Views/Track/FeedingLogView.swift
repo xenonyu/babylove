@@ -32,6 +32,26 @@ struct FeedingLogView: View {
     private var maxAmount: Double { unit == .metric ? 300 : 10 }
     private var amountStep: Double { unit == .metric ? 5 : 0.5 }
 
+    /// Human-readable duration: shows "Xh Ym" for ≥60 min, "X min" otherwise
+    private var durationDisplayText: String {
+        let mins = Int(duration)
+        if mins >= 60 {
+            let h = mins / 60, m = mins % 60
+            return m > 0 ? "\(h)h \(m)m" : "\(h)h"
+        }
+        return "\(mins) min"
+    }
+
+    /// Accessibility-friendly duration text
+    private var durationAccessibilityText: String {
+        let mins = Int(duration)
+        if mins >= 60 {
+            let h = mins / 60, m = mins % 60
+            return m > 0 ? "\(h) hours \(m) minutes" : "\(h) hours"
+        }
+        return "\(mins) minutes"
+    }
+
     /// Whether the current feed type supports timer mode
     private var supportsTimer: Bool {
         feedType == .breast || feedType == .pump
@@ -213,14 +233,14 @@ struct FeedingLogView: View {
                                             .font(.system(size: 15, weight: .semibold))
                                             .foregroundColor(.blTextSecondary)
                                         Spacer()
-                                        Text("\(Int(duration)) min")
+                                        Text(durationDisplayText)
                                             .font(.system(size: 17, weight: .bold))
                                             .foregroundColor(.blFeeding)
                                     }
-                                    Slider(value: $duration, in: 1...60, step: 1)
+                                    Slider(value: $duration, in: 1...180, step: 1)
                                         .tint(.blFeeding)
                                         .accessibilityLabel("Duration")
-                                        .accessibilityValue("\(Int(duration)) minutes")
+                                        .accessibilityValue(durationAccessibilityText)
                                 }
                             }
                         }
@@ -414,7 +434,7 @@ struct FeedingLogView: View {
         if isOngoing {
             // Calculate elapsed minutes from start time as a sensible default
             let elapsed = Date().timeIntervalSince(timestamp) / 60.0
-            duration = max(1, min(60, elapsed.rounded()))
+            duration = max(1, min(180, elapsed.rounded()))
             isEditingOngoingFeeding = true
         } else {
             duration = max(1, Double(r.durationMinutes))
