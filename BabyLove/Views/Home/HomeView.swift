@@ -209,7 +209,37 @@ struct HomeView: View {
         if let lastSide = lastBreastSide {
             parts.append("Last: \(lastSide.displayName)")
         }
+        // Average feeding interval (only meaningful with 2+ completed feedings)
+        if let avgText = avgFeedingIntervalText {
+            parts.append("every \(avgText)")
+        }
         return parts.joined(separator: " · ")
+    }
+
+    /// Average interval in minutes between consecutive feedings today.
+    /// Returns nil when fewer than 2 feedings exist or all have the same timestamp.
+    private var avgFeedingIntervalMinutes: Int? {
+        // Collect sorted timestamps (ascending), skipping ongoing timers
+        let timestamps = todayFeedings
+            .compactMap { $0.timestamp }
+            .sorted()
+        guard timestamps.count >= 2 else { return nil }
+        // Sum of intervals between consecutive feedings
+        var totalInterval: TimeInterval = 0
+        for i in 1..<timestamps.count {
+            totalInterval += timestamps[i].timeIntervalSince(timestamps[i - 1])
+        }
+        let avgMinutes = Int(totalInterval / Double(timestamps.count - 1) / 60)
+        return avgMinutes > 0 ? avgMinutes : nil
+    }
+
+    /// Human-readable average feeding interval (e.g. "2h 15m", "45m")
+    private var avgFeedingIntervalText: String? {
+        guard let mins = avgFeedingIntervalMinutes else { return nil }
+        let h = mins / 60, m = mins % 60
+        if h > 0 && m > 0 { return "\(h)h \(m)m" }
+        if h > 0 { return "\(h)h" }
+        return "\(m)m"
     }
 
     /// The side used in the most recent breast/pump feeding today
@@ -338,11 +368,19 @@ struct HomeView: View {
             joined = "\(parts[0...(parts.count - 2)].joined(separator: ", ")), and \(parts[parts.count - 1])"
         }
 
+        var sentence: String
         if isSelectedDateToday {
-            return "\(babyName) has had \(joined) so far today."
+            sentence = "\(babyName) has had \(joined) so far today."
         } else {
-            return "\(babyName) had \(joined)."
+            sentence = "\(babyName) had \(joined)."
         }
+
+        // Append average feeding interval as a helpful insight
+        if feedCount >= 2, let intervalText = avgFeedingIntervalText {
+            sentence += " Feeding about every \(intervalText)."
+        }
+
+        return sentence
     }
 
     // MARK: - Quick Log Hints
