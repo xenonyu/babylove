@@ -417,6 +417,15 @@ struct SimpleLineChart: View {
         }
     }
 
+    /// Icon shown in empty chart state for each metric
+    private var metricEmptyIcon: String {
+        switch metric {
+        case .weight: return "scalemass"
+        case .height: return "ruler"
+        case .head:   return "circle.dashed"
+        }
+    }
+
     private var unitLabel: String {
         switch metric {
         case .weight: return unit.weightLabel
@@ -452,10 +461,19 @@ struct SimpleLineChart: View {
         let data = dataPoints()
         guard !data.isEmpty else {
             return AnyView(
-                Text("Not enough data")
-                    .font(.system(size: 14))
-                    .foregroundColor(.blTextTertiary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                VStack(spacing: 8) {
+                    Image(systemName: metricEmptyIcon)
+                        .font(.system(size: 28))
+                        .foregroundColor(.blGrowth.opacity(0.35))
+                    Text("No \(metric.rawValue.lowercased()) data yet")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.blTextSecondary)
+                    Text("Add a measurement with \(metric.rawValue.lowercased()) to see the chart")
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             )
         }
 
