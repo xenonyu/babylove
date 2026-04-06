@@ -518,7 +518,7 @@ struct AllGrowthView: View {
 
             Spacer()
 
-            Text(r.date?.formatted(date: .omitted, time: .omitted) ?? "")
+            Text(r.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
