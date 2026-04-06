@@ -1890,6 +1890,9 @@ struct HomeView: View {
 
         for r in todaySleeps {
             guard let st = r.startTime else { continue }
+            let cal = Calendar.current
+            let selectedDayStart = cal.startOfDay(for: selectedDate)
+            let startIsOnDifferentDay = !cal.isDate(st, inSameDayAs: selectedDate)
             let detail: String = {
                 var parts: [String] = []
                 // Location
@@ -1907,14 +1910,39 @@ struct HomeView: View {
                 return parts.joined(separator: " · ")
             }()
             let isOngoing = r.endTime == nil
+            // For cross-midnight sleeps, show a time range and sort by wake time
+            // (or start of selected day) so it appears at the correct position.
+            let sortDate: Date
+            let timeLabel: String
+            if startIsOnDifferentDay {
+                // Sort by the later of endTime or start-of-day so the entry
+                // sits chronologically among today's events.
+                sortDate = r.endTime ?? max(st, selectedDayStart)
+                // Show "10:00 PM – 6:00 AM" range with overnight indicator
+                let startStr = st.formatted(date: .omitted, time: .shortened)
+                let endStr = (r.endTime ?? Date()).formatted(date: .omitted, time: .shortened)
+                timeLabel = "\(startStr) – \(endStr)"
+            } else {
+                sortDate = st
+                timeLabel = st.formatted(date: .omitted, time: .shortened)
+            }
+            let titleSuffix = startIsOnDifferentDay && !isOngoing
+                ? " 🌙"  // overnight indicator
+                : ""
+            let baseTitle: String
+            if isOngoing {
+                baseTitle = "\(NSLocalizedString("home.sleep", comment: "")) (\(NSLocalizedString("home.inProgress", comment: "").lowercased()))"
+            } else {
+                baseTitle = NSLocalizedString("home.sleep", comment: "")
+            }
             items.append(ActivityItem(
                 id: "s-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
-                date: st,
+                date: sortDate,
                 icon: isOngoing ? "moon.fill" : "moon.zzz.fill",
                 color: .blSleep,
-                title: isOngoing ? "\(NSLocalizedString("home.sleep", comment: "")) (\(NSLocalizedString("home.inProgress", comment: "").lowercased()))" : NSLocalizedString("home.sleep", comment: ""),
+                title: baseTitle + titleSuffix,
                 detail: detail,
-                timeLabel: st.formatted(date: .omitted, time: .shortened),
+                timeLabel: timeLabel,
                 notes: r.notes,
                 record: .sleep(r)
             ))
