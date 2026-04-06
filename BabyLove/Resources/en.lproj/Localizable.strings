@@ -368,6 +368,9 @@
 "growthLog.maxHead.metric"    = "max ~60 cm";
 "growthLog.maxHead.imperial"  = "max ~24 in";
 "growthLog.jumpWarning %@ %@ %@ %@" = "%@ changed from %@ to %@ %@ — please verify";
+"growthLog.jumpConfirmTitle"  = "Unusual Value Detected";
+"growthLog.jumpConfirmSave"   = "Save Anyway";
+"growthLog.jumpConfirmCancel" = "Go Back";
 
 /* ===== Growth View ===== */
 "growth.title"            = "Growth";

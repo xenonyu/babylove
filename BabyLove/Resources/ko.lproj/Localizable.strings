@@ -393,6 +393,9 @@
 "growthLog.maxHead.metric"    = "최대 약 60 cm";
 "growthLog.maxHead.imperial"  = "최대 약 24 in";
 "growthLog.jumpWarning %@ %@ %@ %@" = "%1$@이(가) %2$@에서 %3$@ %4$@(으)로 변경되었습니다. 확인해 주세요";
+"growthLog.jumpConfirmTitle"  = "비정상적인 값 감지";
+"growthLog.jumpConfirmSave"   = "그래도 저장";
+"growthLog.jumpConfirmCancel" = "돌아가서 수정";
 
 /* ===== Growth View ===== */
 "growth.title"            = "성장 곡선";

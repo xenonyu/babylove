@@ -17,6 +17,7 @@ struct GrowthLogView: View {
     @State private var recordDate = Date()
     @State private var showDatePicker = false
     @State private var previousRecord: CDGrowthRecord?
+    @State private var showJumpConfirmation = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -188,25 +189,12 @@ struct GrowthLogView: View {
                         Button(isEditing
                                ? NSLocalizedString("growthLog.updateMeasurements", comment: "")
                                : NSLocalizedString("growthLog.saveMeasurements", comment: "")) {
-                            // Convert from display unit to metric for storage.
-                            // When EDITING: empty field → explicit 0 to clear measurement.
-                            // When ADDING:  empty field → nil (leave at CoreData default 0).
-                            let wKG: Double? = Self.parseMetric(weightKG, convert: unit.weightToKG, isEditing: isEditing)
-                            let hCM: Double? = Self.parseMetric(heightCM, convert: unit.lengthToCM, isEditing: isEditing)
-                            let hd: Double? = Self.parseMetric(headCM, convert: unit.lengthToCM, isEditing: isEditing)
-                            var ok = false
-                            if let record = editingRecord {
-                                ok = vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
-                                appState.showToast(ok ? NSLocalizedString("growthLog.updated", comment: "") : NSLocalizedString("growthLog.saveFailed", comment: ""),
-                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blGrowth : .red)
+                            // If there are jump warnings, ask the user to confirm before saving
+                            if !jumpWarnings.isEmpty {
+                                showJumpConfirmation = true
                             } else {
-                                ok = vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
-                                appState.showToast(ok ? NSLocalizedString("growthLog.logged", comment: "") : NSLocalizedString("growthLog.saveFailed", comment: ""),
-                                                   icon: ok ? "chart.bar.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blGrowth : .red)
+                                performSave()
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
                         .disabled(!canSave)
@@ -263,6 +251,14 @@ struct GrowthLogView: View {
                     .foregroundColor(.blGrowth)
                 }
             }
+            .alert(NSLocalizedString("growthLog.jumpConfirmTitle", comment: "Unusual value confirmation"), isPresented: $showJumpConfirmation) {
+                Button(NSLocalizedString("growthLog.jumpConfirmSave", comment: "Save anyway"), role: .destructive) {
+                    performSave()
+                }
+                Button(NSLocalizedString("growthLog.jumpConfirmCancel", comment: "Go back and fix"), role: .cancel) { }
+            } message: {
+                Text(jumpWarnings.joined(separator: "\n"))
+            }
             .onAppear {
                 populateFromRecord()
                 // Apply initial date for retroactive logging (only when creating new records)
@@ -273,6 +269,26 @@ struct GrowthLogView: View {
                 previousRecord = vm.latestGrowthRecord(excluding: editingRecord?.id)
             }
         }
+    }
+
+    /// Performs the actual save/update after any confirmations are resolved.
+    private func performSave() {
+        let wKG: Double? = Self.parseMetric(weightKG, convert: unit.weightToKG, isEditing: isEditing)
+        let hCM: Double? = Self.parseMetric(heightCM, convert: unit.lengthToCM, isEditing: isEditing)
+        let hd: Double? = Self.parseMetric(headCM, convert: unit.lengthToCM, isEditing: isEditing)
+        var ok = false
+        if let record = editingRecord {
+            ok = vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
+            appState.showToast(ok ? NSLocalizedString("growthLog.updated", comment: "") : NSLocalizedString("growthLog.saveFailed", comment: ""),
+                               icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blGrowth : .red)
+        } else {
+            ok = vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
+            appState.showToast(ok ? NSLocalizedString("growthLog.logged", comment: "") : NSLocalizedString("growthLog.saveFailed", comment: ""),
+                               icon: ok ? "chart.bar.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blGrowth : .red)
+        }
+        if ok { Haptic.success(); dismiss() } else { Haptic.error() }
     }
 
     private func populateFromRecord() {

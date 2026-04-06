@@ -393,6 +393,9 @@
 "growthLog.maxHead.metric"    = "最大约 60 cm";
 "growthLog.maxHead.imperial"  = "最大约 24 in";
 "growthLog.jumpWarning %@ %@ %@ %@" = "%1$@从 %2$@ 变为 %3$@ %4$@，请确认";
+"growthLog.jumpConfirmTitle"  = "检测到异常数值";
+"growthLog.jumpConfirmSave"   = "仍然保存";
+"growthLog.jumpConfirmCancel" = "返回修改";
 
 /* ===== Growth View ===== */
 "growth.title"            = "生长曲线";

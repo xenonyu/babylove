@@ -393,6 +393,9 @@
 "growthLog.maxHead.metric"    = "最大約60 cm";
 "growthLog.maxHead.imperial"  = "最大約24 in";
 "growthLog.jumpWarning %@ %@ %@ %@" = "%1$@が%2$@から%3$@ %4$@に変化しました。ご確認ください";
+"growthLog.jumpConfirmTitle"  = "異常な数値を検出";
+"growthLog.jumpConfirmSave"   = "このまま保存";
+"growthLog.jumpConfirmCancel" = "戻って修正";
 
 /* ===== Growth View ===== */
 "growth.title"            = "成長曲線";
