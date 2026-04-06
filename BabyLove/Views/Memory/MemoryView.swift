@@ -62,6 +62,23 @@ struct MemoryView: View {
         filteredMilestones.filter { !$0.isCompleted }.count
     }
 
+    /// Group milestones by month (e.g. "April 2026") for timeline display
+    private var groupedByMonth: [(key: String, milestones: [CDMilestone])] {
+        let cal = Calendar.current
+        let fmt = DateFormatter()
+        fmt.dateFormat = "MMMM yyyy"
+        var dict: [String: [CDMilestone]] = [:]
+        var order: [String] = []
+        for m in filteredMilestones {
+            let date = m.date ?? Date.distantPast
+            let key = fmt.string(from: date)
+            if dict[key] == nil { order.append(key) }
+            dict[key, default: []].append(m)
+        }
+        // Sort months by the actual date of their first milestone (already sorted desc from FetchRequest)
+        return order.map { (key: $0, milestones: dict[$0]!) }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -100,34 +117,32 @@ struct MemoryView: View {
                                 .padding(.horizontal, 20)
                             }
 
-                            // Milestones list
+                            // Milestones timeline
                             if filteredMilestones.isEmpty {
                                 noResultsState
                             } else {
-                                LazyVStack(spacing: 16) {
-                                    ForEach(filteredMilestones, id: \.objectID) { m in
-                                        MilestoneCard(milestone: m, baby: appState.currentBaby) {
-                                            Haptic.medium()
-                                            withAnimation(.spring(response: 0.35)) {
-                                                vm.toggleMilestoneCompleted(m, in: ctx)
-                                            }
+                                LazyVStack(spacing: 0) {
+                                    ForEach(Array(groupedByMonth.enumerated()), id: \.element.key) { sectionIdx, section in
+                                        // Month header
+                                        HStack(spacing: 10) {
+                                            Circle()
+                                                .fill(Color.blPrimary)
+                                                .frame(width: 10, height: 10)
+                                            Text(section.key)
+                                                .font(.system(size: 14, weight: .bold))
+                                                .foregroundColor(.blPrimary)
+                                            Rectangle()
+                                                .fill(Color.blPrimary.opacity(0.2))
+                                                .frame(height: 1)
                                         }
-                                            .contentShape(Rectangle())
-                                            .onTapGesture { milestoneToEdit = m }
-                                            .padding(.horizontal, 20)
-                                            .contextMenu {
-                                                Button {
-                                                    milestoneToEdit = m
-                                                } label: {
-                                                    Label("Edit", systemImage: "pencil")
-                                                }
-                                                Button(role: .destructive) {
-                                                    milestoneToDelete = m
-                                                } label: {
-                                                    Label("Delete", systemImage: "trash")
-                                                }
-                                            }
-                                            .transition(.opacity.combined(with: .move(edge: .top)))
+                                        .padding(.horizontal, 20)
+                                        .padding(.top, sectionIdx == 0 ? 4 : 20)
+                                        .padding(.bottom, 12)
+
+                                        ForEach(Array(section.milestones.enumerated()), id: \.element.objectID) { idx, m in
+                                            let isLast = (idx == section.milestones.count - 1) && (sectionIdx == groupedByMonth.count - 1)
+                                            timelineRow(milestone: m, isLastGlobal: isLast)
+                                        }
                                     }
                                 }
                             }
@@ -173,6 +188,68 @@ struct MemoryView: View {
             }
         } message: {
             Text("This memory will be permanently removed.")
+        }
+    }
+
+    // MARK: - Timeline Row
+
+    @ViewBuilder
+    private func timelineRow(milestone m: CDMilestone, isLastGlobal: Bool) -> some View {
+        let cat = MilestoneCategory(rawValue: m.category ?? "") ?? .custom
+        let catColor = Color(hex: cat.color)
+
+        HStack(alignment: .top, spacing: 0) {
+            // Timeline connector (left gutter)
+            VStack(spacing: 0) {
+                // Dot
+                ZStack {
+                    Circle()
+                        .fill(m.isCompleted ? catColor : catColor.opacity(0.3))
+                        .frame(width: 12, height: 12)
+                    if m.isCompleted {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 5, height: 5)
+                    }
+                }
+                .frame(width: 20)
+
+                // Vertical line (hidden for last item)
+                if !isLastGlobal {
+                    Rectangle()
+                        .fill(catColor.opacity(0.18))
+                        .frame(width: 2)
+                        .frame(maxHeight: .infinity)
+                }
+            }
+            .frame(width: 20)
+            .padding(.leading, 24)
+
+            // Card
+            MilestoneCard(milestone: m, baby: appState.currentBaby) {
+                Haptic.medium()
+                withAnimation(.spring(response: 0.35)) {
+                    vm.toggleMilestoneCompleted(m, in: ctx)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture { milestoneToEdit = m }
+            .contextMenu {
+                Button {
+                    milestoneToEdit = m
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    milestoneToDelete = m
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+            .padding(.leading, 8)
+            .padding(.trailing, 20)
+            .padding(.bottom, 12)
+            .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
 
