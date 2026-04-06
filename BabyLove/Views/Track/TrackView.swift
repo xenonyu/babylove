@@ -298,33 +298,53 @@ struct TrackView: View {
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
         let unit = appState.measurementUnit
         let isOngoing = Self.isFeedingOngoing(r)
-        return HStack {
-            Text(FeedType(rawValue: r.feedType ?? "")?.displayName ?? "Feeding")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.blTextPrimary)
-            if isOngoing {
-                Text("In Progress")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(Color.blFeeding)
-                    .clipShape(Capsule())
+        let feedType = FeedType(rawValue: r.feedType ?? "")
+        return HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text(feedType?.displayName ?? "Feeding")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                    if isOngoing {
+                        Text("In Progress")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.blFeeding)
+                            .clipShape(Capsule())
+                    }
+                }
+                // Detail line: duration, amount, side
+                HStack(spacing: 8) {
+                    if !isOngoing && r.durationMinutes > 0 {
+                        Text("\(r.durationMinutes) min")
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextSecondary)
+                    }
+                    if r.amountML > 0 {
+                        let displayAmount = unit.volumeFromML(r.amountML)
+                        Text(unit == .metric
+                             ? "\(Int(displayAmount)) \(unit.volumeLabel)"
+                             : String(format: "%.1f %@", displayAmount, unit.volumeLabel))
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextSecondary)
+                    }
+                    if let side = r.breastSide, !side.isEmpty {
+                        Text(BreastSide(rawValue: side)?.displayName ?? side)
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextSecondary)
+                    }
+                }
+                // Notes preview
+                if let notes = r.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                        .lineLimit(1)
+                }
             }
             Spacer()
-            if !isOngoing && r.durationMinutes > 0 {
-                Text("\(r.durationMinutes)m")
-                    .font(.system(size: 14))
-                    .foregroundColor(.blFeeding)
-            }
-            if r.amountML > 0 {
-                let displayAmount = unit.volumeFromML(r.amountML)
-                Text(unit == .metric
-                     ? "\(Int(displayAmount))\(unit.volumeLabel)"
-                     : String(format: "%.1f\(unit.volumeLabel)", displayAmount))
-                    .font(.system(size: 14))
-                    .foregroundColor(.blFeeding)
-            }
             Text(Self.timestampText(r.timestamp))
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
