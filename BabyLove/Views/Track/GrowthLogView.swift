@@ -34,19 +34,28 @@ struct GrowthLogView: View {
     /// Returns a validation warning if any entered value is unrealistically large/negative
     private var validationWarning: String? {
         if let w = Double(weightKG) {
-            if w < 0 { return "Weight cannot be negative" }
+            if w < 0 { return NSLocalizedString("growthLog.weightNeg", comment: "") }
             let maxWeight = unit == .metric ? 30.0 : 66.0  // 30 kg / 66 lbs
-            if w > maxWeight { return "Weight seems too high (\(unit == .metric ? "max ~30 kg" : "max ~66 lbs"))" }
+            let maxLabel = unit == .metric
+                ? NSLocalizedString("growthLog.maxWeight.metric", comment: "")
+                : NSLocalizedString("growthLog.maxWeight.imperial", comment: "")
+            if w > maxWeight { return String(format: NSLocalizedString("growthLog.weightHigh %@", comment: ""), maxLabel) }
         }
         if let h = Double(heightCM) {
-            if h < 0 { return "Height cannot be negative" }
+            if h < 0 { return NSLocalizedString("growthLog.heightNeg", comment: "") }
             let maxHeight = unit == .metric ? 130.0 : 51.0  // 130 cm / 51 in
-            if h > maxHeight { return "Height seems too high (\(unit == .metric ? "max ~130 cm" : "max ~51 in"))" }
+            let maxLabel = unit == .metric
+                ? NSLocalizedString("growthLog.maxHeight.metric", comment: "")
+                : NSLocalizedString("growthLog.maxHeight.imperial", comment: "")
+            if h > maxHeight { return String(format: NSLocalizedString("growthLog.heightHigh %@", comment: ""), maxLabel) }
         }
         if let hc = Double(headCM) {
-            if hc < 0 { return "Head circumference cannot be negative" }
+            if hc < 0 { return NSLocalizedString("growthLog.headNeg", comment: "") }
             let maxHead = unit == .metric ? 60.0 : 24.0  // 60 cm / 24 in
-            if hc > maxHead { return "Head circumference seems too high (\(unit == .metric ? "max ~60 cm" : "max ~24 in"))" }
+            let maxLabel = unit == .metric
+                ? NSLocalizedString("growthLog.maxHead.metric", comment: "")
+                : NSLocalizedString("growthLog.maxHead.imperial", comment: "")
+            if hc > maxHead { return String(format: NSLocalizedString("growthLog.headHigh %@", comment: ""), maxLabel) }
         }
         return nil
     }
@@ -66,13 +75,13 @@ struct GrowthLogView: View {
             if ratio > 3.0 || ratio < 0.4 {
                 let unitLabel = convertFromKG ? unit.weightLabel : unit.heightLabel
                 let prevStr = convertFromKG ? String(format: "%.2f", prevDisplay) : String(format: "%.1f", prevDisplay)
-                warnings.append("\(label) changed from \(prevStr) to \(newText) \(unitLabel) — please verify")
+                warnings.append(String(format: NSLocalizedString("growthLog.jumpWarning %@ %@ %@ %@", comment: ""), label, prevStr, newText, unitLabel))
             }
         }
 
-        checkJump(newText: weightKG, prevMetric: prev.weightKG, label: "Weight", convertFromKG: true)
-        checkJump(newText: heightCM, prevMetric: prev.heightCM, label: "Height", convertFromKG: false)
-        checkJump(newText: headCM, prevMetric: prev.headCircumferenceCM, label: "Head circ.", convertFromKG: false)
+        checkJump(newText: weightKG, prevMetric: prev.weightKG, label: NSLocalizedString("growthLog.weight", comment: ""), convertFromKG: true)
+        checkJump(newText: heightCM, prevMetric: prev.heightCM, label: NSLocalizedString("growthLog.height", comment: ""), convertFromKG: false)
+        checkJump(newText: headCM, prevMetric: prev.headCircumferenceCM, label: NSLocalizedString("growthLog.headCirc", comment: ""), convertFromKG: false)
         return warnings
     }
 
@@ -92,7 +101,7 @@ struct GrowthLogView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
                                     .foregroundColor(.blGrowth)
-                                Text("Recording for \(recordDate.formatted(date: .long, time: .omitted))")
+                                Text(String(format: NSLocalizedString("log.recordingFor %@", comment: ""), recordDate.formatted(date: .long, time: .omitted)))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blTextPrimary)
                                 Spacer()
@@ -107,7 +116,7 @@ struct GrowthLogView: View {
                         }
 
                         measurementField(
-                            label: "Weight",
+                            label: NSLocalizedString("growthLog.weight", comment: ""),
                             unit: unit.weightLabel,
                             icon: "scalemass.fill",
                             color: .blGrowth,
@@ -115,7 +124,7 @@ struct GrowthLogView: View {
                             placeholder: unit == .metric ? "e.g. 5.5" : "e.g. 12.1"
                         )
                         measurementField(
-                            label: "Height / Length",
+                            label: NSLocalizedString("growthLog.height", comment: ""),
                             unit: unit.heightLabel,
                             icon: "ruler.fill",
                             color: .blGrowth,
@@ -123,7 +132,7 @@ struct GrowthLogView: View {
                             placeholder: unit == .metric ? "e.g. 60.5" : "e.g. 23.8"
                         )
                         measurementField(
-                            label: "Head Circumference",
+                            label: NSLocalizedString("growthLog.headCirc", comment: ""),
                             unit: unit.heightLabel,
                             icon: "circle.dotted",
                             color: .blGrowth,
@@ -137,7 +146,7 @@ struct GrowthLogView: View {
                                 withAnimation(.spring(response: 0.3)) { showDatePicker.toggle() }
                             } label: {
                                 HStack {
-                                    Label("Date", systemImage: "calendar")
+                                    Label(NSLocalizedString("growthLog.date", comment: ""), systemImage: "calendar")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
@@ -166,17 +175,19 @@ struct GrowthLogView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Notes", systemImage: "note.text")
+                            Label(NSLocalizedString("log.notes", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            TextField("Doctor's notes, observations…", text: $notes, axis: .vertical)
+                            TextField(NSLocalizedString("growthLog.notesPlaceholder", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(2...4)
                                 .padding(14)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(isEditing ? "Update Measurements" : "Save Measurements") {
+                        Button(isEditing
+                               ? NSLocalizedString("growthLog.updateMeasurements", comment: "")
+                               : NSLocalizedString("growthLog.saveMeasurements", comment: "")) {
                             // Convert from display unit to metric for storage.
                             // nil means "keep existing value" (editing) or "not measured" (adding).
                             // Only non-empty fields overwrite the stored value.
@@ -186,12 +197,12 @@ struct GrowthLogView: View {
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
-                                appState.showToast(ok ? "Growth updated" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("growthLog.updated", comment: "") : NSLocalizedString("growthLog.saveFailed", comment: ""),
                                                    icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blGrowth : .red)
                             } else {
                                 ok = vm.logGrowth(weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
-                                appState.showToast(ok ? "Growth logged" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("growthLog.logged", comment: "") : NSLocalizedString("growthLog.saveFailed", comment: ""),
                                                    icon: ok ? "chart.bar.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blGrowth : .red)
                             }
@@ -208,7 +219,7 @@ struct GrowthLogView: View {
                                 .foregroundColor(.blPrimary)
                                 .frame(maxWidth: .infinity)
                         } else if !hasValidMeasurement {
-                            Text("Enter at least one measurement to save")
+                            Text(NSLocalizedString("growthLog.enterOne", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
                                 .frame(maxWidth: .infinity)
@@ -237,15 +248,15 @@ struct GrowthLogView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(isEditing ? "Edit Growth" : "Log Growth")
+            .navigationTitle(isEditing ? NSLocalizedString("growthLog.editTitle", comment: "") : NSLocalizedString("growthLog.title", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(NSLocalizedString("log.cancel", comment: "")) { dismiss() }
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(NSLocalizedString("log.done", comment: "")) {
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
                     .font(.system(size: 16, weight: .semibold))

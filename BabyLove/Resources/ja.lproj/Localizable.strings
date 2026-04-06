@@ -266,3 +266,101 @@
 "allRecords.sleepDeleted"          = "睡眠記録を削除しました";
 "allRecords.diaperDeleted"         = "おむつ記録を削除しました";
 "allRecords.growthDeleted"         = "成長記録を削除しました";
+
+/* ===== Log Views (Shared) ===== */
+"log.recordingFor %@"     = "%@の記録";
+"log.cancel"              = "キャンセル";
+"log.done"                = "完了";
+"log.notes"               = "メモ";
+"log.notesOptional"       = "メモ（任意）";
+"log.addNote"             = "メモを追加…";
+"log.time"                = "時間";
+
+/* ===== Feeding Log ===== */
+"feedLog.title"           = "授乳を記録";
+"feedLog.editTitle"       = "授乳を編集";
+"feedLog.type"            = "種類";
+"feedLog.side"            = "左右";
+"feedLog.useTimer"        = "タイマーを使う";
+"feedLog.duration"        = "時間";
+"feedLog.amount"          = "量";
+"feedLog.amountPumped"    = "搾乳量";
+"feedLog.lastSide %@"    = "前回：%@";
+"feedLog.suggested %@"   = "おすすめ：%@";
+"feedLog.ongoing"         = "授乳中";
+"feedLog.ongoingHint"     = "最終時間を設定して授乳を終了します。";
+"feedLog.timerRunning"    = "授乳タイマー稼働中";
+"feedLog.timerRunningHint" = "新しいタイマーを開始する前に、ホーム画面で現在の授乳を終了してください。";
+"feedLog.timerActive"     = "授乳タイマーが稼働中です";
+"feedLog.timerHint"       = "タイマーはホーム画面に表示されます。終了時に停止してください";
+"feedLog.setAmount"       = "量を設定してから保存してください";
+"feedLog.endFeeding"      = "授乳を終了";
+"feedLog.updateFeeding"   = "授乳を更新";
+"feedLog.startTimer"      = "タイマーを開始";
+"feedLog.logFeeding"      = "授乳を記録";
+"feedLog.updated"         = "授乳を更新しました";
+"feedLog.timerStarted"    = "授乳タイマーを開始しました";
+"feedLog.logged"          = "授乳を記録しました";
+"feedLog.saveFailed"      = "保存に失敗しました。もう一度お試しください";
+
+/* ===== Sleep Log ===== */
+"sleepLog.title"          = "睡眠を記録";
+"sleepLog.editTitle"      = "睡眠を編集";
+"sleepLog.babyIsSleeping" = "赤ちゃんは今寝ています";
+"sleepLog.stillSleeping"  = "まだ寝ています";
+"sleepLog.fellAsleep"     = "寝た時間";
+"sleepLog.sleeping"       = "睡眠中…";
+"sleepLog.sleepDuration"  = "睡眠時間";
+"sleepLog.startTime"      = "開始時間";
+"sleepLog.wakeTime"       = "起床時間";
+"sleepLog.location"       = "場所";
+"sleepLog.timerRunning"   = "睡眠タイマー稼働中";
+"sleepLog.timerRunningHint" = "新しいタイマーを開始する前に、ホーム画面で現在の睡眠を終了してください。";
+"sleepLog.timerActive"    = "睡眠タイマーが稼働中です";
+"sleepLog.endAfterStart"  = "終了時間は開始時間より後にしてください";
+"sleepLog.updateSleep"    = "睡眠を更新";
+"sleepLog.startTimer"     = "タイマーを開始";
+"sleepLog.logSleep"       = "睡眠を記録";
+"sleepLog.updated"        = "睡眠を更新しました";
+"sleepLog.timerStarted"   = "睡眠タイマーを開始しました";
+"sleepLog.logged"         = "睡眠を記録しました";
+"sleepLog.saveFailed"     = "保存に失敗しました。もう一度お試しください";
+
+/* ===== Diaper Log ===== */
+"diaperLog.title"         = "おむつを記録";
+"diaperLog.editTitle"     = "おむつを編集";
+"diaperLog.diaperType"    = "おむつの種類";
+"diaperLog.notesPlaceholder" = "色、かたさ、その他のメモ…";
+"diaperLog.updateDiaper"  = "記録を更新";
+"diaperLog.logDiaper"     = "おむつ交換を記録";
+"diaperLog.updated"       = "おむつ記録を更新しました";
+"diaperLog.logged"        = "おむつを記録しました";
+"diaperLog.saveFailed"    = "保存に失敗しました。もう一度お試しください";
+
+/* ===== Growth Log ===== */
+"growthLog.title"         = "成長を記録";
+"growthLog.editTitle"     = "成長を編集";
+"growthLog.weight"        = "体重";
+"growthLog.height"        = "身長";
+"growthLog.headCirc"      = "頭囲";
+"growthLog.date"          = "日付";
+"growthLog.notesPlaceholder" = "医師のメモ、観察記録…";
+"growthLog.updateMeasurements" = "測定データを更新";
+"growthLog.saveMeasurements"   = "測定データを保存";
+"growthLog.updated"       = "成長データを更新しました";
+"growthLog.logged"        = "成長データを記録しました";
+"growthLog.saveFailed"    = "保存に失敗しました。もう一度お試しください";
+"growthLog.enterOne"      = "保存するには少なくとも1つの測定値を入力してください";
+"growthLog.weightNeg"     = "体重は負の値にできません";
+"growthLog.weightHigh %@" = "体重が高すぎるようです（%@）";
+"growthLog.heightNeg"     = "身長は負の値にできません";
+"growthLog.heightHigh %@" = "身長が高すぎるようです（%@）";
+"growthLog.headNeg"       = "頭囲は負の値にできません";
+"growthLog.headHigh %@"   = "頭囲が高すぎるようです（%@）";
+"growthLog.maxWeight.metric"  = "最大約30 kg";
+"growthLog.maxWeight.imperial" = "最大約66 lbs";
+"growthLog.maxHeight.metric"  = "最大約130 cm";
+"growthLog.maxHeight.imperial" = "最大約51 in";
+"growthLog.maxHead.metric"    = "最大約60 cm";
+"growthLog.maxHead.imperial"  = "最大約24 in";
+"growthLog.jumpWarning %@ %@ %@ %@" = "%1$@が%2$@から%3$@ %4$@に変化しました。ご確認ください";

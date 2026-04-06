@@ -266,3 +266,101 @@
 "allRecords.sleepDeleted"          = "睡眠记录已删除";
 "allRecords.diaperDeleted"         = "尿布记录已删除";
 "allRecords.growthDeleted"         = "生长记录已删除";
+
+/* ===== Log Views (Shared) ===== */
+"log.recordingFor %@"     = "记录日期：%@";
+"log.cancel"              = "取消";
+"log.done"                = "完成";
+"log.notes"               = "备注";
+"log.notesOptional"       = "备注（可选）";
+"log.addNote"             = "添加备注…";
+"log.time"                = "时间";
+
+/* ===== Feeding Log ===== */
+"feedLog.title"           = "记录喂食";
+"feedLog.editTitle"       = "编辑喂食";
+"feedLog.type"            = "类型";
+"feedLog.side"            = "侧别";
+"feedLog.useTimer"        = "使用计时器";
+"feedLog.duration"        = "时长";
+"feedLog.amount"          = "奶量";
+"feedLog.amountPumped"    = "吸奶量";
+"feedLog.lastSide %@"    = "上次：%@";
+"feedLog.suggested %@"   = "建议：%@";
+"feedLog.ongoing"         = "正在喂食";
+"feedLog.ongoingHint"     = "设置最终时长以结束本次喂食。";
+"feedLog.timerRunning"    = "喂食计时器已在运行";
+"feedLog.timerRunningHint" = "请先在首页结束当前喂食，再开始新的计时。";
+"feedLog.timerActive"     = "喂食计时器已在运行";
+"feedLog.timerHint"       = "计时器将在首页显示，完成后结束";
+"feedLog.setAmount"       = "请设置奶量后再保存";
+"feedLog.endFeeding"      = "结束喂食";
+"feedLog.updateFeeding"   = "更新喂食";
+"feedLog.startTimer"      = "开始计时";
+"feedLog.logFeeding"      = "记录喂食";
+"feedLog.updated"         = "喂食已更新";
+"feedLog.timerStarted"    = "喂食计时已开始";
+"feedLog.logged"          = "喂食已记录";
+"feedLog.saveFailed"      = "保存失败，请重试";
+
+/* ===== Sleep Log ===== */
+"sleepLog.title"          = "记录睡眠";
+"sleepLog.editTitle"      = "编辑睡眠";
+"sleepLog.babyIsSleeping" = "宝宝正在睡觉";
+"sleepLog.stillSleeping"  = "仍在睡觉";
+"sleepLog.fellAsleep"     = "入睡时间";
+"sleepLog.sleeping"       = "睡觉中…";
+"sleepLog.sleepDuration"  = "睡眠时长";
+"sleepLog.startTime"      = "开始时间";
+"sleepLog.wakeTime"       = "醒来时间";
+"sleepLog.location"       = "地点";
+"sleepLog.timerRunning"   = "睡眠计时器已在运行";
+"sleepLog.timerRunningHint" = "请先在首页结束当前睡眠，再开始新的计时。";
+"sleepLog.timerActive"    = "睡眠计时器已在运行";
+"sleepLog.endAfterStart"  = "结束时间必须在开始时间之后";
+"sleepLog.updateSleep"    = "更新睡眠";
+"sleepLog.startTimer"     = "开始计时";
+"sleepLog.logSleep"       = "记录睡眠";
+"sleepLog.updated"        = "睡眠已更新";
+"sleepLog.timerStarted"   = "睡眠计时已开始";
+"sleepLog.logged"         = "睡眠已记录";
+"sleepLog.saveFailed"     = "保存失败，请重试";
+
+/* ===== Diaper Log ===== */
+"diaperLog.title"         = "记录换尿布";
+"diaperLog.editTitle"     = "编辑尿布";
+"diaperLog.diaperType"    = "尿布类型";
+"diaperLog.notesPlaceholder" = "颜色、质地或其他备注…";
+"diaperLog.updateDiaper"  = "更新记录";
+"diaperLog.logDiaper"     = "记录换尿布";
+"diaperLog.updated"       = "尿布记录已更新";
+"diaperLog.logged"        = "尿布已记录";
+"diaperLog.saveFailed"    = "保存失败，请重试";
+
+/* ===== Growth Log ===== */
+"growthLog.title"         = "记录生长";
+"growthLog.editTitle"     = "编辑生长";
+"growthLog.weight"        = "体重";
+"growthLog.height"        = "身高 / 身长";
+"growthLog.headCirc"      = "头围";
+"growthLog.date"          = "日期";
+"growthLog.notesPlaceholder" = "医生备注、观察记录…";
+"growthLog.updateMeasurements" = "更新测量数据";
+"growthLog.saveMeasurements"   = "保存测量数据";
+"growthLog.updated"       = "生长数据已更新";
+"growthLog.logged"        = "生长数据已记录";
+"growthLog.saveFailed"    = "保存失败，请重试";
+"growthLog.enterOne"      = "请至少输入一项测量数据";
+"growthLog.weightNeg"     = "体重不能为负数";
+"growthLog.weightHigh %@" = "体重似乎过高（%@）";
+"growthLog.heightNeg"     = "身高不能为负数";
+"growthLog.heightHigh %@" = "身高似乎过高（%@）";
+"growthLog.headNeg"       = "头围不能为负数";
+"growthLog.headHigh %@"   = "头围似乎过高（%@）";
+"growthLog.maxWeight.metric"  = "最大约 30 kg";
+"growthLog.maxWeight.imperial" = "最大约 66 lbs";
+"growthLog.maxHeight.metric"  = "最大约 130 cm";
+"growthLog.maxHeight.imperial" = "最大约 51 in";
+"growthLog.maxHead.metric"    = "最大约 60 cm";
+"growthLog.maxHead.imperial"  = "最大约 24 in";
+"growthLog.jumpWarning %@ %@ %@ %@" = "%1$@从 %2$@ 变为 %3$@ %4$@，请确认";

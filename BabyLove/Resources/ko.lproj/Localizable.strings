@@ -266,3 +266,101 @@
 "allRecords.sleepDeleted"          = "수면 기록 삭제됨";
 "allRecords.diaperDeleted"         = "기저귀 기록 삭제됨";
 "allRecords.growthDeleted"         = "성장 기록 삭제됨";
+
+/* ===== Log Views (Shared) ===== */
+"log.recordingFor %@"     = "%@ 기록";
+"log.cancel"              = "취소";
+"log.done"                = "완료";
+"log.notes"               = "메모";
+"log.notesOptional"       = "메모 (선택)";
+"log.addNote"             = "메모 추가…";
+"log.time"                = "시간";
+
+/* ===== Feeding Log ===== */
+"feedLog.title"           = "수유 기록";
+"feedLog.editTitle"       = "수유 편집";
+"feedLog.type"            = "종류";
+"feedLog.side"            = "방향";
+"feedLog.useTimer"        = "타이머 사용";
+"feedLog.duration"        = "시간";
+"feedLog.amount"          = "양";
+"feedLog.amountPumped"    = "유축량";
+"feedLog.lastSide %@"    = "이전: %@";
+"feedLog.suggested %@"   = "추천: %@";
+"feedLog.ongoing"         = "수유 중";
+"feedLog.ongoingHint"     = "최종 시간을 설정하여 수유를 종료하세요.";
+"feedLog.timerRunning"    = "수유 타이머 작동 중";
+"feedLog.timerRunningHint" = "새 타이머를 시작하기 전에 홈 화면에서 현재 수유를 종료하세요.";
+"feedLog.timerActive"     = "수유 타이머가 이미 작동 중입니다";
+"feedLog.timerHint"       = "타이머가 홈 화면에 표시됩니다. 완료 시 종료하세요";
+"feedLog.setAmount"       = "저장하기 전에 양을 설정하세요";
+"feedLog.endFeeding"      = "수유 종료";
+"feedLog.updateFeeding"   = "수유 업데이트";
+"feedLog.startTimer"      = "타이머 시작";
+"feedLog.logFeeding"      = "수유 기록";
+"feedLog.updated"         = "수유가 업데이트되었습니다";
+"feedLog.timerStarted"    = "수유 타이머가 시작되었습니다";
+"feedLog.logged"          = "수유가 기록되었습니다";
+"feedLog.saveFailed"      = "저장 실패 — 다시 시도하세요";
+
+/* ===== Sleep Log ===== */
+"sleepLog.title"          = "수면 기록";
+"sleepLog.editTitle"      = "수면 편집";
+"sleepLog.babyIsSleeping" = "아기가 자고 있어요";
+"sleepLog.stillSleeping"  = "아직 자고 있어요";
+"sleepLog.fellAsleep"     = "잠든 시간";
+"sleepLog.sleeping"       = "수면 중…";
+"sleepLog.sleepDuration"  = "수면 시간";
+"sleepLog.startTime"      = "시작 시간";
+"sleepLog.wakeTime"       = "기상 시간";
+"sleepLog.location"       = "장소";
+"sleepLog.timerRunning"   = "수면 타이머 작동 중";
+"sleepLog.timerRunningHint" = "새 타이머를 시작하기 전에 홈 화면에서 현재 수면을 종료하세요.";
+"sleepLog.timerActive"    = "수면 타이머가 이미 작동 중입니다";
+"sleepLog.endAfterStart"  = "종료 시간은 시작 시간 이후여야 합니다";
+"sleepLog.updateSleep"    = "수면 업데이트";
+"sleepLog.startTimer"     = "타이머 시작";
+"sleepLog.logSleep"       = "수면 기록";
+"sleepLog.updated"        = "수면이 업데이트되었습니다";
+"sleepLog.timerStarted"   = "수면 타이머가 시작되었습니다";
+"sleepLog.logged"         = "수면이 기록되었습니다";
+"sleepLog.saveFailed"     = "저장 실패 — 다시 시도하세요";
+
+/* ===== Diaper Log ===== */
+"diaperLog.title"         = "기저귀 기록";
+"diaperLog.editTitle"     = "기저귀 편집";
+"diaperLog.diaperType"    = "기저귀 종류";
+"diaperLog.notesPlaceholder" = "색상, 질감 또는 기타 메모…";
+"diaperLog.updateDiaper"  = "기록 업데이트";
+"diaperLog.logDiaper"     = "기저귀 교체 기록";
+"diaperLog.updated"       = "기저귀 기록이 업데이트되었습니다";
+"diaperLog.logged"        = "기저귀가 기록되었습니다";
+"diaperLog.saveFailed"    = "저장 실패 — 다시 시도하세요";
+
+/* ===== Growth Log ===== */
+"growthLog.title"         = "성장 기록";
+"growthLog.editTitle"     = "성장 편집";
+"growthLog.weight"        = "체중";
+"growthLog.height"        = "신장 / 키";
+"growthLog.headCirc"      = "머리둘레";
+"growthLog.date"          = "날짜";
+"growthLog.notesPlaceholder" = "의사 소견, 관찰 기록…";
+"growthLog.updateMeasurements" = "측정 데이터 업데이트";
+"growthLog.saveMeasurements"   = "측정 데이터 저장";
+"growthLog.updated"       = "성장 데이터가 업데이트되었습니다";
+"growthLog.logged"        = "성장 데이터가 기록되었습니다";
+"growthLog.saveFailed"    = "저장 실패 — 다시 시도하세요";
+"growthLog.enterOne"      = "저장하려면 최소 하나의 측정값을 입력하세요";
+"growthLog.weightNeg"     = "체중은 음수일 수 없습니다";
+"growthLog.weightHigh %@" = "체중이 너무 높은 것 같습니다 (%@)";
+"growthLog.heightNeg"     = "신장은 음수일 수 없습니다";
+"growthLog.heightHigh %@" = "신장이 너무 높은 것 같습니다 (%@)";
+"growthLog.headNeg"       = "머리둘레는 음수일 수 없습니다";
+"growthLog.headHigh %@"   = "머리둘레가 너무 높은 것 같습니다 (%@)";
+"growthLog.maxWeight.metric"  = "최대 약 30 kg";
+"growthLog.maxWeight.imperial" = "최대 약 66 lbs";
+"growthLog.maxHeight.metric"  = "최대 약 130 cm";
+"growthLog.maxHeight.imperial" = "최대 약 51 in";
+"growthLog.maxHead.metric"    = "최대 약 60 cm";
+"growthLog.maxHead.imperial"  = "최대 약 24 in";
+"growthLog.jumpWarning %@ %@ %@ %@" = "%1$@이(가) %2$@에서 %3$@ %4$@(으)로 변경되었습니다. 확인해 주세요";

@@ -33,7 +33,7 @@ struct DiaperLogView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
                                     .foregroundColor(.blDiaper)
-                                Text("Recording for \(timestamp.formatted(date: .long, time: .omitted))")
+                                Text(String(format: NSLocalizedString("log.recordingFor %@", comment: ""), timestamp.formatted(date: .long, time: .omitted)))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blTextPrimary)
                                 Spacer()
@@ -49,7 +49,7 @@ struct DiaperLogView: View {
 
                         // Type selection
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Diaper Type")
+                            Text(NSLocalizedString("diaperLog.diaperType", comment: ""))
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
 
@@ -84,7 +84,7 @@ struct DiaperLogView: View {
                                 withAnimation(.spring(response: 0.3)) { showTimePicker.toggle() }
                             } label: {
                                 HStack {
-                                    Label("Time", systemImage: "clock.fill")
+                                    Label(NSLocalizedString("log.time", comment: ""), systemImage: "clock.fill")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
@@ -117,26 +117,28 @@ struct DiaperLogView: View {
 
                         // Notes
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Notes (optional)", systemImage: "note.text")
+                            Label(NSLocalizedString("log.notesOptional", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            TextField("Color, consistency, or other notes…", text: $notes, axis: .vertical)
+                            TextField(NSLocalizedString("diaperLog.notesPlaceholder", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(2...4)
                                 .padding(14)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
+                        Button(isEditing
+                               ? NSLocalizedString("diaperLog.updateDiaper", comment: "")
+                               : NSLocalizedString("diaperLog.logDiaper", comment: "")) {
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
-                                appState.showToast(ok ? "Diaper updated" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("diaperLog.updated", comment: "") : NSLocalizedString("diaperLog.saveFailed", comment: ""),
                                                    icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blDiaper : .red)
                             } else {
                                 ok = vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
-                                appState.showToast(ok ? "Diaper logged" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("diaperLog.logged", comment: "") : NSLocalizedString("diaperLog.saveFailed", comment: ""),
                                                    icon: ok ? "oval.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blDiaper : .red)
                             }
@@ -149,15 +151,15 @@ struct DiaperLogView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(isEditing ? "Edit Diaper" : "Log Diaper")
+            .navigationTitle(isEditing ? NSLocalizedString("diaperLog.editTitle", comment: "") : NSLocalizedString("diaperLog.title", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(NSLocalizedString("log.cancel", comment: "")) { dismiss() }
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(NSLocalizedString("log.done", comment: "")) {
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
                     .font(.system(size: 16, weight: .semibold))

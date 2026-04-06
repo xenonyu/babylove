@@ -241,3 +241,101 @@
 "track.diaperDeleted"    = "Diaper deleted";
 "track.growthDeleted"    = "Growth record deleted";
 "track.recordDeleted"    = "Record deleted";
+
+/* ===== Log Views (Shared) ===== */
+"log.recordingFor %@"     = "Recording for %@";
+"log.cancel"              = "Cancel";
+"log.done"                = "Done";
+"log.notes"               = "Notes";
+"log.notesOptional"       = "Notes (optional)";
+"log.addNote"             = "Add a note…";
+"log.time"                = "Time";
+
+/* ===== Feeding Log ===== */
+"feedLog.title"           = "Log Feeding";
+"feedLog.editTitle"       = "Edit Feeding";
+"feedLog.type"            = "Type";
+"feedLog.side"            = "Side";
+"feedLog.useTimer"        = "Use Timer";
+"feedLog.duration"        = "Duration";
+"feedLog.amount"          = "Amount";
+"feedLog.amountPumped"    = "Amount Pumped";
+"feedLog.lastSide %@"    = "Last: %@";
+"feedLog.suggested %@"   = "Suggested: %@";
+"feedLog.ongoing"         = "Ongoing feeding";
+"feedLog.ongoingHint"     = "Set the final duration to end this feeding session.";
+"feedLog.timerRunning"    = "Feeding timer already running";
+"feedLog.timerRunningHint" = "End the current feeding from the Home screen before starting a new one.";
+"feedLog.timerActive"     = "A feeding timer is already active";
+"feedLog.timerHint"       = "Timer will run on the home screen — end it when done";
+"feedLog.setAmount"       = "Set the amount before saving";
+"feedLog.endFeeding"      = "End Feeding";
+"feedLog.updateFeeding"   = "Update Feeding";
+"feedLog.startTimer"      = "Start Feeding Timer";
+"feedLog.logFeeding"      = "Log Feeding";
+"feedLog.updated"         = "Feeding updated";
+"feedLog.timerStarted"    = "Feeding timer started";
+"feedLog.logged"          = "Feeding logged";
+"feedLog.saveFailed"      = "Save failed — try again";
+
+/* ===== Sleep Log ===== */
+"sleepLog.title"          = "Log Sleep";
+"sleepLog.editTitle"      = "Edit Sleep";
+"sleepLog.babyIsSleeping" = "Baby is sleeping now";
+"sleepLog.stillSleeping"  = "Still sleeping";
+"sleepLog.fellAsleep"     = "Fell Asleep";
+"sleepLog.sleeping"       = "sleeping…";
+"sleepLog.sleepDuration"  = "sleep duration";
+"sleepLog.startTime"      = "Start Time";
+"sleepLog.wakeTime"       = "Wake Time";
+"sleepLog.location"       = "Location";
+"sleepLog.timerRunning"   = "Sleep timer already running";
+"sleepLog.timerRunningHint" = "End the current sleep from the Home screen before starting a new one.";
+"sleepLog.timerActive"    = "A sleep timer is already active";
+"sleepLog.endAfterStart"  = "End time must be after start time";
+"sleepLog.updateSleep"    = "Update Sleep";
+"sleepLog.startTimer"     = "Start Sleep Timer";
+"sleepLog.logSleep"       = "Log Sleep";
+"sleepLog.updated"        = "Sleep updated";
+"sleepLog.timerStarted"   = "Sleep timer started";
+"sleepLog.logged"         = "Sleep logged";
+"sleepLog.saveFailed"     = "Save failed — try again";
+
+/* ===== Diaper Log ===== */
+"diaperLog.title"         = "Log Diaper";
+"diaperLog.editTitle"     = "Edit Diaper";
+"diaperLog.diaperType"    = "Diaper Type";
+"diaperLog.notesPlaceholder" = "Color, consistency, or other notes…";
+"diaperLog.updateDiaper"  = "Update Diaper";
+"diaperLog.logDiaper"     = "Log Diaper Change";
+"diaperLog.updated"       = "Diaper updated";
+"diaperLog.logged"        = "Diaper logged";
+"diaperLog.saveFailed"    = "Save failed — try again";
+
+/* ===== Growth Log ===== */
+"growthLog.title"         = "Log Growth";
+"growthLog.editTitle"     = "Edit Growth";
+"growthLog.weight"        = "Weight";
+"growthLog.height"        = "Height / Length";
+"growthLog.headCirc"      = "Head Circumference";
+"growthLog.date"          = "Date";
+"growthLog.notesPlaceholder" = "Doctor's notes, observations…";
+"growthLog.updateMeasurements" = "Update Measurements";
+"growthLog.saveMeasurements"   = "Save Measurements";
+"growthLog.updated"       = "Growth updated";
+"growthLog.logged"        = "Growth logged";
+"growthLog.saveFailed"    = "Save failed — try again";
+"growthLog.enterOne"      = "Enter at least one measurement to save";
+"growthLog.weightNeg"     = "Weight cannot be negative";
+"growthLog.weightHigh %@" = "Weight seems too high (%@)";
+"growthLog.heightNeg"     = "Height cannot be negative";
+"growthLog.heightHigh %@" = "Height seems too high (%@)";
+"growthLog.headNeg"       = "Head circumference cannot be negative";
+"growthLog.headHigh %@"   = "Head circumference seems too high (%@)";
+"growthLog.maxWeight.metric"  = "max ~30 kg";
+"growthLog.maxWeight.imperial" = "max ~66 lbs";
+"growthLog.maxHeight.metric"  = "max ~130 cm";
+"growthLog.maxHeight.imperial" = "max ~51 in";
+"growthLog.maxHead.metric"    = "max ~60 cm";
+"growthLog.maxHead.imperial"  = "max ~24 in";
+"growthLog.jumpWarning %@ %@ %@ %@" = "%@ changed from %@ to %@ %@ — please verify";

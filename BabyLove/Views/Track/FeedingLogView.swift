@@ -65,10 +65,10 @@ struct FeedingLogView: View {
 
     /// Dynamic button label based on mode
     private var buttonLabel: String {
-        if isEditingOngoingFeeding { return "End Feeding" }
-        if isEditing { return "Update Feeding" }
-        if isTimerMode && supportsTimer { return "Start Feeding Timer" }
-        return "Log Feeding"
+        if isEditingOngoingFeeding { return NSLocalizedString("feedLog.endFeeding", comment: "") }
+        if isEditing { return NSLocalizedString("feedLog.updateFeeding", comment: "") }
+        if isTimerMode && supportsTimer { return NSLocalizedString("feedLog.startTimer", comment: "") }
+        return NSLocalizedString("feedLog.logFeeding", comment: "")
     }
 
     /// Formula/solid require amount > 0; breast/pump always valid (have duration).
@@ -96,7 +96,7 @@ struct FeedingLogView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
                                     .foregroundColor(.blFeeding)
-                                Text("Recording for \(timestamp.formatted(date: .long, time: .omitted))")
+                                Text(String(format: NSLocalizedString("log.recordingFor %@", comment: ""), timestamp.formatted(date: .long, time: .omitted)))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blTextPrimary)
                                 Spacer()
@@ -112,7 +112,7 @@ struct FeedingLogView: View {
 
                         // Feed type picker
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Type", systemImage: "drop.fill")
+                            Label(NSLocalizedString("feedLog.type", comment: ""), systemImage: "drop.fill")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
                             HStack(spacing: 10) {
@@ -144,7 +144,7 @@ struct FeedingLogView: View {
                         // Breast side (when breast)
                         if feedType == .breast || feedType == .pump {
                             VStack(alignment: .leading, spacing: 10) {
-                                Label("Side", systemImage: "arrow.left.arrow.right")
+                                Label(NSLocalizedString("feedLog.side", comment: ""), systemImage: "arrow.left.arrow.right")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
                                 HStack(spacing: 10) {
@@ -173,13 +173,13 @@ struct FeedingLogView: View {
                                         Image(systemName: "brain.head.profile")
                                             .font(.system(size: 12, weight: .medium))
                                             .foregroundColor(.blFeeding)
-                                        Text("Last: \(lastSide.displayName)")
+                                        Text(String(format: NSLocalizedString("feedLog.lastSide %@", comment: ""), lastSide.displayName))
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.blTextSecondary)
                                         Image(systemName: "arrow.right")
                                             .font(.system(size: 10, weight: .bold))
                                             .foregroundColor(.blTextTertiary)
-                                        Text("Suggested: \(side.displayName)")
+                                        Text(String(format: NSLocalizedString("feedLog.suggested %@", comment: ""), side.displayName))
                                             .font(.system(size: 13, weight: .semibold))
                                             .foregroundColor(.blFeeding)
                                     }
@@ -193,7 +193,7 @@ struct FeedingLogView: View {
                             // Timer mode toggle (only for new records, not editing ongoing)
                             if !isEditing {
                                 Toggle(isOn: $isTimerMode) {
-                                    Label("Use Timer", systemImage: "timer")
+                                    Label(NSLocalizedString("feedLog.useTimer", comment: ""), systemImage: "timer")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextPrimary)
                                 }
@@ -210,10 +210,10 @@ struct FeedingLogView: View {
                                         .font(.system(size: 16))
                                         .foregroundColor(.blFeeding)
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text("Ongoing feeding")
+                                        Text(NSLocalizedString("feedLog.ongoing", comment: ""))
                                             .font(.system(size: 14, weight: .semibold))
                                             .foregroundColor(.blTextPrimary)
-                                        Text("Set the final duration to end this feeding session.")
+                                        Text(NSLocalizedString("feedLog.ongoingHint", comment: ""))
                                             .font(.system(size: 13))
                                             .foregroundColor(.blTextSecondary)
                                     }
@@ -234,10 +234,10 @@ struct FeedingLogView: View {
                                         .font(.system(size: 16))
                                         .foregroundColor(.blGrowth)
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text("Feeding timer already running")
+                                        Text(NSLocalizedString("feedLog.timerRunning", comment: ""))
                                             .font(.system(size: 14, weight: .semibold))
                                             .foregroundColor(.blTextPrimary)
-                                        Text("End the current feeding from the Home screen before starting a new one.")
+                                        Text(NSLocalizedString("feedLog.timerRunningHint", comment: ""))
                                             .font(.system(size: 13))
                                             .foregroundColor(.blTextSecondary)
                                     }
@@ -255,7 +255,7 @@ struct FeedingLogView: View {
                             if !isTimerMode {
                                 VStack(alignment: .leading, spacing: 10) {
                                     HStack {
-                                        Label("Duration", systemImage: "timer")
+                                        Label(NSLocalizedString("feedLog.duration", comment: ""), systemImage: "timer")
                                             .font(.system(size: 15, weight: .semibold))
                                             .foregroundColor(.blTextSecondary)
                                         Spacer()
@@ -265,7 +265,7 @@ struct FeedingLogView: View {
                                     }
                                     Slider(value: $duration, in: 1...180, step: 1)
                                         .tint(.blFeeding)
-                                        .accessibilityLabel("Duration")
+                                        .accessibilityLabel(NSLocalizedString("feedLog.duration", comment: ""))
                                         .accessibilityValue(durationAccessibilityText)
                                 }
                             }
@@ -275,7 +275,9 @@ struct FeedingLogView: View {
                         if feedType == .formula || feedType == .pump || feedType == .solid {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
-                                    Label(feedType == .pump ? "Amount Pumped" : "Amount",
+                                    Label(feedType == .pump
+                                          ? NSLocalizedString("feedLog.amountPumped", comment: "")
+                                          : NSLocalizedString("feedLog.amount", comment: ""),
                                           systemImage: feedType == .pump ? "drop.halffull" : "scalemass.fill")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
@@ -288,7 +290,7 @@ struct FeedingLogView: View {
                                 }
                                 Slider(value: $amount, in: 0...maxAmount, step: amountStep)
                                     .tint(.blFeeding)
-                                    .accessibilityLabel("Amount")
+                                    .accessibilityLabel(NSLocalizedString("feedLog.amount", comment: ""))
                                     .accessibilityValue(unit == .metric ? "\(Int(amount)) milliliters" : String(format: "%.1f ounces", amount))
                             }
                         }
@@ -299,7 +301,7 @@ struct FeedingLogView: View {
                                 withAnimation(.spring(response: 0.3)) { showTimePicker.toggle() }
                             } label: {
                                 HStack {
-                                    Label("Time", systemImage: "clock.fill")
+                                    Label(NSLocalizedString("log.time", comment: ""), systemImage: "clock.fill")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
@@ -337,10 +339,10 @@ struct FeedingLogView: View {
 
                         // Notes
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Notes (optional)", systemImage: "note.text")
+                            Label(NSLocalizedString("log.notesOptional", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            TextField("Add a note…", text: $notes, axis: .vertical)
+                            TextField(NSLocalizedString("log.addNote", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(3...5)
                                 .padding(14)
                                 .background(Color.blSurface)
@@ -363,7 +365,7 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast(ok ? "Feeding updated" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("feedLog.updated", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
                                                    icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blFeeding : .red)
                             } else if isTimerMode && supportsTimer {
@@ -374,7 +376,7 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast(ok ? "Feeding timer started" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("feedLog.timerStarted", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
                                                    icon: ok ? "timer" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blFeeding : .red)
                             } else {
@@ -386,7 +388,7 @@ struct FeedingLogView: View {
                                     notes: notes,
                                     timestamp: timestamp
                                 )
-                                appState.showToast(ok ? "Feeding logged" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("feedLog.logged", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
                                                    icon: ok ? "drop.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blFeeding : .red)
                             }
@@ -398,18 +400,18 @@ struct FeedingLogView: View {
                         .padding(.top, 8)
 
                         if isTimerMode && supportsTimer && !isEditing && hasExistingOngoingFeeding {
-                            Text("A feeding timer is already active")
+                            Text(NSLocalizedString("feedLog.timerActive", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.blGrowth)
                                 .frame(maxWidth: .infinity)
                         } else if isTimerMode && supportsTimer && !isEditing {
-                            Text("Timer will run on the home screen — end it when done")
+                            Text(NSLocalizedString("feedLog.timerHint", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
                                 .frame(maxWidth: .infinity)
                                 .multilineTextAlignment(.center)
                         } else if !canSave {
-                            Text("Set the amount before saving")
+                            Text(NSLocalizedString("feedLog.setAmount", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
                                 .frame(maxWidth: .infinity)
@@ -419,15 +421,15 @@ struct FeedingLogView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(isEditing ? "Edit Feeding" : "Log Feeding")
+            .navigationTitle(isEditing ? NSLocalizedString("feedLog.editTitle", comment: "") : NSLocalizedString("feedLog.title", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(NSLocalizedString("log.cancel", comment: "")) { dismiss() }
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(NSLocalizedString("log.done", comment: "")) {
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
                     .font(.system(size: 16, weight: .semibold))

@@ -63,7 +63,7 @@ struct SleepLogView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
                                     .foregroundColor(.blSleep)
-                                Text("Recording for \(startTime.formatted(date: .long, time: .omitted))")
+                                Text(String(format: NSLocalizedString("log.recordingFor %@", comment: ""), startTime.formatted(date: .long, time: .omitted)))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blTextPrimary)
                                 Spacer()
@@ -79,7 +79,9 @@ struct SleepLogView: View {
 
                         // Ongoing toggle
                         Toggle(isOn: $isOngoing) {
-                            Label(isEditing ? "Still sleeping" : "Baby is sleeping now",
+                            Label(isEditing
+                                  ? NSLocalizedString("sleepLog.stillSleeping", comment: "")
+                                  : NSLocalizedString("sleepLog.babyIsSleeping", comment: ""),
                                   systemImage: "moon.zzz.fill")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextPrimary)
@@ -96,10 +98,10 @@ struct SleepLogView: View {
                                     .font(.system(size: 16))
                                     .foregroundColor(.blGrowth)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Sleep timer already running")
+                                    Text(NSLocalizedString("sleepLog.timerRunning", comment: ""))
                                         .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(.blTextPrimary)
-                                    Text("End the current sleep from the Home screen before starting a new one.")
+                                    Text(NSLocalizedString("sleepLog.timerRunningHint", comment: ""))
                                         .font(.system(size: 13))
                                         .foregroundColor(.blTextSecondary)
                                 }
@@ -116,7 +118,7 @@ struct SleepLogView: View {
                         if isOngoing {
                             // Ongoing: show start time + live elapsed
                             VStack(alignment: .leading, spacing: 10) {
-                                Label("Fell Asleep", systemImage: "moon.fill")
+                                Label(NSLocalizedString("sleepLog.fellAsleep", comment: ""), systemImage: "moon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
                                 DatePicker("Fell asleep time", selection: $startTime, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
@@ -133,7 +135,7 @@ struct SleepLogView: View {
                                         Text(ongoingDurationText)
                                             .font(.system(size: 36, weight: .bold))
                                             .foregroundColor(.blSleep)
-                                        Text("sleeping…")
+                                        Text(NSLocalizedString("sleepLog.sleeping", comment: ""))
                                             .font(.system(size: 14))
                                             .foregroundColor(.blTextSecondary)
                                     }
@@ -149,7 +151,7 @@ struct SleepLogView: View {
                                     Text(durationText)
                                         .font(.system(size: 36, weight: .bold))
                                         .foregroundColor(.blSleep)
-                                    Text("sleep duration")
+                                    Text(NSLocalizedString("sleepLog.sleepDuration", comment: ""))
                                         .font(.system(size: 14))
                                         .foregroundColor(.blTextSecondary)
                                 }
@@ -159,7 +161,7 @@ struct SleepLogView: View {
 
                             // Start time
                             VStack(alignment: .leading, spacing: 10) {
-                                Label("Start Time", systemImage: "moon.fill")
+                                Label(NSLocalizedString("sleepLog.startTime", comment: ""), systemImage: "moon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
                                 DatePicker("Sleep start time", selection: $startTime, in: ...endTime, displayedComponents: [.date, .hourAndMinute])
@@ -171,7 +173,7 @@ struct SleepLogView: View {
 
                             // End time
                             VStack(alignment: .leading, spacing: 10) {
-                                Label("Wake Time", systemImage: "sun.and.horizon.fill")
+                                Label(NSLocalizedString("sleepLog.wakeTime", comment: ""), systemImage: "sun.and.horizon.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
                                 DatePicker("Wake up time", selection: $endTime, in: startTime...Date(), displayedComponents: [.date, .hourAndMinute])
@@ -184,7 +186,7 @@ struct SleepLogView: View {
 
                         // Location
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Location", systemImage: "location.fill")
+                            Label(NSLocalizedString("sleepLog.location", comment: ""), systemImage: "location.fill")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
@@ -214,31 +216,35 @@ struct SleepLogView: View {
 
                         // Notes
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Notes", systemImage: "note.text")
+                            Label(NSLocalizedString("log.notes", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            TextField("Add a note…", text: $notes, axis: .vertical)
+                            TextField(NSLocalizedString("log.addNote", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(2...4)
                                 .padding(14)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(isEditing ? "Update Sleep" : (isOngoing ? "Start Sleep Timer" : "Log Sleep")) {
+                        Button(isEditing
+                               ? NSLocalizedString("sleepLog.updateSleep", comment: "")
+                               : (isOngoing
+                                  ? NSLocalizedString("sleepLog.startTimer", comment: "")
+                                  : NSLocalizedString("sleepLog.logSleep", comment: ""))) {
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
-                                appState.showToast(ok ? "Sleep updated" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("sleepLog.updated", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
                                                    icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blSleep : .red)
                             } else if isOngoing {
                                 ok = vm.startSleep(at: startTime, location: location, notes: notes)
-                                appState.showToast(ok ? "Sleep timer started" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("sleepLog.timerStarted", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
                                                    icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blSleep : .red)
                             } else {
                                 ok = vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
-                                appState.showToast(ok ? "Sleep logged" : "Save failed — try again",
+                                appState.showToast(ok ? NSLocalizedString("sleepLog.logged", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
                                                    icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blSleep : .red)
                             }
@@ -250,12 +256,12 @@ struct SleepLogView: View {
                         .padding(.top, 8)
 
                         if !canSave && isOngoing && hasExistingOngoingSleep && !isEditing {
-                            Text("A sleep timer is already active")
+                            Text(NSLocalizedString("sleepLog.timerActive", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.blGrowth)
                                 .frame(maxWidth: .infinity)
                         } else if !canSave && !isOngoing {
-                            Text("End time must be after start time")
+                            Text(NSLocalizedString("sleepLog.endAfterStart", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
                                 .frame(maxWidth: .infinity)
@@ -265,15 +271,15 @@ struct SleepLogView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(isEditing ? "Edit Sleep" : "Log Sleep")
+            .navigationTitle(isEditing ? NSLocalizedString("sleepLog.editTitle", comment: "") : NSLocalizedString("sleepLog.title", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(NSLocalizedString("log.cancel", comment: "")) { dismiss() }
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(NSLocalizedString("log.done", comment: "")) {
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
                     .font(.system(size: 16, weight: .semibold))
