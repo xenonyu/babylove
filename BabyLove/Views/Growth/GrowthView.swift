@@ -20,6 +20,23 @@ struct GrowthView: View {
         case weight = "Weight"
         case height = "Height"
         case head   = "Head"
+
+        var localizedName: String {
+            switch self {
+            case .weight: return String(localized: "growth.weight")
+            case .height: return String(localized: "growth.height")
+            case .head:   return String(localized: "growth.head")
+            }
+        }
+
+        /// Lowercase localized name for accessibility / chart labels
+        var localizedAccessibilityName: String {
+            switch self {
+            case .weight: return String(localized: "growth.weightLabel")
+            case .height: return String(localized: "growth.heightLabel")
+            case .head:   return String(localized: "growth.headCircLabel")
+            }
+        }
     }
 
     var body: some View {
@@ -29,9 +46,9 @@ struct GrowthView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Metric picker
-                        Picker("Metric", selection: $selectedMetric) {
+                        Picker(String(localized: "growth.title"), selection: $selectedMetric) {
                             ForEach(GrowthMetric.allCases, id: \.self) { m in
-                                Text(m.rawValue).tag(m)
+                                Text(m.localizedName).tag(m)
                             }
                         }
                         .pickerStyle(.segmented)
@@ -45,7 +62,7 @@ struct GrowthView: View {
                         if !records.isEmpty {
                             VStack(spacing: 12) {
                                 HStack {
-                                    BLSectionHeader(title: "Records")
+                                    BLSectionHeader(title: String(localized: "growth.records"))
                                     Spacer()
                                     Text("\(records.count)")
                                         .font(.system(size: 13, weight: .medium))
@@ -66,12 +83,12 @@ struct GrowthView: View {
                                                 Button {
                                                     recordToEdit = r
                                                 } label: {
-                                                    Label("Edit", systemImage: "pencil")
+                                                    Label(String(localized: "growth.edit"), systemImage: "pencil")
                                                 }
                                                 Button(role: .destructive) {
                                                     recordToDelete = r
                                                 } label: {
-                                                    Label("Delete", systemImage: "trash")
+                                                    Label(String(localized: "growth.delete"), systemImage: "trash")
                                                 }
                                             }
                                         if index < displayed.count - 1 {
@@ -89,7 +106,7 @@ struct GrowthView: View {
                                             }
                                         } label: {
                                             HStack(spacing: 6) {
-                                                Text(showAllRecords ? "Show Less" : "Show All \(records.count) Records")
+                                                Text(showAllRecords ? String(localized: "growth.showLess") : String(localized: "growth.showAll \(records.count)"))
                                                     .font(.system(size: 14, weight: .medium))
                                                 Image(systemName: showAllRecords ? "chevron.up" : "chevron.down")
                                                     .font(.system(size: 11, weight: .semibold))
@@ -113,7 +130,7 @@ struct GrowthView: View {
                     .padding(.top, 16)
                 }
             }
-            .navigationTitle("Growth")
+            .navigationTitle(String(localized: "growth.title"))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -133,21 +150,21 @@ struct GrowthView: View {
         .sheet(item: $recordToEdit) { record in
             GrowthLogView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(String(localized: "growth.deleteRecord"), isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "growth.cancel"), role: .cancel) { recordToDelete = nil }
+            Button(String(localized: "growth.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast("Growth record deleted", icon: "trash.fill", color: .blGrowth)
+                    appState.showToast(String(localized: "growth.deleted"), icon: "trash.fill", color: .blGrowth)
                 }
                 recordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(String(localized: "growth.deleteConfirm"))
         }
     }
 
@@ -221,29 +238,29 @@ struct GrowthView: View {
 
     /// VoiceOver summary for the growth chart
     private var chartAccessibilityLabel: String {
-        let metricName = selectedMetric.rawValue.lowercased()
         let unit = appState.measurementUnit
         let dataRecords = records.filter { rawValueForMetric($0) > 0 }
+        let metricLocalized = selectedMetric.localizedName
         guard !dataRecords.isEmpty else {
-            return "\(selectedMetric.rawValue) chart, no data"
+            return String(localized: "growth.chartNoData \(metricLocalized)")
         }
         let count = dataRecords.count
         if let first = dataRecords.first, let last = dataRecords.last {
             let firstVal = displayValueForMetric(first, unit: unit)
             let lastVal = displayValueForMetric(last, unit: unit)
             let unitLabel = selectedMetric == .weight ? unit.weightLabel : unit.heightLabel
-            var label = "\(selectedMetric.rawValue) chart with \(count) measurement\(count == 1 ? "" : "s")"
+            var label = String(localized: "growth.chartLabel \(metricLocalized) \(count)")
             if count > 1 {
-                label += ", from \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", firstVal)) to \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", lastVal)) \(unitLabel)"
+                label += ", \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", firstVal)) → \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", lastVal)) \(unitLabel)"
             } else {
                 label += ", \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", lastVal)) \(unitLabel)"
             }
             if let pctl = whoPercentile(for: selectedMetric) {
-                label += ", currently at percentile \(pctl)"
+                label += ", \(String(localized: "growth.percentile \(pctl)"))"
             }
             return label
         }
-        return "\(selectedMetric.rawValue) chart"
+        return String(localized: "growth.chartNoData \(metricLocalized)")
     }
 
     /// Raw value in storage units for a record given the selected metric
@@ -301,7 +318,7 @@ struct GrowthView: View {
             // Head
             metricColumn(
                 value: latestHead.map { String(format: "%.1f", unit.lengthFromCM($0.headCircumferenceCM)) },
-                label: "Head",
+                label: String(localized: "growth.head"),
                 icon: "circle.dashed",
                 isSelected: selectedMetric == .head,
                 percentile: headPctl,
@@ -311,7 +328,7 @@ struct GrowthView: View {
         .padding(.vertical, 16)
         .blCard()
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Latest measurements")
+        .accessibilityLabel(String(localized: "growth.latestMeasurements"))
     }
 
     private var dividerLine: some View {
@@ -365,7 +382,7 @@ struct GrowthView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(metricAccessibilityLabel(value: value, label: label, percentile: percentile, measureDate: measureDate))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
-        .accessibilityHint("Double tap to view \(label.lowercased()) chart")
+        .accessibilityHint(String(localized: "growth.viewChart \(label)"))
     }
 
     /// Build a comprehensive VoiceOver label for a metric column
@@ -374,30 +391,30 @@ struct GrowthView: View {
         if let value {
             parts.append(value)
         } else {
-            parts.append("no data")
+            parts.append(String(localized: "growth.noData"))
         }
         if let pctl = percentile {
             let range = percentileRangeDescription(pctl)
-            parts.append("percentile \(pctl), \(range)")
+            parts.append("\(String(localized: "growth.percentile \(pctl)")), \(range)")
         }
         if let date = measureDate {
-            parts.append("measured \(Self.shortMeasureDate(date))")
+            parts.append(String(localized: "growth.measured \(Self.shortMeasureDate(date))"))
         }
         return parts.joined(separator: ", ")
     }
 
     /// Human-readable description of what a percentile range means
     private func percentileRangeDescription(_ pctl: Int) -> String {
-        if pctl < 3 || pctl > 97 { return "outside normal range" }
-        if pctl < 15 || pctl > 85 { return "worth monitoring" }
-        return "healthy range"
+        if pctl < 3 || pctl > 97 { return String(localized: "growth.outsideRange") }
+        if pctl < 15 || pctl > 85 { return String(localized: "growth.worthMonitoring") }
+        return String(localized: "growth.healthyRange")
     }
 
     /// Short date text for measurement date: "Today", "Yesterday", or "Apr 3"
     private static func shortMeasureDate(_ date: Date) -> String {
         let cal = Calendar.current
-        if cal.isDateInToday(date) { return "Today" }
-        if cal.isDateInYesterday(date) { return "Yesterday" }
+        if cal.isDateInToday(date) { return String(localized: "growth.today") }
+        if cal.isDateInYesterday(date) { return String(localized: "growth.yesterday") }
         return BLDateFormatters.monthDay.string(from: date)
     }
 
@@ -448,7 +465,7 @@ struct GrowthView: View {
                             .foregroundColor(.blTextSecondary)
                     }
                     if r.headCircumferenceCM > 0 {
-                        Text("HC \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
+                        Text("\(String(localized: "growth.hc")) \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }
@@ -471,13 +488,13 @@ struct GrowthView: View {
             parts.append(baby.ageText(at: date))
         }
         if r.weightKG > 0 {
-            parts.append("weight \(String(format: "%.2f", unit.weightFromKG(r.weightKG))) \(unit.weightLabel)")
+            parts.append("\(String(localized: "growth.weightLabel")) \(String(format: "%.2f", unit.weightFromKG(r.weightKG))) \(unit.weightLabel)")
         }
         if r.heightCM > 0 {
-            parts.append("height \(String(format: "%.1f", unit.lengthFromCM(r.heightCM))) \(unit.heightLabel)")
+            parts.append("\(String(localized: "growth.heightLabel")) \(String(format: "%.1f", unit.lengthFromCM(r.heightCM))) \(unit.heightLabel)")
         }
         if r.headCircumferenceCM > 0 {
-            parts.append("head circumference \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
+            parts.append("\(String(localized: "growth.headCircLabel")) \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
         }
         return parts.joined(separator: ", ")
     }
@@ -487,14 +504,14 @@ struct GrowthView: View {
             Image(systemName: "chart.line.uptrend.xyaxis")
                 .font(.system(size: 48))
                 .foregroundColor(.blGrowth.opacity(0.4))
-            Text("No growth records yet")
+            Text(String(localized: "growth.noRecords"))
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.blTextSecondary)
-            Text("Tap + to add your baby's first measurement")
+            Text(String(localized: "growth.tapToAdd"))
                 .font(.system(size: 14))
                 .foregroundColor(.blTextTertiary)
                 .multilineTextAlignment(.center)
-            Button("Add Measurement") { showLog = true }
+            Button(String(localized: "growth.addMeasurement")) { showLog = true }
                 .buttonStyle(BLPrimaryButton(color: .blGrowth))
                 .frame(width: 200)
         }
@@ -597,10 +614,10 @@ struct SimpleLineChart: View {
                     Image(systemName: metricEmptyIcon)
                         .font(.system(size: 28))
                         .foregroundColor(.blGrowth.opacity(0.35))
-                    Text("No \(metric.rawValue.lowercased()) data yet")
+                    Text(String(localized: "growth.noDataYet \(metric.localizedName)"))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.blTextSecondary)
-                    Text("Add a measurement with \(metric.rawValue.lowercased()) to see the chart")
+                    Text(String(localized: "growth.addToSeeChart \(metric.localizedName)"))
                         .font(.system(size: 12))
                         .foregroundColor(.blTextTertiary)
                         .multilineTextAlignment(.center)
@@ -614,7 +631,7 @@ struct SimpleLineChart: View {
         guard let ageMin = data.map(\.age).min(),
               let ageMax = data.map(\.age).max() else {
             return AnyView(
-                Text("Not enough data")
+                Text(String(localized: "growth.notEnoughData"))
                     .font(.system(size: 14))
                     .foregroundColor(.blTextTertiary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -635,7 +652,7 @@ struct SimpleLineChart: View {
         guard let rawMin = allValues.min(),
               let rawMax = allValues.max() else {
             return AnyView(
-                Text("Not enough data")
+                Text(String(localized: "growth.notEnoughData"))
                     .font(.system(size: 14))
                     .foregroundColor(.blTextTertiary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -679,7 +696,7 @@ struct SimpleLineChart: View {
                             RoundedRectangle(cornerRadius: 1)
                                 .fill(Color.blTeal.opacity(0.25))
                                 .frame(width: 12, height: 8)
-                            Text("WHO")
+                            Text(String(localized: "growth.who"))
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(.blTextTertiary)
                         }
