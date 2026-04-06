@@ -253,6 +253,7 @@
 "editBaby.namePlaceholder"  = "名前";
 "editBaby.birthday"         = "誕生日";
 "editBaby.gender"           = "性別";
+"editBaby.saved"            = "プロフィールを更新しました";
 
 /* ===== Track View ===== */
 "track.title"            = "記録";

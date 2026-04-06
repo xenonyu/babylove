@@ -253,6 +253,7 @@
 "editBaby.namePlaceholder"  = "이름";
 "editBaby.birthday"         = "생년월일";
 "editBaby.gender"           = "성별";
+"editBaby.saved"            = "프로필이 업데이트되었습니다";
 
 /* ===== Track View ===== */
 "track.title"            = "기록";

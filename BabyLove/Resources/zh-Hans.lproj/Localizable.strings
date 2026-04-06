@@ -253,6 +253,7 @@
 "editBaby.namePlaceholder"  = "名字";
 "editBaby.birthday"         = "出生日期";
 "editBaby.gender"           = "性别";
+"editBaby.saved"            = "资料已更新";
 
 /* ===== Track View ===== */
 "track.title"            = "记录";

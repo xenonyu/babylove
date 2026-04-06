@@ -598,12 +598,16 @@ struct EditBabyView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "common.save")) {
-                        var baby = appState.currentBaby ?? Baby(name: name, birthDate: birthDate, gender: gender)
-                        baby.name = name
+                        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+                        guard !trimmedName.isEmpty else { return }
+                        var baby = appState.currentBaby ?? Baby(name: trimmedName, birthDate: birthDate, gender: gender)
+                        baby.name = trimmedName
                         baby.birthDate = birthDate
                         baby.gender = gender
                         baby.photoData = photoData
                         appState.saveBaby(baby)
+                        Haptic.success()
+                        appState.showToast(String(localized: "editBaby.saved"), icon: "checkmark.circle.fill", color: .blPrimary)
                         dismiss()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
