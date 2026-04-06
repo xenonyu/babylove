@@ -374,6 +374,145 @@ struct AllDiapersView: View {
     }
 }
 
+// MARK: - All Growth
+struct AllGrowthView: View {
+    @EnvironmentObject var appState: AppState
+    @Environment(\.managedObjectContext) var ctx
+    @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
+    @State private var recordToDelete: CDGrowthRecord?
+    @State private var recordToEdit: CDGrowthRecord?
+
+    @FetchRequest(
+        entity: CDGrowthRecord.entity(),
+        sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
+    ) private var records: FetchedResults<CDGrowthRecord>
+
+    var body: some View {
+        ZStack {
+            Color.blBackground.ignoresSafeArea()
+
+            if records.isEmpty {
+                emptyState("No growth records yet", icon: "chart.bar.fill", color: .blGrowth)
+            } else {
+                List {
+                    ForEach(groupedByDate(records, keyPath: \.date), id: \.key) { section in
+                        Section {
+                            ForEach(section.records) { r in
+                                growthRow(r)
+                                    .listRowBackground(Color.blCard)
+                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture { recordToEdit = r }
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button(role: .destructive) { recordToDelete = r } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
+                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                        Button { recordToEdit = r } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                        .tint(.blGrowth)
+                                    }
+                            }
+                        } header: {
+                            Text(section.key)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.blTextSecondary)
+                                .textCase(nil)
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
+            }
+        }
+        .navigationTitle("All Growth")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $recordToEdit) { record in
+            GrowthLogView(vm: vm, editingRecord: record)
+        }
+        .alert("Delete Record?", isPresented: Binding(
+            get: { recordToDelete != nil },
+            set: { if !$0 { recordToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { recordToDelete = nil }
+            Button("Delete", role: .destructive) {
+                Haptic.warning()
+                if let obj = recordToDelete {
+                    withAnimation { vm.deleteObject(obj, in: ctx) }
+                    appState.showToast("Growth record deleted", icon: "trash.fill", color: .blGrowth)
+                }
+                recordToDelete = nil
+            }
+        } message: {
+            Text("This record will be permanently removed.")
+        }
+    }
+
+    private func growthRow(_ r: CDGrowthRecord) -> some View {
+        let unit = appState.measurementUnit
+        return HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.blGrowth.opacity(0.15))
+                    .frame(width: 40, height: 40)
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(.blGrowth)
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                // Compact measurement pills with icons for disambiguation
+                HStack(spacing: 8) {
+                    if r.weightKG > 0 {
+                        growthMetricPill(
+                            icon: "scalemass.fill",
+                            text: String(format: "%.2f %@", unit.weightFromKG(r.weightKG), unit.weightLabel)
+                        )
+                    }
+                    if r.heightCM > 0 {
+                        growthMetricPill(
+                            icon: "ruler.fill",
+                            text: String(format: "%.1f %@", unit.lengthFromCM(r.heightCM), unit.heightLabel)
+                        )
+                    }
+                    if r.headCircumferenceCM > 0 {
+                        growthMetricPill(
+                            icon: "circle.dashed",
+                            text: String(format: "%.1f %@", unit.lengthFromCM(r.headCircumferenceCM), unit.heightLabel)
+                        )
+                    }
+                }
+                if let notes = r.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer()
+
+            Text(r.date?.formatted(date: .omitted, time: .omitted) ?? "")
+                .font(.system(size: 13))
+                .foregroundColor(.blTextTertiary)
+        }
+    }
+
+    private func growthMetricPill(icon: String, text: String) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.system(size: 10))
+                .foregroundColor(.blGrowth.opacity(0.7))
+            Text(text)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(.blGrowth)
+        }
+        .lineLimit(1)
+    }
+}
+
 // MARK: - Shared Helpers
 
 private struct DateSection<T>: Identifiable {

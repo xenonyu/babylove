@@ -160,7 +160,7 @@ struct TrackView: View {
 
                         // Recent growth
                         if !recentGrowth.isEmpty {
-                            recentSection(title: "Growth", color: .blGrowth, destination: GrowthView()) {
+                            recentSection(title: "Growth", color: .blGrowth, destination: AllGrowthView()) {
                                 ForEach(recentGrowth.prefix(5)) { r in
                                     growthRow(r)
                                         .contextMenu {
