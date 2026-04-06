@@ -12,6 +12,7 @@
 		0C8C80E1D8F868B4DE42DE7F /* BabyLoveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC24EB6F25EFF04C69355F9C /* BabyLoveApp.swift */; };
 		12073B6064D9A934FDD4541B /* GrowthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC15279BB5BDEFB55581EDCC /* GrowthView.swift */; };
 		1C6D5F75F1DBEC43825019F4 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89DE628BE1B26CD56A7BD37B /* UserNotifications.framework */; };
+		245FEA9BDE7F649FAD4550E9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 876AD3B1D80CF827CEA5FC8E /* Localizable.strings */; };
 		2C483538BEA3D8CE002759F9 /* GrowthLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053E5A82A50B226040E832BD /* GrowthLogView.swift */; };
 		2E493A664C6C133F70A23942 /* FeedingLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCECAE45648C1C42C3C9F7D /* FeedingLogView.swift */; };
 		37FB93695ED51D9575591280 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6634790B09DF900EBFD38662 /* AppState.swift */; };
@@ -61,6 +62,7 @@
 		053E5A82A50B226040E832BD /* GrowthLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthLogView.swift; sourceTree = "<group>"; };
 		09B5D01A6042586BA1799CB5 /* BabyLove.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BabyLove.xcdatamodel; sourceTree = "<group>"; };
 		0D3FF8EA410AA77A514874E1 /* TrackViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewModelTests.swift; sourceTree = "<group>"; };
+		0D4A5FC40C9CF198920E5149 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1B98F4037DA0E6B9CD25D10A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		22849F5945EFD383E0FF08B6 /* BabyLoveUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BabyLoveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		38890DBB75E06D850CDAFE23 /* BabyLoveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BabyLoveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,6 +71,7 @@
 		49262E70FA0EB20482A2D08E /* BabyModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyModelTests.swift; sourceTree = "<group>"; };
 		502AD43E02D7DDBE8A6C1584 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
 		59D3DD30D2D961910E0BFD57 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		6039441D8AFE2B8D18FD4EEA /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6356131A5FD91F90E155E48E /* MainTabUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabUITests.swift; sourceTree = "<group>"; };
 		6634790B09DF900EBFD38662 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		673B4B9F6094D50AD5A2AA08 /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
@@ -76,6 +79,7 @@
 		709CBB9F52E43EEE1D85CDCB /* BabyLove.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BabyLove.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		76E83015CBD149D49CDA6EE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7FCECAE45648C1C42C3C9F7D /* FeedingLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingLogView.swift; sourceTree = "<group>"; };
+		7FCEFB476E123D3291E45FA9 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		87860DF03AD4B3B60EA4CEF3 /* SleepLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepLogView.swift; sourceTree = "<group>"; };
 		89DE628BE1B26CD56A7BD37B /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		8C95F233B930ADB06E9B9859 /* DiaperLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaperLogView.swift; sourceTree = "<group>"; };
@@ -83,6 +87,7 @@
 		ACDABBF2A70EB5F67B70EF54 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B0247BB54BD42C6812F09569 /* BabyLove.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BabyLove.entitlements; sourceTree = "<group>"; };
 		B2B307A128ADC0AF566C8273 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B4C55F5255DA700C2022BC3A /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B584E212EAEC77D4BE5A0CC4 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		B73E8B5F2D9845C9A03918C7 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		BC310D7FE3E975FA5F3BEF2A /* TrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackView.swift; sourceTree = "<group>"; };
@@ -250,6 +255,7 @@
 			children = (
 				76E83015CBD149D49CDA6EE6 /* Assets.xcassets */,
 				ACDABBF2A70EB5F67B70EF54 /* Info.plist */,
+				876AD3B1D80CF827CEA5FC8E /* Localizable.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -382,6 +388,9 @@
 			knownRegions = (
 				Base,
 				en,
+				ja,
+				ko,
+				"zh-Hans",
 			);
 			mainGroup = 10AE8A8494C9DF4D64B497A2;
 			minimizedProjectReferenceProxies = 1;
@@ -402,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				80CAB0B97D3F1C451DCD2591 /* Assets.xcassets in Resources */,
+				245FEA9BDE7F649FAD4550E9 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,6 +480,20 @@
 			targetProxy = FD97F5F1246DEE3971372EAB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		876AD3B1D80CF827CEA5FC8E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0D4A5FC40C9CF198920E5149 /* en */,
+				B4C55F5255DA700C2022BC3A /* ja */,
+				7FCEFB476E123D3291E45FA9 /* ko */,
+				6039441D8AFE2B8D18FD4EEA /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		012CE6557FF7127B13F8A8CE /* Debug */ = {

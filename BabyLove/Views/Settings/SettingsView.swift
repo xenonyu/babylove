@@ -35,7 +35,7 @@ struct SettingsView: View {
                                         Text(baby.name)
                                             .font(.system(size: 17, weight: .semibold))
                                             .foregroundColor(.blTextPrimary)
-                                        Text("\(baby.ageText) old")
+                                        Text(baby.localizedAge)
                                             .font(.system(size: 14))
                                             .foregroundColor(.blTextSecondary)
                                         Text(baby.birthDate.formatted(date: .long, time: .omitted))

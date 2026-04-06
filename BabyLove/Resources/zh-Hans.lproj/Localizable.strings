@@ -1,0 +1,42 @@
+/* BabyLove – Simplified Chinese */
+
+/* ===== Gender ===== */
+"gender.boy"   = "男宝宝";
+"gender.girl"  = "女宝宝";
+"gender.other" = "宝宝";
+
+/* ===== Feed Type ===== */
+"feedType.breast"  = "母乳";
+"feedType.formula" = "配方奶";
+"feedType.solid"   = "辅食";
+"feedType.pump"    = "吸奶";
+
+/* ===== Breast Side ===== */
+"breastSide.left"  = "左侧";
+"breastSide.right" = "右侧";
+"breastSide.both"  = "两侧";
+
+/* ===== Diaper Type ===== */
+"diaperType.wet"   = "小便";
+"diaperType.dirty" = "大便";
+"diaperType.both"  = "混合";
+"diaperType.dry"   = "干爽";
+
+/* ===== Milestone Category ===== */
+"milestone.social"    = "社交";
+"milestone.motor"     = "运动";
+"milestone.language"  = "语言";
+"milestone.cognitive" = "认知";
+"milestone.health"    = "健康";
+"milestone.custom"    = "自定义";
+
+/* ===== Sleep Location ===== */
+"sleep.crib"      = "婴儿床";
+"sleep.bassinet"  = "摇篮";
+"sleep.bed"       = "大床";
+"sleep.stroller"  = "推车";
+"sleep.carrier"   = "背带";
+"sleep.other"     = "其他";
+
+/* ===== Age Display ===== */
+"age.format"      = "%@";

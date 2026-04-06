@@ -1,0 +1,42 @@
+/* BabyLove – Korean */
+
+/* ===== Gender ===== */
+"gender.boy"   = "남자아이";
+"gender.girl"  = "여자아이";
+"gender.other" = "기타";
+
+/* ===== Feed Type ===== */
+"feedType.breast"  = "모유";
+"feedType.formula" = "분유";
+"feedType.solid"   = "이유식";
+"feedType.pump"    = "유축";
+
+/* ===== Breast Side ===== */
+"breastSide.left"  = "왼쪽";
+"breastSide.right" = "오른쪽";
+"breastSide.both"  = "양쪽";
+
+/* ===== Diaper Type ===== */
+"diaperType.wet"   = "소변";
+"diaperType.dirty" = "대변";
+"diaperType.both"  = "혼합";
+"diaperType.dry"   = "건조";
+
+/* ===== Milestone Category ===== */
+"milestone.social"    = "사회성";
+"milestone.motor"     = "운동";
+"milestone.language"  = "언어";
+"milestone.cognitive" = "인지";
+"milestone.health"    = "건강";
+"milestone.custom"    = "사용자 지정";
+
+/* ===== Sleep Location ===== */
+"sleep.crib"      = "아기 침대";
+"sleep.bassinet"  = "바시넷";
+"sleep.bed"       = "부모 침대";
+"sleep.stroller"  = "유모차";
+"sleep.carrier"   = "아기띠";
+"sleep.other"     = "기타";
+
+/* ===== Age Display ===== */
+"age.format"      = "%@";

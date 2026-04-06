@@ -1,0 +1,42 @@
+/* BabyLove – Japanese */
+
+/* ===== Gender ===== */
+"gender.boy"   = "男の子";
+"gender.girl"  = "女の子";
+"gender.other" = "その他";
+
+/* ===== Feed Type ===== */
+"feedType.breast"  = "母乳";
+"feedType.formula" = "ミルク";
+"feedType.solid"   = "離乳食";
+"feedType.pump"    = "搾乳";
+
+/* ===== Breast Side ===== */
+"breastSide.left"  = "左";
+"breastSide.right" = "右";
+"breastSide.both"  = "両方";
+
+/* ===== Diaper Type ===== */
+"diaperType.wet"   = "おしっこ";
+"diaperType.dirty" = "うんち";
+"diaperType.both"  = "両方";
+"diaperType.dry"   = "乾燥";
+
+/* ===== Milestone Category ===== */
+"milestone.social"    = "社会性";
+"milestone.motor"     = "運動";
+"milestone.language"  = "言語";
+"milestone.cognitive" = "認知";
+"milestone.health"    = "健康";
+"milestone.custom"    = "カスタム";
+
+/* ===== Sleep Location ===== */
+"sleep.crib"      = "ベビーベッド";
+"sleep.bassinet"  = "バシネット";
+"sleep.bed"       = "親のベッド";
+"sleep.stroller"  = "ベビーカー";
+"sleep.carrier"   = "抱っこ紐";
+"sleep.other"     = "その他";
+
+/* ===== Age Display ===== */
+"age.format"      = "%@";

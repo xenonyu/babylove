@@ -1,0 +1,42 @@
+/* BabyLove – English (Base) Localizable Strings */
+
+/* ===== Gender ===== */
+"gender.boy"   = "Boy";
+"gender.girl"  = "Girl";
+"gender.other" = "Other";
+
+/* ===== Feed Type ===== */
+"feedType.breast"  = "Breast";
+"feedType.formula" = "Formula";
+"feedType.solid"   = "Solid";
+"feedType.pump"    = "Pumped";
+
+/* ===== Breast Side ===== */
+"breastSide.left"  = "Left";
+"breastSide.right" = "Right";
+"breastSide.both"  = "Both";
+
+/* ===== Diaper Type ===== */
+"diaperType.wet"   = "Wet";
+"diaperType.dirty" = "Dirty";
+"diaperType.both"  = "Both";
+"diaperType.dry"   = "Dry";
+
+/* ===== Milestone Category ===== */
+"milestone.social"    = "Social";
+"milestone.motor"     = "Motor";
+"milestone.language"  = "Language";
+"milestone.cognitive" = "Cognitive";
+"milestone.health"    = "Health";
+"milestone.custom"    = "Custom";
+
+/* ===== Sleep Location ===== */
+"sleep.crib"      = "Crib";
+"sleep.bassinet"  = "Bassinet";
+"sleep.bed"       = "Parent's Bed";
+"sleep.stroller"  = "Stroller";
+"sleep.carrier"   = "Carrier";
+"sleep.other"     = "Other";
+
+/* ===== Age Display ===== */
+"age.format"      = "%@ old";

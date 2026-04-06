@@ -1634,7 +1634,7 @@ struct HomeView: View {
         var parts: [String] = []
         parts.append(baby?.name ?? "Baby")
         if let ageText = baby?.ageText, !ageText.isEmpty {
-            parts.append("\(ageText) old")
+            parts.append(baby?.localizedAge ?? ageText)
         }
         parts.append(Date().formatted(date: .complete, time: .omitted))
         return parts.joined(separator: ", ")

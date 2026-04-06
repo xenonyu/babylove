@@ -9,10 +9,10 @@ enum FeedType: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .breast:  return "Breast"
-        case .formula: return "Formula"
-        case .solid:   return "Solid"
-        case .pump:    return "Pumped"
+        case .breast:  return String(localized: "feedType.breast")
+        case .formula: return String(localized: "feedType.formula")
+        case .solid:   return String(localized: "feedType.solid")
+        case .pump:    return String(localized: "feedType.pump")
         }
     }
 
@@ -34,9 +34,9 @@ enum BreastSide: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .left:  return "Left"
-        case .right: return "Right"
-        case .both:  return "Both"
+        case .left:  return String(localized: "breastSide.left")
+        case .right: return String(localized: "breastSide.right")
+        case .both:  return String(localized: "breastSide.both")
         }
     }
 }
@@ -50,10 +50,10 @@ enum DiaperType: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .wet:   return "Wet"
-        case .dirty: return "Dirty"
-        case .both:  return "Both"
-        case .dry:   return "Dry"
+        case .wet:   return String(localized: "diaperType.wet")
+        case .dirty: return String(localized: "diaperType.dirty")
+        case .both:  return String(localized: "diaperType.both")
+        case .dry:   return String(localized: "diaperType.dry")
         }
     }
 
@@ -78,12 +78,12 @@ enum MilestoneCategory: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .social:    return "Social"
-        case .motor:     return "Motor"
-        case .language:  return "Language"
-        case .cognitive: return "Cognitive"
-        case .health:    return "Health"
-        case .custom:    return "Custom"
+        case .social:    return String(localized: "milestone.social")
+        case .motor:     return String(localized: "milestone.motor")
+        case .language:  return String(localized: "milestone.language")
+        case .cognitive: return String(localized: "milestone.cognitive")
+        case .health:    return String(localized: "milestone.health")
+        case .custom:    return String(localized: "milestone.custom")
         }
     }
 
@@ -165,12 +165,12 @@ enum SleepLocation: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .crib:     return "Crib"
-        case .bassinet: return "Bassinet"
-        case .bed:      return "Parent's Bed"
-        case .stroller: return "Stroller"
-        case .carrier:  return "Carrier"
-        case .other:    return "Other"
+        case .crib:     return String(localized: "sleep.crib")
+        case .bassinet: return String(localized: "sleep.bassinet")
+        case .bed:      return String(localized: "sleep.bed")
+        case .stroller: return String(localized: "sleep.stroller")
+        case .carrier:  return String(localized: "sleep.carrier")
+        case .other:    return String(localized: "sleep.other")
         }
     }
 

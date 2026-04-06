@@ -5,6 +5,8 @@ options:
     iOS: "26.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
+  developmentLanguage: en
+  knownRegions: [en, zh-Hans, ja, ko]
 
 settings:
   base:

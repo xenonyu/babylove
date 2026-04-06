@@ -13,9 +13,9 @@ struct Baby: Codable, Identifiable {
 
         var displayName: String {
             switch self {
-            case .boy:   return NSLocalizedString("Boy", comment: "")
-            case .girl:  return NSLocalizedString("Girl", comment: "")
-            case .other: return NSLocalizedString("Other", comment: "")
+            case .boy:   return String(localized: "gender.boy")
+            case .girl:  return String(localized: "gender.girl")
+            case .other: return String(localized: "gender.other")
             }
         }
 
@@ -67,6 +67,13 @@ struct Baby: Codable, Identifiable {
         } else {
             return "\(dy) day\(dy != 1 ? "s" : "")"
         }
+    }
+
+    /// Localized age string (e.g. "3m 12d old" in English, "3m 12d" in CJK).
+    /// Uses the `age.format` key from Localizable.strings which supports
+    /// languages where the "old" suffix is unnecessary (Chinese, Japanese, Korean).
+    var localizedAge: String {
+        String(format: String(localized: "age.format"), ageText)
     }
 
     var ageInDays: Int {
