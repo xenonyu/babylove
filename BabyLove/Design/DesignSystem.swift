@@ -130,6 +130,8 @@ struct QuickLogCard: View {
     let icon: String
     let label: String
     let color: Color
+    /// Optional contextual hint shown below the label (e.g. "2h ago", "Next: Right")
+    var hint: String? = nil
     let action: () -> Void
 
     var body: some View {
@@ -137,7 +139,7 @@ struct QuickLogCard: View {
             Haptic.light()
             action()
         } label: {
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 ZStack {
                     Circle()
                         .fill(color.opacity(0.15))
@@ -150,9 +152,16 @@ struct QuickLogCard: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.blTextSecondary)
                     .multilineTextAlignment(.center)
+                if let hint, !hint.isEmpty {
+                    Text(hint)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(color.opacity(0.8))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
+            .padding(.vertical, 16)
             .blCard()
         }
         .buttonStyle(.plain)

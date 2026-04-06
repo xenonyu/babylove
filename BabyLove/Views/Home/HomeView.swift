@@ -260,6 +260,34 @@ struct HomeView: View {
         return parts.joined(separator: " ")
     }
 
+    // MARK: - Quick Log Hints
+
+    /// Contextual hint for the Feeding quick log card
+    private var quickLogFeedingHint: String? {
+        if globalLastFeedingIsOngoing { return "In progress" }
+        // Show "Next: Right/Left" if we know the last breast side
+        if let lastSide = lastBreastSide, lastSide != .both {
+            let nextSide = lastSide == .left ? "Right" : "Left"
+            return "Next: \(nextSide)"
+        }
+        // Otherwise show time since last feeding
+        guard let lastTime = globalLastFeedingTime else { return nil }
+        return Self.timeSinceText(from: lastTime)
+    }
+
+    /// Contextual hint for the Sleep quick log card
+    private var quickLogSleepHint: String? {
+        if globalLastSleepIsOngoing { return "Sleeping now" }
+        guard let lastTime = globalLastSleepEnd else { return nil }
+        return Self.timeSinceText(from: lastTime)
+    }
+
+    /// Contextual hint for the Diaper quick log card
+    private var quickLogDiaperHint: String? {
+        guard let lastTime = globalLastDiaperTime else { return nil }
+        return Self.timeSinceText(from: lastTime)
+    }
+
     private var totalSleepMinutes: Int {
         let cal = Calendar.current
         let dayStart = cal.startOfDay(for: selectedDate)
@@ -381,13 +409,16 @@ struct HomeView: View {
                                 ], spacing: 12) {
                                     QuickLogCard(icon: "drop.fill",
                                                  label: "Feeding",
-                                                 color: .blFeeding) { showFeedingLog = true }
+                                                 color: .blFeeding,
+                                                 hint: quickLogFeedingHint) { showFeedingLog = true }
                                     QuickLogCard(icon: "moon.zzz.fill",
                                                  label: "Sleep",
-                                                 color: .blSleep) { showSleepLog = true }
+                                                 color: .blSleep,
+                                                 hint: quickLogSleepHint) { showSleepLog = true }
                                     QuickLogCard(icon: "oval.fill",
                                                  label: "Diaper",
-                                                 color: .blDiaper) { showDiaperLog = true }
+                                                 color: .blDiaper,
+                                                 hint: quickLogDiaperHint) { showDiaperLog = true }
                                     QuickLogCard(icon: "chart.bar.fill",
                                                  label: "Growth",
                                                  color: .blGrowth) { showGrowthLog = true }
