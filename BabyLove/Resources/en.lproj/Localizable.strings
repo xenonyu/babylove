@@ -81,6 +81,22 @@
 "settings.notifications.enableMessage" = "Please enable notifications in Settings to receive feeding reminders.";
 
 /* ===== Edit Baby ===== */
+/* ===== Onboarding ===== */
+"onboarding.getStarted"      = "Get Started";
+"onboarding.continue"        = "Continue";
+"onboarding.startLogging"    = "Start Logging 💛";
+"onboarding.welcomeTitle"    = "Welcome to\nBabyLove";
+"onboarding.welcomeSubtitle" = "The simplest way to track\nyour baby's precious moments.";
+"onboarding.tellUs"          = "Tell us about your baby";
+"onboarding.babyName"        = "Baby's Name";
+"onboarding.namePlaceholder" = "e.g. Emma, Oliver…";
+"onboarding.birthday"        = "Birthday";
+"onboarding.gender"          = "Gender";
+"onboarding.selectBirthday"  = "Select Birthday";
+"onboarding.allSet"          = "All set!";
+"onboarding.readyToTrack %@" = "Ready to start tracking\n%@'s journey 💛";
+"onboarding.yourBaby"        = "your baby";
+
 "editBaby.title"            = "Edit Baby";
 "editBaby.addPhoto"         = "Add Photo";
 "editBaby.changePhoto"      = "Change Photo";

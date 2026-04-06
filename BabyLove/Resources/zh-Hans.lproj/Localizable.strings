@@ -81,6 +81,22 @@
 "settings.notifications.enableMessage" = "请在设置中开启通知权限，以接收喂食提醒。";
 
 /* ===== Edit Baby ===== */
+/* ===== Onboarding ===== */
+"onboarding.getStarted"      = "开始使用";
+"onboarding.continue"        = "继续";
+"onboarding.startLogging"    = "开始记录 💛";
+"onboarding.welcomeTitle"    = "欢迎来到\nBabyLove";
+"onboarding.welcomeSubtitle" = "记录宝宝珍贵时刻\n最简单的方式";
+"onboarding.tellUs"          = "介绍一下你的宝宝";
+"onboarding.babyName"        = "宝宝名字";
+"onboarding.namePlaceholder" = "例如：小明、朵朵…";
+"onboarding.birthday"        = "出生日期";
+"onboarding.gender"          = "性别";
+"onboarding.selectBirthday"  = "选择出生日期";
+"onboarding.allSet"          = "准备就绪！";
+"onboarding.readyToTrack %@" = "准备开始记录\n%@的成长之旅 💛";
+"onboarding.yourBaby"        = "宝宝";
+
 "editBaby.title"            = "编辑宝宝";
 "editBaby.addPhoto"         = "添加照片";
 "editBaby.changePhoto"      = "更换照片";

@@ -81,6 +81,22 @@
 "settings.notifications.enableMessage" = "授乳リマインダーを受け取るには、設定で通知を有効にしてください。";
 
 /* ===== Edit Baby ===== */
+/* ===== Onboarding ===== */
+"onboarding.getStarted"      = "はじめる";
+"onboarding.continue"        = "次へ";
+"onboarding.startLogging"    = "記録を始める 💛";
+"onboarding.welcomeTitle"    = "ようこそ\nBabyLoveへ";
+"onboarding.welcomeSubtitle" = "赤ちゃんの大切な瞬間を\n記録するいちばん簡単な方法";
+"onboarding.tellUs"          = "赤ちゃんについて教えてください";
+"onboarding.babyName"        = "赤ちゃんの名前";
+"onboarding.namePlaceholder" = "例：はるか、ゆうと…";
+"onboarding.birthday"        = "誕生日";
+"onboarding.gender"          = "性別";
+"onboarding.selectBirthday"  = "誕生日を選択";
+"onboarding.allSet"          = "準備完了！";
+"onboarding.readyToTrack %@" = "%@の成長記録を\n始めましょう 💛";
+"onboarding.yourBaby"        = "赤ちゃん";
+
 "editBaby.title"            = "赤ちゃんを編集";
 "editBaby.addPhoto"         = "写真を追加";
 "editBaby.changePhoto"      = "写真を変更";

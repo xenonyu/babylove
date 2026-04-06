@@ -48,7 +48,9 @@ struct OnboardingView: View {
 
                 // Next button
                 if page < 2 {
-                    Button(page == 0 ? "Get Started" : "Continue") {
+                    Button(page == 0
+                           ? String(localized: "onboarding.getStarted")
+                           : String(localized: "onboarding.continue")) {
                         isNameFieldFocused = false
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                             page += 1
@@ -59,7 +61,7 @@ struct OnboardingView: View {
                     .padding(.bottom, 48)
                     .disabled(page == 1 && babyName.trimmingCharacters(in: .whitespaces).isEmpty)
                 } else {
-                    Button("Start Logging 💛") {
+                    Button(String(localized: "onboarding.startLogging")) {
                         let baby = Baby(name: babyName.trimmingCharacters(in: .whitespaces),
                                         birthDate: birthDate,
                                         gender: gender)
@@ -79,11 +81,11 @@ struct OnboardingView: View {
         VStack(spacing: 24) {
             Text("🍼")
                 .font(.system(size: 80))
-            Text("Welcome to\nBabyLove")
+            Text("onboarding.welcomeTitle")
                 .font(.system(size: 34, weight: .bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextPrimary)
-            Text("The simplest way to track\nyour baby's precious moments.")
+            Text("onboarding.welcomeSubtitle")
                 .font(.system(size: 17))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextSecondary)
@@ -93,16 +95,16 @@ struct OnboardingView: View {
 
     private var babyInfoPage: some View {
         VStack(spacing: 28) {
-            Text("Tell us about your baby")
+            Text("onboarding.tellUs")
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(.blTextPrimary)
 
             // Name field
             VStack(alignment: .leading, spacing: 8) {
-                Text("Baby's Name")
+                Text("onboarding.babyName")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blTextSecondary)
-                TextField("e.g. Emma, Oliver…", text: $babyName)
+                TextField(String(localized: "onboarding.namePlaceholder"), text: $babyName)
                     .font(.system(size: 17))
                     .focused($isNameFieldFocused)
                     .submitLabel(.done)
@@ -115,7 +117,7 @@ struct OnboardingView: View {
 
             // Birthday
             VStack(alignment: .leading, spacing: 8) {
-                Text("Birthday")
+                Text("onboarding.birthday")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blTextSecondary)
                 Button {
@@ -143,7 +145,7 @@ struct OnboardingView: View {
 
             // Gender
             VStack(alignment: .leading, spacing: 8) {
-                Text("Gender")
+                Text("onboarding.gender")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blTextSecondary)
                     .padding(.horizontal, 32)
@@ -176,10 +178,10 @@ struct OnboardingView: View {
         VStack(spacing: 20) {
             Text("🎉")
                 .font(.system(size: 80))
-            Text("All set!")
+            Text("onboarding.allSet")
                 .font(.system(size: 34, weight: .bold))
                 .foregroundColor(.blTextPrimary)
-            Text("Ready to start tracking\n\(babyName.isEmpty ? "your baby" : babyName)'s journey 💛")
+            Text(String(localized: "onboarding.readyToTrack \(babyName.isEmpty ? String(localized: "onboarding.yourBaby") : babyName)"))
                 .font(.system(size: 17))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextSecondary)
@@ -195,16 +197,16 @@ struct DatePickerSheet: View {
 
     var body: some View {
         NavigationStack {
-            DatePicker("Birthday", selection: $date,
+            DatePicker(String(localized: "onboarding.birthday"), selection: $date,
                        in: ...Date(),
                        displayedComponents: .date)
                 .datePickerStyle(.graphical)
                 .padding()
-                .navigationTitle("Select Birthday")
+                .navigationTitle(String(localized: "onboarding.selectBirthday"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") { dismiss() }
+                        Button(String(localized: "common.done")) { dismiss() }
                     }
                 }
         }

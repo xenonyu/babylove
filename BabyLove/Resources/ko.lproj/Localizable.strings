@@ -81,6 +81,22 @@
 "settings.notifications.enableMessage" = "수유 알림을 받으려면 설정에서 알림을 활성화해 주세요.";
 
 /* ===== Edit Baby ===== */
+/* ===== Onboarding ===== */
+"onboarding.getStarted"      = "시작하기";
+"onboarding.continue"        = "계속";
+"onboarding.startLogging"    = "기록 시작 💛";
+"onboarding.welcomeTitle"    = "BabyLove에\n오신 것을 환영합니다";
+"onboarding.welcomeSubtitle" = "아기의 소중한 순간을\n기록하는 가장 간단한 방법";
+"onboarding.tellUs"          = "아기에 대해 알려주세요";
+"onboarding.babyName"        = "아기 이름";
+"onboarding.namePlaceholder" = "예: 지민, 서연…";
+"onboarding.birthday"        = "생년월일";
+"onboarding.gender"          = "성별";
+"onboarding.selectBirthday"  = "생년월일 선택";
+"onboarding.allSet"          = "준비 완료!";
+"onboarding.readyToTrack %@" = "%@의 성장 기록을\n시작할 준비가 되었어요 💛";
+"onboarding.yourBaby"        = "아기";
+
 "editBaby.title"            = "아기 편집";
 "editBaby.addPhoto"         = "사진 추가";
 "editBaby.changePhoto"      = "사진 변경";
