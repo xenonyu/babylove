@@ -8,6 +8,7 @@ struct AllFeedingsView: View {
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDFeedingRecord?
     @State private var recordToEdit: CDFeedingRecord?
+    @State private var showAddSheet = false
 
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
@@ -56,6 +57,18 @@ struct AllFeedingsView: View {
         }
         .navigationTitle("All Feedings")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showAddSheet = true } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(.blFeeding)
+                }
+            }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            FeedingLogView(vm: vm)
+        }
         .sheet(item: $recordToEdit) { record in
             FeedingLogView(vm: vm, editingRecord: record)
         }
@@ -162,6 +175,7 @@ struct AllSleepsView: View {
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDSleepRecord?
     @State private var recordToEdit: CDSleepRecord?
+    @State private var showAddSheet = false
 
     @FetchRequest(
         entity: CDSleepRecord.entity(),
@@ -210,6 +224,18 @@ struct AllSleepsView: View {
         }
         .navigationTitle("All Sleep")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showAddSheet = true } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(.blSleep)
+                }
+            }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            SleepLogView(vm: vm)
+        }
         .sheet(item: $recordToEdit) { record in
             SleepLogView(vm: vm, editingRecord: record)
         }
@@ -297,6 +323,7 @@ struct AllDiapersView: View {
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDDiaperRecord?
     @State private var recordToEdit: CDDiaperRecord?
+    @State private var showAddSheet = false
 
     @FetchRequest(
         entity: CDDiaperRecord.entity(),
@@ -345,6 +372,18 @@ struct AllDiapersView: View {
         }
         .navigationTitle("All Diapers")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showAddSheet = true } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(.blDiaper)
+                }
+            }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            DiaperLogView(vm: vm)
+        }
         .sheet(item: $recordToEdit) { record in
             DiaperLogView(vm: vm, editingRecord: record)
         }
@@ -405,6 +444,7 @@ struct AllGrowthView: View {
     @StateObject private var vm = TrackViewModel(context: PersistenceController.shared.container.viewContext)
     @State private var recordToDelete: CDGrowthRecord?
     @State private var recordToEdit: CDGrowthRecord?
+    @State private var showAddSheet = false
 
     @FetchRequest(
         entity: CDGrowthRecord.entity(),
@@ -453,6 +493,18 @@ struct AllGrowthView: View {
         }
         .navigationTitle("All Growth")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showAddSheet = true } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(.blGrowth)
+                }
+            }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            GrowthLogView(vm: vm)
+        }
         .sheet(item: $recordToEdit) { record in
             GrowthLogView(vm: vm, editingRecord: record)
         }
