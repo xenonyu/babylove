@@ -9,6 +9,7 @@ private func _trackSafeAdd(_ component: Calendar.Component, value: Int, to date:
 struct TrackView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var vm: TrackViewModel = TrackViewModel(context: PersistenceController.shared.container.viewContext)
 
     @State private var showFeedingLog  = false
@@ -16,6 +17,9 @@ struct TrackView: View {
     @State private var showDiaperLog   = false
     @State private var showGrowthLog   = false
     @State private var recordToDelete: NSManagedObject?
+    /// Tracks the calendar day when predicates were last refreshed, so we can
+    /// detect midnight crossings and update the 14-day fetch windows.
+    @State private var lastRefreshedDay: Date = Calendar.current.startOfDay(for: Date())
 
     // Edit states
     @State private var feedingToEdit: CDFeedingRecord?
@@ -206,6 +210,10 @@ struct TrackView: View {
             }
             .navigationTitle(String(localized: "track.title"))
             .navigationBarTitleDisplayMode(.large)
+            .onAppear { refreshPredicatesIfNeeded() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { refreshPredicatesIfNeeded() }
+            }
         }
         .sheet(isPresented: $showFeedingLog) { FeedingLogView(vm: vm) }
         .sheet(isPresented: $showSleepLog)   { SleepLogView(vm: vm) }
@@ -259,6 +267,22 @@ struct TrackView: View {
         } message: {
             Text(String(localized: "track.deleteConfirmMsg"))
         }
+    }
+
+    // MARK: - Predicate Refresh
+
+    /// Re-compute the 14-day fetch window when the calendar day has changed
+    /// since the last refresh (e.g. app survived past midnight in memory).
+    private func refreshPredicatesIfNeeded() {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        guard today != lastRefreshedDay else { return }
+        lastRefreshedDay = today
+
+        let windowStart = (cal.date(byAdding: .day, value: -14, to: today) ?? today) as NSDate
+        recentFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@", windowStart)
+        recentSleeps.nsPredicate   = NSPredicate(format: "startTime >= %@", windowStart)
+        recentDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", windowStart)
     }
 
     // MARK: - Recent Section
