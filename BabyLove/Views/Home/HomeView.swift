@@ -884,13 +884,25 @@ struct HomeView: View {
             }
         }
 
-        // Sleep start times
+        // Sleep records — use overlap predicate to capture cross-midnight sessions
+        // that started before the range but ended within it (e.g. 10 PM day -14 → 6 AM day -13).
+        // Also insert BOTH start day and end day so overnight sleeps mark both days as active.
+        let rangeEndNS = (cal.date(byAdding: .day, value: 1, to: today) ?? today) as NSDate
         let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
-        sleepReq.predicate = NSPredicate(format: "startTime >= %@", rangeStartNS)
-        sleepReq.propertiesToFetch = ["startTime"]
+        sleepReq.predicate = NSPredicate(
+            format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)",
+            rangeEndNS, rangeStartNS
+        )
         if let results = try? ctx.fetch(sleepReq) {
             for r in results {
-                if let st = r.startTime { days.insert(cal.startOfDay(for: st)) }
+                if let st = r.startTime {
+                    let startDay = cal.startOfDay(for: st)
+                    if startDay >= rangeStart { days.insert(startDay) }
+                }
+                if let et = r.endTime {
+                    let endDay = cal.startOfDay(for: et)
+                    if endDay >= rangeStart { days.insert(endDay) }
+                }
             }
         }
 
