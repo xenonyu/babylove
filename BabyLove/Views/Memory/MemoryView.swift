@@ -106,7 +106,7 @@ struct MemoryView: View {
                             } else {
                                 LazyVStack(spacing: 16) {
                                     ForEach(filteredMilestones, id: \.objectID) { m in
-                                        MilestoneCard(milestone: m) {
+                                        MilestoneCard(milestone: m, baby: appState.currentBaby) {
                                             Haptic.medium()
                                             withAnimation(.spring(response: 0.35)) {
                                                 vm.toggleMilestoneCompleted(m, in: ctx)
@@ -253,6 +253,7 @@ struct MemoryView: View {
 // MARK: - Milestone Card
 struct MilestoneCard: View {
     @ObservedObject var milestone: CDMilestone
+    var baby: Baby?
     var onToggleCompleted: (() -> Void)?
 
     private var category: MilestoneCategory {
@@ -305,6 +306,17 @@ struct MilestoneCard: View {
                     Text(milestone.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
                         .font(.system(size: 13))
                         .foregroundColor(.blTextSecondary)
+
+                    // Baby's age at this milestone
+                    if let baby, let date = milestone.date {
+                        Text(baby.ageText(at: date))
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color(hex: category.color))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(Color(hex: category.color).opacity(0.12))
+                            .clipShape(Capsule())
+                    }
                 }
 
                 if let notes = milestone.notes, !notes.isEmpty {
