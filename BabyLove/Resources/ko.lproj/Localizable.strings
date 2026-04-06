@@ -68,6 +68,23 @@
 "settings.exportCSV"                  = "모든 데이터 내보내기 (CSV)";
 "settings.export.footer"              = "모든 기록을 CSV 파일로 내보냅니다. 소아과 의사와 공유하거나 백업으로 저장하세요.";
 "settings.export.failed"              = "내보내기 실패";
+/* CSV 내보내기 열 헤더 및 값 */
+"export.header.recordType"  = "기록 유형";
+"export.header.date"        = "날짜";
+"export.header.time"        = "시간";
+"export.header.details"     = "상세";
+"export.header.notes"       = "메모";
+"export.type.feeding"       = "수유";
+"export.type.sleep"         = "수면";
+"export.type.diaper"        = "기저귀";
+"export.type.growth"        = "성장";
+"export.type.milestone"     = "마일스톤";
+"export.sleep.end %@"       = "종료: %@";
+"export.sleep.ongoing"      = "진행 중";
+"export.growth.height %@ %@" = "%@ %@ 신장";
+"export.growth.head %@ %@"  = "%@ %@ 머리둘레";
+"export.milestone.completed" = "완료";
+"export.milestone.inProgress" = "진행 중";
 "settings.section.about"              = "정보";
 "settings.version"                    = "버전";
 "settings.privacyPolicy"              = "개인정보 처리방침";

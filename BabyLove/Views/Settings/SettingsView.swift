@@ -231,9 +231,24 @@ struct SettingsView: View {
             timeFormatter.dateStyle = .none
             timeFormatter.timeStyle = .short
 
+            // Pre-resolve localized strings on the calling context (safe from detached task)
+            let hdrRecordType = NSLocalizedString("export.header.recordType", comment: "")
+            let hdrDate       = NSLocalizedString("export.header.date", comment: "")
+            let hdrTime       = NSLocalizedString("export.header.time", comment: "")
+            let hdrDetails    = NSLocalizedString("export.header.details", comment: "")
+            let hdrNotes      = NSLocalizedString("export.header.notes", comment: "")
+            let typeFeeding   = NSLocalizedString("export.type.feeding", comment: "")
+            let typeSleep     = NSLocalizedString("export.type.sleep", comment: "")
+            let typeDiaper    = NSLocalizedString("export.type.diaper", comment: "")
+            let typeGrowth    = NSLocalizedString("export.type.growth", comment: "")
+            let typeMilestone = NSLocalizedString("export.type.milestone", comment: "")
+            let sleepOngoing  = NSLocalizedString("export.sleep.ongoing", comment: "")
+            let mCompleted    = NSLocalizedString("export.milestone.completed", comment: "")
+            let mInProgress   = NSLocalizedString("export.milestone.inProgress", comment: "")
+
             do {
                 let csv: String = try bgCtx.performAndWait {
-                    var csv = "Record Type,Date,Time,Details,Notes\n"
+                    var csv = "\(hdrRecordType),\(hdrDate),\(hdrTime),\(hdrDetails),\(hdrNotes)\n"
 
                     // Feeding records
                     let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
@@ -253,7 +268,7 @@ struct SettingsView: View {
                             details.append(BreastSide(rawValue: side)?.displayName ?? side)
                         }
                         let notes = Self.csvEscape(r.notes)
-                        csv += "Feeding,\(date),\(time),\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
+                        csv += "\(typeFeeding),\(date),\(time),\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
                     }
 
                     // Sleep records
@@ -271,12 +286,12 @@ struct SettingsView: View {
                             let mins = Int(e.timeIntervalSince(s) / 60)
                             let h = mins / 60, m = mins % 60
                             details.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
-                            details.append("End: \(timeFormatter.string(from: e))")
+                            details.append(String(format: NSLocalizedString("export.sleep.end %@", comment: ""), timeFormatter.string(from: e)))
                         } else {
-                            details.append("Ongoing")
+                            details.append(sleepOngoing)
                         }
                         let notes = Self.csvEscape(r.notes)
-                        csv += "Sleep,\(date),\(startTime),\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
+                        csv += "\(typeSleep),\(date),\(startTime),\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
                     }
 
                     // Diaper records
@@ -288,7 +303,7 @@ struct SettingsView: View {
                         let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
                         let dType = DiaperType(rawValue: r.diaperType ?? "")?.displayName ?? r.diaperType ?? ""
                         let notes = Self.csvEscape(r.notes)
-                        csv += "Diaper,\(date),\(time),\(dType),\(notes)\n"
+                        csv += "\(typeDiaper),\(date),\(time),\(dType),\(notes)\n"
                     }
 
                     // Growth records
@@ -304,14 +319,14 @@ struct SettingsView: View {
                         }
                         if r.heightCM > 0 {
                             let h = unit.lengthFromCM(r.heightCM)
-                            details.append(String(format: "%.1f %@ height", h, unit.heightLabel))
+                            details.append(String(format: NSLocalizedString("export.growth.height %@ %@", comment: ""), String(format: "%.1f", h), unit.heightLabel))
                         }
                         if r.headCircumferenceCM > 0 {
                             let hc = unit.lengthFromCM(r.headCircumferenceCM)
-                            details.append(String(format: "%.1f %@ head", hc, unit.heightLabel))
+                            details.append(String(format: NSLocalizedString("export.growth.head %@ %@", comment: ""), String(format: "%.1f", hc), unit.heightLabel))
                         }
                         let notes = Self.csvEscape(r.notes)
-                        csv += "Growth,\(date),,\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
+                        csv += "\(typeGrowth),\(date),,\(Self.csvEscape(details.joined(separator: "; "))),\(notes)\n"
                     }
 
                     // Milestones
@@ -322,19 +337,22 @@ struct SettingsView: View {
                         let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
                         let title = Self.csvEscape(r.title)
                         let cat = MilestoneCategory(rawValue: r.category ?? "")?.displayName ?? r.category ?? ""
-                        let status = r.isCompleted ? "Completed" : "In Progress"
+                        let status = r.isCompleted ? mCompleted : mInProgress
                         let notes = Self.csvEscape(r.notes)
-                        csv += "Milestone,\(date),,\(title) [\(cat)] (\(status)),\(notes)\n"
+                        csv += "\(typeMilestone),\(date),,\(title) [\(cat)] (\(status)),\(notes)\n"
                     }
 
                     return csv
                 }
 
-                // Write to temp file (file I/O is also off main thread)
+                // Write to temp file with UTF-8 BOM so Excel correctly
+                // detects encoding for CJK characters (中文/日本語/한국어).
                 let fileDateStr = BLDateFormatters.isoDate.string(from: Date())
                 let fileName = "\(babyName)_BabyLove_Export_\(fileDateStr).csv"
                 let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
-                try csv.write(to: tempURL, atomically: true, encoding: .utf8)
+                let bom = Data([0xEF, 0xBB, 0xBF])
+                let csvData = bom + (csv.data(using: .utf8) ?? Data())
+                try csvData.write(to: tempURL)
 
                 await MainActor.run {
                     exportFileURL = tempURL

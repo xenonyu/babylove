@@ -68,6 +68,23 @@
 "settings.exportCSV"                  = "导出所有数据 (CSV)";
 "settings.export.footer"              = "将所有记录导出为 CSV 文件，分享给儿科医生或作为备份。";
 "settings.export.failed"              = "导出失败";
+/* CSV 导出列头和值 */
+"export.header.recordType"  = "记录类型";
+"export.header.date"        = "日期";
+"export.header.time"        = "时间";
+"export.header.details"     = "详情";
+"export.header.notes"       = "备注";
+"export.type.feeding"       = "喂食";
+"export.type.sleep"         = "睡眠";
+"export.type.diaper"        = "换尿布";
+"export.type.growth"        = "生长";
+"export.type.milestone"     = "里程碑";
+"export.sleep.end %@"       = "结束: %@";
+"export.sleep.ongoing"      = "进行中";
+"export.growth.height %@ %@" = "%@ %@ 身高";
+"export.growth.head %@ %@"  = "%@ %@ 头围";
+"export.milestone.completed" = "已完成";
+"export.milestone.inProgress" = "进行中";
 "settings.section.about"              = "关于";
 "settings.version"                    = "版本";
 "settings.privacyPolicy"              = "隐私政策";

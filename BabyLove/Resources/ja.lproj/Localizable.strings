@@ -68,6 +68,23 @@
 "settings.exportCSV"                  = "全データをエクスポート (CSV)";
 "settings.export.footer"              = "すべての記録をCSVファイルとしてエクスポートします。小児科医と共有したりバックアップとして保存できます。";
 "settings.export.failed"              = "エクスポート失敗";
+/* CSV エクスポート列ヘッダーと値 */
+"export.header.recordType"  = "記録タイプ";
+"export.header.date"        = "日付";
+"export.header.time"        = "時刻";
+"export.header.details"     = "詳細";
+"export.header.notes"       = "メモ";
+"export.type.feeding"       = "授乳";
+"export.type.sleep"         = "睡眠";
+"export.type.diaper"        = "おむつ";
+"export.type.growth"        = "成長";
+"export.type.milestone"     = "マイルストーン";
+"export.sleep.end %@"       = "終了: %@";
+"export.sleep.ongoing"      = "進行中";
+"export.growth.height %@ %@" = "%@ %@ 身長";
+"export.growth.head %@ %@"  = "%@ %@ 頭囲";
+"export.milestone.completed" = "完了";
+"export.milestone.inProgress" = "進行中";
 "settings.section.about"              = "アプリについて";
 "settings.version"                    = "バージョン";
 "settings.privacyPolicy"              = "プライバシーポリシー";

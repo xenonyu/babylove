@@ -68,6 +68,23 @@
 "settings.exportCSV"                  = "Export All Data (CSV)";
 "settings.export.footer"              = "Export all records as CSV files. Share with your pediatrician or save as a backup.";
 "settings.export.failed"              = "Export Failed";
+/* CSV Export Column Headers & Values */
+"export.header.recordType"  = "Record Type";
+"export.header.date"        = "Date";
+"export.header.time"        = "Time";
+"export.header.details"     = "Details";
+"export.header.notes"       = "Notes";
+"export.type.feeding"       = "Feeding";
+"export.type.sleep"         = "Sleep";
+"export.type.diaper"        = "Diaper";
+"export.type.growth"        = "Growth";
+"export.type.milestone"     = "Milestone";
+"export.sleep.end %@"       = "End: %@";
+"export.sleep.ongoing"      = "Ongoing";
+"export.growth.height %@ %@" = "%@ %@ height";
+"export.growth.head %@ %@"  = "%@ %@ head";
+"export.milestone.completed" = "Completed";
+"export.milestone.inProgress" = "In Progress";
 "settings.section.about"              = "About";
 "settings.version"                    = "Version";
 "settings.privacyPolicy"              = "Privacy Policy";
