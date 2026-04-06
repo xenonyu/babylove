@@ -233,7 +233,8 @@ struct GrowthView: View {
                 label: unit.weightLabel,
                 icon: "scalemass.fill",
                 isSelected: selectedMetric == .weight,
-                percentile: weightPctl
+                percentile: weightPctl,
+                measureDate: latestWeight?.date
             ) { selectedMetric = .weight }
 
             dividerLine
@@ -244,7 +245,8 @@ struct GrowthView: View {
                 label: unit.heightLabel,
                 icon: "ruler.fill",
                 isSelected: selectedMetric == .height,
-                percentile: heightPctl
+                percentile: heightPctl,
+                measureDate: latestHeight?.date
             ) { selectedMetric = .height }
 
             dividerLine
@@ -255,7 +257,8 @@ struct GrowthView: View {
                 label: "Head",
                 icon: "circle.dashed",
                 isSelected: selectedMetric == .head,
-                percentile: headPctl
+                percentile: headPctl,
+                measureDate: latestHead?.date
             ) { selectedMetric = .head }
         }
         .padding(.vertical, 16)
@@ -265,10 +268,10 @@ struct GrowthView: View {
     private var dividerLine: some View {
         Rectangle()
             .fill(Color.blSurface)
-            .frame(width: 1, height: 44)
+            .frame(width: 1, height: 54)
     }
 
-    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, action: @escaping () -> Void) -> some View {
+    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, measureDate: Date? = nil, action: @escaping () -> Void) -> some View {
         Button(action: {
             Haptic.selection()
             withAnimation(.spring(response: 0.3)) { action() }
@@ -298,10 +301,26 @@ struct GrowthView: View {
                             Capsule().fill(percentileColor(pctl))
                         )
                 }
+
+                // Measurement date (e.g. "Apr 3" or "Today")
+                if let date = measureDate {
+                    Text(Self.shortMeasureDate(date))
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(.blTextTertiary)
+                        .lineLimit(1)
+                }
             }
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
+    }
+
+    /// Short date text for measurement date: "Today", "Yesterday", or "Apr 3"
+    private static func shortMeasureDate(_ date: Date) -> String {
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return "Today" }
+        if cal.isDateInYesterday(date) { return "Yesterday" }
+        return BLDateFormatters.monthDay.string(from: date)
     }
 
     /// Color coding for percentile badges: green for normal, amber for watch, red for concern
