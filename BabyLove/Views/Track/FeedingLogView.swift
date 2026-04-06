@@ -23,6 +23,8 @@ struct FeedingLogView: View {
     @State private var didAutoSuggestSide = false
     /// True when another feeding timer is already running (prevents duplicates)
     @State private var hasExistingOngoingFeeding = false
+    /// True when editing an ongoing (timer) feeding — lets user finalize duration
+    @State private var isEditingOngoingFeeding = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -37,6 +39,7 @@ struct FeedingLogView: View {
 
     /// Dynamic button label based on mode
     private var buttonLabel: String {
+        if isEditingOngoingFeeding { return "End Feeding" }
         if isEditing { return "Update Feeding" }
         if isTimerMode && supportsTimer { return "Start Feeding Timer" }
         return "Log Feeding"
@@ -141,7 +144,7 @@ struct FeedingLogView: View {
                                 }
                             }
 
-                            // Timer mode toggle (only for new records)
+                            // Timer mode toggle (only for new records, not editing ongoing)
                             if !isEditing {
                                 Toggle(isOn: $isTimerMode) {
                                     Label("Use Timer", systemImage: "timer")
@@ -152,6 +155,30 @@ struct FeedingLogView: View {
                                 .padding(16)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+
+                            // Banner when editing an ongoing feeding timer
+                            if isEditingOngoingFeeding {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "timer")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.blFeeding)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Ongoing feeding")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.blTextPrimary)
+                                        Text("Set the final duration to end this feeding session.")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(.blTextSecondary)
+                                    }
+                                }
+                                .padding(14)
+                                .background(Color.blFeeding.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .strokeBorder(Color.blFeeding.opacity(0.3), lineWidth: 1)
+                                )
                             }
 
                             // Warning: another feeding timer already running
@@ -378,10 +405,20 @@ struct FeedingLogView: View {
         guard let r = editingRecord else { return }
         feedType = FeedType(rawValue: r.feedType ?? "") ?? .breast
         side = BreastSide(rawValue: r.breastSide ?? "") ?? .left
-        duration = Double(r.durationMinutes)
         amount = unit.volumeFromML(r.amountML)
         notes = r.notes ?? ""
         timestamp = r.timestamp ?? Date()
+
+        let isOngoing = r.durationMinutes == 0
+            && (feedType == .breast || feedType == .pump)
+        if isOngoing {
+            // Calculate elapsed minutes from start time as a sensible default
+            let elapsed = Date().timeIntervalSince(timestamp) / 60.0
+            duration = max(1, min(60, elapsed.rounded()))
+            isEditingOngoingFeeding = true
+        } else {
+            duration = max(1, Double(r.durationMinutes))
+        }
     }
 
     /// Check if another feeding timer (breast/pump with durationMinutes == 0) is already running.
