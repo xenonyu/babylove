@@ -18,21 +18,28 @@ struct TrackView: View {
     @State private var diaperToEdit: CDDiaperRecord?
     @State private var growthToEdit: CDGrowthRecord?
 
+    // Limit high-frequency records to the last 14 days to avoid loading thousands
+    // of objects into memory. Only 5 are shown per section; the "See All" views
+    // have their own unbounded FetchRequests.
     @FetchRequest(
-        entity: CDFeedingRecord.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)]
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "timestamp >= %@",
+                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
     ) private var recentFeedings: FetchedResults<CDFeedingRecord>
 
     @FetchRequest(
-        entity: CDSleepRecord.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "startTime", ascending: false)]
+        sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
+        predicate: NSPredicate(format: "startTime >= %@",
+                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
     ) private var recentSleeps: FetchedResults<CDSleepRecord>
 
     @FetchRequest(
-        entity: CDDiaperRecord.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)]
+        sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
+        predicate: NSPredicate(format: "timestamp >= %@",
+                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
     ) private var recentDiapers: FetchedResults<CDDiaperRecord>
 
+    // Growth records are infrequent (monthly), so keep unbounded
     @FetchRequest(
         entity: CDGrowthRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
