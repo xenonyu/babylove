@@ -555,3 +555,8 @@
 "a11y.logAction %@"          = "%@ 기록";
 "a11y.logHint %@"            = "이중 탭하여 새 %@ 기록";
 "a11y.babyPhoto %@"          = "%@의 사진";
+"a11y.feedTypeOption %@"     = "%@ 수유";
+"a11y.breastSideOption %@"   = "%@ 쪽";
+"a11y.diaperTypeOption %@"   = "%@ 기저귀";
+"a11y.filterBadge %@ %lld"   = "%@, %lld개 기록";
+"a11y.dateHasActivity"       = ", 기록 있음";

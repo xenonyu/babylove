@@ -952,7 +952,7 @@ private struct FilterChip: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(label), \(count) records")
+        .accessibilityLabel(String(format: NSLocalizedString("a11y.filterBadge %@ %lld", comment: ""), label, count))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

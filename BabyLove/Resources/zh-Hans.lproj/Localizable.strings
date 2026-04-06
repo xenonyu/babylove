@@ -555,3 +555,8 @@
 "a11y.logAction %@"          = "记录%@";
 "a11y.logHint %@"            = "双击记录新的%@";
 "a11y.babyPhoto %@"          = "%@的照片";
+"a11y.feedTypeOption %@"     = "%@喂养";
+"a11y.breastSideOption %@"   = "%@侧";
+"a11y.diaperTypeOption %@"   = "%@尿布";
+"a11y.filterBadge %@ %lld"   = "%@，%lld 条记录";
+"a11y.dateHasActivity"       = "，有记录";

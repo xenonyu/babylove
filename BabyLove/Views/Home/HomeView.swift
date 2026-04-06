@@ -1320,7 +1320,7 @@ struct HomeView: View {
                                 )
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel("\(isToday ? dateHeaderText : "\(dayOfWeekText(date)) \(dayNumberText(date))")\(hasActivity ? ", has activity" : "")")
+                            .accessibilityLabel("\(isToday ? dateHeaderText : "\(dayOfWeekText(date)) \(dayNumberText(date))")\(hasActivity ? NSLocalizedString("a11y.dateHasActivity", comment: "") : "")")
                             .accessibilityAddTraits(isSelected ? .isSelected : [])
                             .id(date)
                         }

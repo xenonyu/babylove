@@ -72,7 +72,7 @@ struct DiaperLogView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
                                     .buttonStyle(.plain)
-                                    .accessibilityLabel("\(t.displayName) diaper")
+                                    .accessibilityLabel(String(format: NSLocalizedString("a11y.diaperTypeOption %@", comment: ""), t.displayName))
                                     .accessibilityAddTraits(diaperType == t ? .isSelected : [])
                                 }
                             }

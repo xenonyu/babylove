@@ -137,7 +137,7 @@ struct FeedingLogView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                     }
                                     .buttonStyle(.plain)
-                                    .accessibilityLabel("\(t.displayName) feeding")
+                                    .accessibilityLabel(String(format: NSLocalizedString("a11y.feedTypeOption %@", comment: ""), t.displayName))
                                     .accessibilityAddTraits(feedType == t ? .isSelected : [])
                                 }
                             }
@@ -164,7 +164,7 @@ struct FeedingLogView: View {
                                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                         }
                                         .buttonStyle(.plain)
-                                        .accessibilityLabel("\(s.displayName) side")
+                                        .accessibilityLabel(String(format: NSLocalizedString("a11y.breastSideOption %@", comment: ""), s.displayName))
                                         .accessibilityAddTraits(side == s ? .isSelected : [])
                                     }
                                 }

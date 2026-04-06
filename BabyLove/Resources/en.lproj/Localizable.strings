@@ -530,3 +530,8 @@
 "a11y.logAction %@"          = "Log %@";
 "a11y.logHint %@"            = "Double tap to record a new %@ entry";
 "a11y.babyPhoto %@"          = "%@'s photo";
+"a11y.feedTypeOption %@"     = "%@ feeding";
+"a11y.breastSideOption %@"   = "%@ side";
+"a11y.diaperTypeOption %@"   = "%@ diaper";
+"a11y.filterBadge %@ %lld"   = "%@, %lld records";
+"a11y.dateHasActivity"       = ", has activity";
