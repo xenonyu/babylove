@@ -283,6 +283,68 @@ struct HomeView: View {
         return parts.joined(separator: " ")
     }
 
+    // MARK: - Smart Daily Summary
+
+    /// Generates a human-readable one-liner summarizing the day's activity.
+    /// Returns nil when there's no data at all for the selected day.
+    private var dailySummaryText: String? {
+        let feedCount = todayFeedings.count
+        let sleepMins = totalSleepMinutes
+        let diaperCount = todayDiapers.count
+
+        guard feedCount > 0 || sleepMins > 0 || diaperCount > 0 else { return nil }
+
+        let babyName = baby?.name ?? "Baby"
+        var parts: [String] = []
+
+        // Feedings
+        if feedCount > 0 {
+            var feedPart = "\(feedCount) feeding\(feedCount == 1 ? "" : "s")"
+            if totalFeedingVolumeML > 0 {
+                let unit = appState.measurementUnit
+                let display = unit.volumeFromML(totalFeedingVolumeML)
+                if unit == .metric {
+                    feedPart += " (\(Int(display)) \(unit.volumeLabel))"
+                } else {
+                    feedPart += " (\(String(format: "%.1f", display)) \(unit.volumeLabel))"
+                }
+            }
+            parts.append(feedPart)
+        }
+
+        // Sleep
+        if sleepMins > 0 {
+            let h = sleepMins / 60
+            let m = sleepMins % 60
+            let sleepStr = h > 0
+                ? (m > 0 ? "\(h)h \(m)m" : "\(h)h")
+                : "\(m)m"
+            parts.append("\(sleepStr) of sleep")
+        }
+
+        // Diapers
+        if diaperCount > 0 {
+            parts.append("\(diaperCount) diaper change\(diaperCount == 1 ? "" : "s")")
+        }
+
+        // Assemble natural sentence
+        guard !parts.isEmpty else { return nil }
+        let joined: String
+        if parts.count == 1 {
+            joined = parts[0]
+        } else if parts.count == 2 {
+            joined = "\(parts[0]) and \(parts[1])"
+        } else {
+            joined = "\(parts[0...(parts.count - 2)].joined(separator: ", ")), and \(parts[parts.count - 1])"
+        }
+
+        if isSelectedDateToday {
+            return "\(babyName) has had \(joined) so far today."
+        } else {
+            return "\(babyName) had \(joined)."
+        }
+    }
+
     // MARK: - Quick Log Hints
 
     /// Contextual hint for the Feeding quick log card.
@@ -424,6 +486,28 @@ struct HomeView: View {
                                           timeSince: isSelectedDateToday ? diaperTimeSince : nil)
                             }
                             .padding(.horizontal, 20)
+
+                            // Smart daily summary sentence
+                            if let summary = dailySummaryText {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "text.bubble.fill")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.blPrimary.opacity(0.6))
+                                    Text(summary)
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.blTextSecondary)
+                                        .lineLimit(3)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.blPrimary.opacity(0.04))
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .padding(.horizontal, 20)
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel("Daily summary: \(summary)")
+                            }
                         }
 
                         // Quick log — available for all dates (retroactive logging)
