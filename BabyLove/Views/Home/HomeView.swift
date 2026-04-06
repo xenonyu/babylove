@@ -17,6 +17,9 @@ struct HomeView: View {
     @State private var feedingTimer: Timer?
     @State private var showEndSleepConfirm = false
     @State private var showEndFeedingConfirm = false
+    @State private var showStaleSleepAlert = false
+    @State private var showStaleFeedingAlert = false
+    @State private var staleTimerDuration = ""
     /// Incremented every 60s to force "time since" labels to re-evaluate
     @State private var minuteTick: Int = 0
     @State private var minuteTimer: Timer?
@@ -508,6 +511,8 @@ struct HomeView: View {
                     startMinuteTimer()
                     // Force an immediate refresh so labels are correct when returning
                     minuteTick &+= 1
+                    // Warn about stale timers (>4 hours) the user may have forgotten
+                    checkForStaleTimers()
                 } else if phase == .background {
                     stopSleepTimer()
                     stopFeedingTimer()
@@ -602,6 +607,24 @@ struct HomeView: View {
         } message: {
             let feedType = FeedType(rawValue: ongoingFeeding?.feedType ?? "")?.displayName ?? "Feeding"
             Text("Record \(feedingElapsedText) of \(feedType.lowercased()) for \(appState.currentBaby?.name ?? "baby")?")
+        }
+        // Stale sleep timer warning
+        .alert("Sleep Timer Still Running", isPresented: $showStaleSleepAlert) {
+            Button("Keep Running") {}
+            Button("End Sleep", role: .destructive) {
+                endOngoingSleep()
+            }
+        } message: {
+            Text("\(appState.currentBaby?.name ?? "Baby")'s sleep timer has been running for \(staleTimerDuration). Did you forget to end it?")
+        }
+        // Stale feeding timer warning
+        .alert("Feeding Timer Still Running", isPresented: $showStaleFeedingAlert) {
+            Button("Keep Running") {}
+            Button("End Feeding", role: .destructive) {
+                endOngoingFeeding()
+            }
+        } message: {
+            Text("\(appState.currentBaby?.name ?? "Baby")'s feeding timer has been running for \(staleTimerDuration). Did you forget to end it?")
         }
     }
 
@@ -825,6 +848,42 @@ struct HomeView: View {
     private func stopFeedingTimer() {
         feedingTimer?.invalidate()
         feedingTimer = nil
+    }
+
+    // MARK: - Stale Timer Detection
+
+    /// Threshold in seconds after which we consider a timer "forgotten" (4 hours)
+    private static let staleTimerThreshold: TimeInterval = 4 * 3600
+
+    /// Check if any ongoing timers have been running unusually long and warn the user
+    private func checkForStaleTimers() {
+        // Check sleep timer first (more likely to be forgotten overnight)
+        if let start = ongoingSleep?.startTime {
+            let elapsed = Date().timeIntervalSince(start)
+            if elapsed >= Self.staleTimerThreshold {
+                staleTimerDuration = Self.humanReadableDuration(elapsed)
+                showStaleSleepAlert = true
+                return // Show one alert at a time
+            }
+        }
+        // Then check feeding timer
+        if let start = ongoingFeeding?.timestamp {
+            let elapsed = Date().timeIntervalSince(start)
+            if elapsed >= Self.staleTimerThreshold {
+                staleTimerDuration = Self.humanReadableDuration(elapsed)
+                showStaleFeedingAlert = true
+            }
+        }
+    }
+
+    /// Format a duration into a human-readable string like "5h 23m"
+    private static func humanReadableDuration(_ interval: TimeInterval) -> String {
+        let total = Int(interval)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        if h > 0 && m > 0 { return "\(h)h \(m)m" }
+        if h > 0 { return "\(h)h" }
+        return "\(m)m"
     }
 
     // MARK: - Minute Refresh Timer (keeps "time since" labels accurate)
