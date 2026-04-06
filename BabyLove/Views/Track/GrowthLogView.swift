@@ -16,6 +16,7 @@ struct GrowthLogView: View {
     @State private var notes    = ""
     @State private var recordDate = Date()
     @State private var showDatePicker = false
+    @State private var previousRecord: CDGrowthRecord?
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -48,6 +49,31 @@ struct GrowthLogView: View {
             if hc > maxHead { return "Head circumference seems too high (\(unit == .metric ? "max ~60 cm" : "max ~24 in"))" }
         }
         return nil
+    }
+
+    /// Soft warning when a new value deviates significantly from the previous record.
+    /// Does NOT block saving — just alerts the user to double-check for typos.
+    private var jumpWarnings: [String] {
+        guard let prev = previousRecord else { return [] }
+        var warnings: [String] = []
+
+        func checkJump(newText: String, prevMetric: Double, label: String, convertFromKG: Bool) {
+            guard prevMetric > 0, let newVal = Double(newText), newVal > 0 else { return }
+            let prevDisplay = convertFromKG ? unit.weightFromKG(prevMetric) : unit.lengthFromCM(prevMetric)
+            guard prevDisplay > 0 else { return }
+            let ratio = newVal / prevDisplay
+            // Flag if value changed by more than 3× or dropped by more than 60%
+            if ratio > 3.0 || ratio < 0.4 {
+                let unitLabel = convertFromKG ? unit.weightLabel : unit.heightLabel
+                let prevStr = convertFromKG ? String(format: "%.2f", prevDisplay) : String(format: "%.1f", prevDisplay)
+                warnings.append("\(label) changed from \(prevStr) to \(newText) \(unitLabel) — please verify")
+            }
+        }
+
+        checkJump(newText: weightKG, prevMetric: prev.weightKG, label: "Weight", convertFromKG: true)
+        checkJump(newText: heightCM, prevMetric: prev.heightCM, label: "Height", convertFromKG: false)
+        checkJump(newText: headCM, prevMetric: prev.headCircumferenceCM, label: "Head circ.", convertFromKG: false)
+        return warnings
     }
 
     private var canSave: Bool {
@@ -187,6 +213,25 @@ struct GrowthLogView: View {
                                 .foregroundColor(.blTextSecondary)
                                 .frame(maxWidth: .infinity)
                         }
+
+                        // Soft warnings for large jumps from previous record (don't block save)
+                        if !jumpWarnings.isEmpty {
+                            VStack(spacing: 6) {
+                                ForEach(jumpWarnings, id: \.self) { warning in
+                                    Label(warning, systemImage: "exclamationmark.circle.fill")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.orange)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                            .padding(12)
+                            .background(Color.orange.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(Color.orange.opacity(0.2), lineWidth: 1)
+                            )
+                        }
                     }
                     .padding(24)
                 }
@@ -213,6 +258,8 @@ struct GrowthLogView: View {
                 if !isEditing, let initialDate {
                     recordDate = initialDate
                 }
+                // Fetch the latest previous record to enable jump-detection warnings
+                previousRecord = vm.latestGrowthRecord(excluding: editingRecord?.id)
             }
         }
     }

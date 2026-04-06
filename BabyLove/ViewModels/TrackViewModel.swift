@@ -273,6 +273,19 @@ class TrackViewModel: ObservableObject {
         return save()
     }
 
+    // MARK: - Fetch Latest Growth
+
+    /// Returns the most recent growth record, optionally excluding a specific record (for editing).
+    func latestGrowthRecord(excluding excludeID: UUID? = nil) -> CDGrowthRecord? {
+        let request: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \CDGrowthRecord.date, ascending: false)]
+        if let excludeID {
+            request.predicate = NSPredicate(format: "id != %@", excludeID as CVarArg)
+        }
+        request.fetchLimit = 1
+        return (try? ctx.fetch(request))?.first
+    }
+
     // MARK: - Update Growth
 
     @discardableResult
