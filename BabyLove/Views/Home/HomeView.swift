@@ -1182,6 +1182,8 @@ struct HomeView: View {
                         .frame(width: 32, height: 32)
                 }
                 .disabled(!canNavigateBack)
+                .accessibilityLabel("Previous day")
+                .accessibilityHint(canNavigateBack ? "Go to the previous day" : "Already at earliest date")
 
                 Spacer()
 
@@ -1207,6 +1209,8 @@ struct HomeView: View {
                             .foregroundColor(.blPrimary)
                             .frame(width: 32, height: 32)
                     }
+                    .accessibilityLabel("Next day")
+                    .accessibilityHint("Go to the next day")
                 }
             }
 
@@ -1522,6 +1526,7 @@ struct HomeView: View {
     @ViewBuilder
     private func weeklyRow(icon: String, color: Color, title: String, value: String, unit: String, total: String, current: Double, previous: Double) -> some View {
         let trend = Self.trendIcon(current: current, previous: previous)
+        let trendDescription = Self.trendDescription(current: current, previous: previous)
         HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -1561,6 +1566,30 @@ struct HomeView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(weeklyRowAccessibilityLabel(title: title, value: value, unit: unit, total: total, trend: trendDescription))
+    }
+
+    /// Build a human-readable VoiceOver label for a weekly summary row.
+    private func weeklyRowAccessibilityLabel(title: String, value: String, unit: String, total: String, trend: String) -> String {
+        var parts = ["\(title), \(value) \(unit)"]
+        if !total.isEmpty { parts.append(total) }
+        if !trend.isEmpty { parts.append(trend) }
+        return parts.joined(separator: ", ")
+    }
+
+    /// Human-readable trend description for VoiceOver (e.g. "up 15% from last week")
+    private static func trendDescription(current: Double, previous: Double) -> String {
+        guard previous > 0 else { return "" }
+        let diff = (current - previous) / previous
+        let pct = Int(abs(diff * 100))
+        if diff > 0.1 {
+            return "up \(pct)% from last week"
+        } else if diff < -0.1 {
+            return "down \(pct)% from last week"
+        } else {
+            return "same as last week"
+        }
     }
 
     // MARK: - Baby Hero Card
@@ -1597,6 +1626,18 @@ struct HomeView: View {
         .padding(20)
         .blCard()
         .padding(.horizontal, 20)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(babyHeroAccessibilityLabel)
+    }
+
+    private var babyHeroAccessibilityLabel: String {
+        var parts: [String] = []
+        parts.append(baby?.name ?? "Baby")
+        if let ageText = baby?.ageText, !ageText.isEmpty {
+            parts.append("\(ageText) old")
+        }
+        parts.append(Date().formatted(date: .complete, time: .omitted))
+        return parts.joined(separator: ", ")
     }
 
     // MARK: - Empty Day State
