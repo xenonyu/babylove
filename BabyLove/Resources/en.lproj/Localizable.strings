@@ -498,6 +498,7 @@
 "a11y.diaperChangeTime"    = "Diaper change time";
 "a11y.measurementDate"     = "Measurement date";
 "a11y.atAge %@"            = "at age %@";
+"a11y.trackView.headCirc %@" = "head circumference %@";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "Failed to delete. Please try again.";
@@ -562,6 +563,7 @@
 "a11y.at %@"                 = "at %@";
 "a11y.note %@"               = "note: %@";
 "a11y.atAge %@"              = "at age %@";
+"a11y.trackView.headCirc %@" = "head circumference %@";
 "a11y.logAction %@"          = "Log %@";
 "a11y.logHint %@"            = "Double tap to record a new %@ entry";
 "a11y.babyPhoto %@"          = "%@'s photo";

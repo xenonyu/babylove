@@ -364,6 +364,40 @@ struct TrackView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(feedingRowAccessibilityLabel(r))
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
+    }
+
+    private func feedingRowAccessibilityLabel(_ r: CDFeedingRecord) -> String {
+        let unit = appState.measurementUnit
+        let isOngoing = Self.isFeedingOngoing(r)
+        let feedType = FeedType(rawValue: r.feedType ?? "")
+        var parts: [String] = []
+        parts.append(feedType?.displayName ?? String(localized: "track.feeding"))
+        if isOngoing {
+            parts.append(String(localized: "track.inProgress"))
+        } else if r.durationMinutes > 0 {
+            parts.append(DurationFormat.standard(r.durationMinutes))
+        }
+        if r.amountML > 0 {
+            let display = unit.volumeFromML(r.amountML)
+            if unit == .metric {
+                parts.append("\(Int(display)) \(unit.volumeLabel)")
+            } else {
+                parts.append(String(format: "%.1f %@", display, unit.volumeLabel))
+            }
+        }
+        if let side = r.breastSide, !side.isEmpty {
+            parts.append(BreastSide(rawValue: side)?.displayName ?? side)
+        }
+        if let ts = r.timestamp {
+            parts.append(String(format: NSLocalizedString("a11y.at %@", comment: ""), Self.timestampText(ts)))
+        }
+        if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
+        }
+        return parts.joined(separator: ", ")
     }
 
     private func sleepRow(_ r: CDSleepRecord) -> some View {
@@ -428,6 +462,39 @@ struct TrackView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(sleepRowAccessibilityLabel(r))
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
+    }
+
+    private func sleepRowAccessibilityLabel(_ r: CDSleepRecord) -> String {
+        var parts: [String] = []
+        if let loc = r.location, let sl = SleepLocation(rawValue: loc) {
+            parts.append(sl.displayName)
+        } else {
+            parts.append(String(localized: "track.sleep"))
+        }
+        if r.endTime == nil {
+            parts.append(String(localized: "track.inProgress"))
+        }
+        if let s = r.startTime {
+            let startStr = s.formatted(date: .omitted, time: .shortened)
+            if let e = r.endTime {
+                let endStr = e.formatted(date: .omitted, time: .shortened)
+                parts.append("\(startStr) – \(endStr)")
+                let mins = Int(e.timeIntervalSince(s) / 60)
+                parts.append(DurationFormat.fromMinutes(mins))
+            } else {
+                parts.append(startStr)
+            }
+        }
+        if let datePrefix = Self.relativeDatePrefix(r.startTime) {
+            parts.append(datePrefix)
+        }
+        if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
+        }
+        return parts.joined(separator: ", ")
     }
 
     private func diaperRow(_ r: CDDiaperRecord) -> some View {
@@ -457,6 +524,25 @@ struct TrackView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(diaperRowAccessibilityLabel(r))
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
+    }
+
+    private func diaperRowAccessibilityLabel(_ r: CDDiaperRecord) -> String {
+        var parts: [String] = []
+        if let dtype = DiaperType(rawValue: r.diaperType ?? "") {
+            parts.append(dtype.displayName)
+        } else {
+            parts.append(String(localized: "track.diaper"))
+        }
+        if let ts = r.timestamp {
+            parts.append(String(format: NSLocalizedString("a11y.at %@", comment: ""), Self.timestampText(ts)))
+        }
+        if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
+        }
+        return parts.joined(separator: ", ")
     }
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {
@@ -518,6 +604,38 @@ struct TrackView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(growthRowAccessibilityLabel(r))
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
+    }
+
+    private func growthRowAccessibilityLabel(_ r: CDGrowthRecord) -> String {
+        let unit = appState.measurementUnit
+        let baby = appState.currentBaby
+        var parts: [String] = []
+        parts.append(String(localized: "track.growth"))
+        if let baby, let date = r.date {
+            parts.append(String(format: NSLocalizedString("a11y.atAge %@", comment: ""), baby.ageText(at: date)))
+        }
+        if r.weightKG > 0 {
+            let w = unit.weightFromKG(r.weightKG)
+            parts.append("\(String(format: "%.1f", w)) \(unit.weightLabel)")
+        }
+        if r.heightCM > 0 {
+            let h = unit.lengthFromCM(r.heightCM)
+            parts.append("\(String(format: "%.1f", h)) \(unit.heightLabel)")
+        }
+        if r.headCircumferenceCM > 0 {
+            let hc = unit.lengthFromCM(r.headCircumferenceCM)
+            parts.append(String(format: NSLocalizedString("a11y.trackView.headCirc %@", comment: ""), "\(String(format: "%.1f", hc)) \(unit.heightLabel)"))
+        }
+        if let date = r.date {
+            parts.append(DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none))
+        }
+        if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
+        }
+        return parts.joined(separator: ", ")
     }
 
     /// Compact pill showing a growth metric with its icon for visual disambiguation.

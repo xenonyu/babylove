@@ -498,6 +498,7 @@
 "a11y.diaperChangeTime"    = "换尿布时间";
 "a11y.measurementDate"     = "测量日期";
 "a11y.atAge %@"            = "%@时";
+"a11y.trackView.headCirc %@" = "头围 %@";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "删除失败，请重试";
@@ -562,6 +563,7 @@
 "a11y.at %@"                 = "于 %@";
 "a11y.note %@"               = "备注：%@";
 "a11y.atAge %@"              = "%@ 时";
+"a11y.trackView.headCirc %@" = "头围 %@";
 "a11y.logAction %@"          = "记录%@";
 "a11y.logHint %@"            = "双击记录新的%@";
 "a11y.babyPhoto %@"          = "%@的照片";

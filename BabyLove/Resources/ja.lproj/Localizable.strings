@@ -498,6 +498,7 @@
 "a11y.diaperChangeTime"    = "おむつ替え時間";
 "a11y.measurementDate"     = "計測日";
 "a11y.atAge %@"            = "%@の時";
+"a11y.trackView.headCirc %@" = "頭囲 %@";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "削除に失敗しました。もう一度お試しください。";
@@ -562,6 +563,7 @@
 "a11y.at %@"                 = "%@ に";
 "a11y.note %@"               = "メモ：%@";
 "a11y.atAge %@"              = "%@ の時";
+"a11y.trackView.headCirc %@" = "頭囲 %@";
 "a11y.logAction %@"          = "%@を記録";
 "a11y.logHint %@"            = "ダブルタップで新しい%@を記録";
 "a11y.babyPhoto %@"          = "%@の写真";
