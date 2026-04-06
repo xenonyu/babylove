@@ -220,7 +220,10 @@ struct HomeView: View {
     /// Returns nil when fewer than 2 feedings exist or all have the same timestamp.
     private var avgFeedingIntervalMinutes: Int? {
         // Collect sorted timestamps (ascending), skipping ongoing timers
+        // An ongoing breast/pump feeding (durationMinutes == 0) has just been started
+        // and should not be included as it skews the interval calculation.
         let timestamps = todayFeedings
+            .filter { !Self.isFeedingOngoing($0) }
             .compactMap { $0.timestamp }
             .sorted()
         guard timestamps.count >= 2 else { return nil }
