@@ -40,6 +40,13 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";
+"age.ym"          = "%lld년 %lld개월";
+"age.y"           = "%lld년";
+"age.md"          = "%lld개월 %lld일";
+"age.m"           = "%lld개월";
+"age.wd"          = "%lld주 %lld일";
+"age.w"           = "%lld주";
+"age.d"           = "%lld일";
 
 /* ===== Tab Bar ===== */
 "tab.today"    = "오늘";
@@ -479,6 +486,7 @@
 "a11y.wakeUpTime"          = "깬 시간";
 "a11y.diaperChangeTime"    = "기저귀 교체 시간";
 "a11y.measurementDate"     = "측정 날짜";
+"a11y.atAge %@"            = "%@ 때";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "삭제에 실패했습니다. 다시 시도해 주세요.";

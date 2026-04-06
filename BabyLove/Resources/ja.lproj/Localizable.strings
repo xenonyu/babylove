@@ -40,6 +40,13 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";
+"age.ym"          = "%lld歳%lldヶ月";
+"age.y"           = "%lld歳";
+"age.md"          = "%lldヶ月%lld日";
+"age.m"           = "%lldヶ月";
+"age.wd"          = "%lld週%lld日";
+"age.w"           = "%lld週";
+"age.d"           = "%lld日";
 
 /* ===== Tab Bar ===== */
 "tab.today"    = "今日";
@@ -479,6 +486,7 @@
 "a11y.wakeUpTime"          = "起きた時間";
 "a11y.diaperChangeTime"    = "おむつ替え時間";
 "a11y.measurementDate"     = "計測日";
+"a11y.atAge %@"            = "%@の時";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "削除に失敗しました。もう一度お試しください。";

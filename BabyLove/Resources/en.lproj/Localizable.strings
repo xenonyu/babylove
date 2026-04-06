@@ -40,6 +40,13 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@ old";
+"age.ym"          = "%lld yr %lld mo";
+"age.y"           = "%lld yr";
+"age.md"          = "%lld mo %lld d";
+"age.m"           = "%lld mo";
+"age.wd"          = "%lld wk %lld d";
+"age.w"           = "%lld wk";
+"age.d"           = "%lld d";
 
 /* ===== Tab Bar ===== */
 "tab.today"    = "Today";
@@ -454,6 +461,7 @@
 "a11y.wakeUpTime"          = "Wake up time";
 "a11y.diaperChangeTime"    = "Diaper change time";
 "a11y.measurementDate"     = "Measurement date";
+"a11y.atAge %@"            = "at age %@";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "Failed to delete. Please try again.";

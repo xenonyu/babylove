@@ -40,6 +40,13 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";
+"age.ym"          = "%lld岁%lld个月";
+"age.y"           = "%lld岁";
+"age.md"          = "%lld个月%lld天";
+"age.m"           = "%lld个月";
+"age.wd"          = "%lld周%lld天";
+"age.w"           = "%lld周";
+"age.d"           = "%lld天";
 
 /* ===== Tab Bar ===== */
 "tab.today"    = "今日";
@@ -479,6 +486,7 @@
 "a11y.wakeUpTime"          = "醒来时间";
 "a11y.diaperChangeTime"    = "换尿布时间";
 "a11y.measurementDate"     = "测量日期";
+"a11y.atAge %@"            = "%@时";
 
 // MARK: - Common Error
 "common.deleteFailed"      = "删除失败，请重试";

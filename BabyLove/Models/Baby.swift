@@ -47,26 +47,7 @@ struct Baby: Codable, Identifiable {
     }
 
     var ageText: String {
-        let c = ageComponents
-        let yr = c.year ?? 0
-        let mo = c.month ?? 0
-        let dy = c.day ?? 0
-
-        if yr > 0 {
-            return mo > 0 ? "\(yr)y \(mo)m" : "\(yr) year\(yr > 1 ? "s" : "")"
-        } else if mo > 0 {
-            return dy > 0 ? "\(mo)m \(dy)d" : "\(mo) month\(mo > 1 ? "s" : "")"
-        } else if dy >= 7 {
-            // For babies under 1 month, show weeks (computed from total days)
-            let wk = dy / 7
-            let remDays = dy % 7
-            if remDays > 0 {
-                return "\(wk) week\(wk > 1 ? "s" : "") \(remDays)d"
-            }
-            return "\(wk) week\(wk > 1 ? "s" : "")"
-        } else {
-            return "\(dy) day\(dy != 1 ? "s" : "")"
-        }
+        Self.formatAge(from: ageComponents)
     }
 
     /// Localized age string (e.g. "3m 12d old" in English, "3m 12d" in CJK).
@@ -89,23 +70,39 @@ struct Baby: Codable, Identifiable {
     /// Useful for growth records where the measurement date may differ from today.
     func ageText(at date: Date) -> String {
         let c = Calendar.current.dateComponents([.year, .month, .day], from: birthDate, to: date)
+        return Self.formatAge(from: c)
+    }
+
+    // MARK: - Localized Age Formatting
+
+    /// Convert age components into a localized abbreviated string.
+    /// Uses keys from Localizable.strings: age.ym, age.y, age.md, age.m, age.wd, age.w, age.d
+    private static func formatAge(from c: DateComponents) -> String {
         let yr = c.year ?? 0
         let mo = c.month ?? 0
         let dy = c.day ?? 0
 
         // Guard against future or same-day dates
-        guard yr >= 0 && mo >= 0 && dy >= 0 else { return "0 days" }
+        guard yr >= 0 && mo >= 0 && dy >= 0 else {
+            return String(format: NSLocalizedString("age.d", comment: ""), 0)
+        }
 
         if yr > 0 {
-            return mo > 0 ? "\(yr)y \(mo)m" : "\(yr)y"
+            return mo > 0
+                ? String(format: NSLocalizedString("age.ym", comment: ""), yr, mo)
+                : String(format: NSLocalizedString("age.y", comment: ""), yr)
         } else if mo > 0 {
-            return dy > 0 ? "\(mo)m \(dy)d" : "\(mo)m"
+            return dy > 0
+                ? String(format: NSLocalizedString("age.md", comment: ""), mo, dy)
+                : String(format: NSLocalizedString("age.m", comment: ""), mo)
         } else if dy >= 7 {
             let wk = dy / 7
             let remDays = dy % 7
-            return remDays > 0 ? "\(wk)w \(remDays)d" : "\(wk)w"
+            return remDays > 0
+                ? String(format: NSLocalizedString("age.wd", comment: ""), wk, remDays)
+                : String(format: NSLocalizedString("age.w", comment: ""), wk)
         } else {
-            return "\(dy)d"
+            return String(format: NSLocalizedString("age.d", comment: ""), dy)
         }
     }
 }

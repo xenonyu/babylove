@@ -839,7 +839,7 @@ struct AllGrowthView: View {
                 parts.append(String(format: "head %.1f %@", unit.lengthFromCM(r.headCircumferenceCM), unit.heightLabel))
             }
             if let baby, let date = r.date {
-                parts.append("at age \(baby.ageText(at: date))")
+                parts.append(String(format: NSLocalizedString("a11y.atAge %@", comment: ""), baby.ageText(at: date)))
             }
             if let date = r.date {
                 parts.append(DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none))
