@@ -17,6 +17,9 @@ struct HomeView: View {
     @State private var feedingTimer: Timer?
     @State private var showEndSleepConfirm = false
     @State private var showEndFeedingConfirm = false
+    /// Incremented every 60s to force "time since" labels to re-evaluate
+    @State private var minuteTick: Int = 0
+    @State private var minuteTimer: Timer?
     @State private var selectedDate: Date = Date()
     /// Tracks the calendar day when the view was last active, so we can detect day-boundary crossings
     @State private var lastActiveCalendarDay: Date = Calendar.current.startOfDay(for: Date())
@@ -236,21 +239,27 @@ struct HomeView: View {
         return days == 1 ? "1d ago" : "\(days)d ago"
     }
 
-    /// Time since last feeding (global — not limited to selected day), or "feeding now" if ongoing
+    /// Time since last feeding (global — not limited to selected day), or "feeding now" if ongoing.
+    /// References `minuteTick` so the label refreshes every 60 seconds.
     private var feedingTimeSince: String {
+        _ = minuteTick
         if globalLastFeedingIsOngoing { return "feeding now" }
         return Self.timeSinceText(from: globalLastFeedingTime)
     }
 
-    /// Time since last sleep ended (global), or "sleeping now" if ongoing
+    /// Time since last sleep ended (global), or "sleeping now" if ongoing.
+    /// References `minuteTick` so the label refreshes every 60 seconds.
     private var sleepTimeSince: String {
+        _ = minuteTick
         if globalLastSleepIsOngoing { return "sleeping now" }
         return Self.timeSinceText(from: globalLastSleepEnd)
     }
 
-    /// Time since last diaper change (global)
+    /// Time since last diaper change (global).
+    /// References `minuteTick` so the label refreshes every 60 seconds.
     private var diaperTimeSince: String {
-        Self.timeSinceText(from: globalLastDiaperTime)
+        _ = minuteTick
+        return Self.timeSinceText(from: globalLastDiaperTime)
     }
 
     /// Diaper breakdown subtitle (e.g. "3💧 2💩")
@@ -273,8 +282,10 @@ struct HomeView: View {
 
     // MARK: - Quick Log Hints
 
-    /// Contextual hint for the Feeding quick log card
+    /// Contextual hint for the Feeding quick log card.
+    /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogFeedingHint: String? {
+        _ = minuteTick
         if globalLastFeedingIsOngoing { return "In progress" }
         // Show "Next: Right/Left" if we know the last breast side
         if let lastSide = lastBreastSide, lastSide != .both {
@@ -286,15 +297,19 @@ struct HomeView: View {
         return Self.timeSinceText(from: lastTime)
     }
 
-    /// Contextual hint for the Sleep quick log card
+    /// Contextual hint for the Sleep quick log card.
+    /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogSleepHint: String? {
+        _ = minuteTick
         if globalLastSleepIsOngoing { return "Sleeping now" }
         guard let lastTime = globalLastSleepEnd else { return nil }
         return Self.timeSinceText(from: lastTime)
     }
 
-    /// Contextual hint for the Diaper quick log card
+    /// Contextual hint for the Diaper quick log card.
+    /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogDiaperHint: String? {
+        _ = minuteTick
         guard let lastTime = globalLastDiaperTime else { return nil }
         return Self.timeSinceText(from: lastTime)
     }
@@ -461,10 +476,12 @@ struct HomeView: View {
                 refreshActiveDays()
                 startSleepTimerIfNeeded()
                 startFeedingTimerIfNeeded()
+                startMinuteTimer()
             }
             .onDisappear {
                 stopSleepTimer()
                 stopFeedingTimer()
+                stopMinuteTimer()
             }
             .onChange(of: selectedDate) { _, _ in
                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -488,9 +505,13 @@ struct HomeView: View {
                     refreshActiveDays()
                     startSleepTimerIfNeeded()
                     startFeedingTimerIfNeeded()
+                    startMinuteTimer()
+                    // Force an immediate refresh so labels are correct when returning
+                    minuteTick &+= 1
                 } else if phase == .background {
                     stopSleepTimer()
                     stopFeedingTimer()
+                    stopMinuteTimer()
                 }
             }
             .onChange(of: todayFeedings.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
@@ -804,6 +825,20 @@ struct HomeView: View {
     private func stopFeedingTimer() {
         feedingTimer?.invalidate()
         feedingTimer = nil
+    }
+
+    // MARK: - Minute Refresh Timer (keeps "time since" labels accurate)
+
+    private func startMinuteTimer() {
+        guard minuteTimer == nil else { return }
+        minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            Task { @MainActor in minuteTick &+= 1 }
+        }
+    }
+
+    private func stopMinuteTimer() {
+        minuteTimer?.invalidate()
+        minuteTimer = nil
     }
 
     private func updateFeedingElapsed() {
