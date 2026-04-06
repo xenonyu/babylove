@@ -31,6 +31,8 @@ struct FeedingLogView: View {
     @State private var hasExistingOngoingFeeding = false
     /// True when editing an ongoing (timer) feeding — lets user finalize duration
     @State private var isEditingOngoingFeeding = false
+    /// Timer to keep the displayed elapsed duration up to date while editing an ongoing feeding
+    @State private var elapsedTimer: Timer?
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -356,11 +358,20 @@ struct FeedingLogView: View {
                             let amountML = hasAmount ? unit.volumeToML(amount) : 0
                             var ok = false
                             if let record = editingRecord {
+                                // When ending an ongoing feeding, recalculate duration
+                                // at save time to avoid stale elapsed-time values.
+                                let finalDuration: Int
+                                if isEditingOngoingFeeding && hasDuration {
+                                    let elapsed = Date().timeIntervalSince(timestamp) / 60.0
+                                    finalDuration = Int(max(1, min(180, elapsed.rounded())))
+                                } else {
+                                    finalDuration = hasDuration ? Int(duration) : 0
+                                }
                                 ok = vm.updateFeeding(
                                     record,
                                     type: feedType,
                                     side: hasDuration ? side : nil,
-                                    durationMinutes: hasDuration ? Int(duration) : 0,
+                                    durationMinutes: finalDuration,
                                     amountML: amountML,
                                     notes: notes,
                                     timestamp: timestamp
@@ -453,6 +464,11 @@ struct FeedingLogView: View {
                 }
                 if !isEditing { suggestNextSide() }
                 checkExistingOngoingFeeding()
+                startElapsedTimerIfNeeded()
+            }
+            .onDisappear {
+                elapsedTimer?.invalidate()
+                elapsedTimer = nil
             }
         }
     }
@@ -519,5 +535,15 @@ struct FeedingLogView: View {
         }
         side = suggested
         didAutoSuggestSide = true
+    }
+
+    /// Start a 15-second timer that keeps the displayed duration in sync
+    /// with the actual elapsed time while editing an ongoing feeding.
+    private func startElapsedTimerIfNeeded() {
+        guard isEditingOngoingFeeding else { return }
+        elapsedTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { _ in
+            let elapsed = Date().timeIntervalSince(timestamp) / 60.0
+            duration = max(1, min(180, elapsed.rounded()))
+        }
     }
 }
