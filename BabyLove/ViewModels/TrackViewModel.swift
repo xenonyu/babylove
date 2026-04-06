@@ -157,9 +157,11 @@ class TrackViewModel: ObservableObject {
                       date: Date = Date(),
                       notes: String = "",
                       isCompleted: Bool = true) -> Bool {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
+        guard !trimmedTitle.isEmpty else { return false }
         let m = CDMilestone(context: ctx)
         m.id = UUID()
-        m.title = title
+        m.title = trimmedTitle
         m.category = category.rawValue
         m.date = date
         m.notes = trimmedOrNil(notes)
@@ -174,7 +176,9 @@ class TrackViewModel: ObservableObject {
                          date: Date,
                          notes: String = "",
                          isCompleted: Bool = true) -> Bool {
-        record.title = title
+        let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
+        guard !trimmedTitle.isEmpty else { return false }
+        record.title = trimmedTitle
         record.category = category.rawValue
         record.date = date
         record.notes = trimmedOrNil(notes)
