@@ -490,3 +490,35 @@
 
 // MARK: - Common Error
 "common.deleteFailed"      = "删除失败，请重试";
+
+/* ===== 预设里程碑标题 ===== */
+"preset.ageMonths"           = "月";
+// 社交
+"preset.firstSmile"          = "第一次社交微笑";
+"preset.laughedOutLoud"      = "大声笑出来";
+"preset.strangerAnxiety"     = "认生";
+"preset.wavedByeBye"         = "挥手再见";
+"preset.playedPeekaboo"      = "玩躲猫猫";
+// 运动
+"preset.heldHeadUp"          = "抬头";
+"preset.rolledOver"          = "翻身";
+"preset.satWithoutSupport"   = "独坐";
+"preset.crawled"             = "爬行";
+"preset.pulledToStand"       = "扶站";
+"preset.firstSteps"          = "迈出第一步";
+"preset.graspedToy"          = "抓握玩具";
+// 语言
+"preset.firstCoo"            = "第一次咿呀发声";
+"preset.babbled"             = "咿呀学语（ba-ba、da-da）";
+"preset.saidFirstWord"       = "说出第一个词";
+"preset.respondedToName"     = "对自己名字有反应";
+// 认知
+"preset.followedObject"      = "追视移动物体";
+"preset.foundHiddenToy"      = "找到藏起来的玩具";
+"preset.pointedAtObjects"    = "用手指指物";
+"preset.stackedBlocks"       = "叠积木";
+// 健康
+"preset.firstTooth"          = "长出第一颗牙";
+"preset.sleptThroughNight"   = "整夜安睡";
+"preset.startedSolidFoods"   = "开始吃辅食";
+"preset.firstHaircut"        = "第一次理发";

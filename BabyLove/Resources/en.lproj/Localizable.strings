@@ -465,3 +465,35 @@
 
 // MARK: - Common Error
 "common.deleteFailed"      = "Failed to delete. Please try again.";
+
+/* ===== Preset Milestone Titles ===== */
+"preset.ageMonths"           = "mo";
+// Social
+"preset.firstSmile"          = "First social smile";
+"preset.laughedOutLoud"      = "Laughed out loud";
+"preset.strangerAnxiety"     = "Stranger anxiety";
+"preset.wavedByeBye"         = "Waved bye-bye";
+"preset.playedPeekaboo"      = "Played peek-a-boo";
+// Motor
+"preset.heldHeadUp"          = "Held head up";
+"preset.rolledOver"          = "Rolled over";
+"preset.satWithoutSupport"   = "Sat without support";
+"preset.crawled"             = "Crawled";
+"preset.pulledToStand"       = "Pulled to stand";
+"preset.firstSteps"          = "First steps";
+"preset.graspedToy"          = "Grasped a toy";
+// Language
+"preset.firstCoo"            = "First coo";
+"preset.babbled"             = "Babbled (ba-ba, da-da)";
+"preset.saidFirstWord"       = "Said first word";
+"preset.respondedToName"     = "Responded to own name";
+// Cognitive
+"preset.followedObject"      = "Followed moving object";
+"preset.foundHiddenToy"      = "Found hidden toy";
+"preset.pointedAtObjects"    = "Pointed at objects";
+"preset.stackedBlocks"       = "Stacked blocks";
+// Health
+"preset.firstTooth"          = "First tooth";
+"preset.sleptThroughNight"   = "Slept through the night";
+"preset.startedSolidFoods"   = "Started solid foods";
+"preset.firstHaircut"        = "First haircut";

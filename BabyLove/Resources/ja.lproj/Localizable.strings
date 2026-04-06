@@ -490,3 +490,35 @@
 
 // MARK: - Common Error
 "common.deleteFailed"      = "削除に失敗しました。もう一度お試しください。";
+
+/* ===== プリセットマイルストーン ===== */
+"preset.ageMonths"           = "ヶ月";
+// 社会性
+"preset.firstSmile"          = "初めての社会的微笑";
+"preset.laughedOutLoud"      = "声を出して笑った";
+"preset.strangerAnxiety"     = "人見知り";
+"preset.wavedByeBye"         = "バイバイした";
+"preset.playedPeekaboo"      = "いないいないばぁ";
+// 運動
+"preset.heldHeadUp"          = "首がすわった";
+"preset.rolledOver"          = "寝返り";
+"preset.satWithoutSupport"   = "お座り";
+"preset.crawled"             = "ハイハイ";
+"preset.pulledToStand"       = "つかまり立ち";
+"preset.firstSteps"          = "初めての一歩";
+"preset.graspedToy"          = "おもちゃを握った";
+// 言語
+"preset.firstCoo"            = "初めてのクーイング";
+"preset.babbled"             = "喃語（バブバブ）";
+"preset.saidFirstWord"       = "初めての言葉";
+"preset.respondedToName"     = "名前に反応した";
+// 認知
+"preset.followedObject"      = "動くものを目で追った";
+"preset.foundHiddenToy"      = "隠したおもちゃを見つけた";
+"preset.pointedAtObjects"    = "指差し";
+"preset.stackedBlocks"       = "積み木を重ねた";
+// 健康
+"preset.firstTooth"          = "初めての歯";
+"preset.sleptThroughNight"   = "夜通し眠った";
+"preset.startedSolidFoods"   = "離乳食を始めた";
+"preset.firstHaircut"        = "初めての散髪";

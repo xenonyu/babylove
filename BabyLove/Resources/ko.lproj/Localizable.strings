@@ -490,3 +490,35 @@
 
 // MARK: - Common Error
 "common.deleteFailed"      = "삭제에 실패했습니다. 다시 시도해 주세요.";
+
+/* ===== 프리셋 마일스톤 ===== */
+"preset.ageMonths"           = "개월";
+// 사회성
+"preset.firstSmile"          = "첫 사회적 미소";
+"preset.laughedOutLoud"      = "소리 내어 웃음";
+"preset.strangerAnxiety"     = "낯가림";
+"preset.wavedByeBye"         = "바이바이 손 흔들기";
+"preset.playedPeekaboo"      = "까꿍 놀이";
+// 운동
+"preset.heldHeadUp"          = "목 가누기";
+"preset.rolledOver"          = "뒤집기";
+"preset.satWithoutSupport"   = "혼자 앉기";
+"preset.crawled"             = "기어가기";
+"preset.pulledToStand"       = "잡고 일어서기";
+"preset.firstSteps"          = "첫 걸음";
+"preset.graspedToy"          = "장난감 잡기";
+// 언어
+"preset.firstCoo"            = "첫 옹알이 (쿠잉)";
+"preset.babbled"             = "옹알이 (바바, 다다)";
+"preset.saidFirstWord"       = "첫 단어";
+"preset.respondedToName"     = "이름에 반응";
+// 인지
+"preset.followedObject"      = "움직이는 물체 눈으로 따라가기";
+"preset.foundHiddenToy"      = "숨긴 장난감 찾기";
+"preset.pointedAtObjects"    = "손가락으로 가리키기";
+"preset.stackedBlocks"       = "블록 쌓기";
+// 건강
+"preset.firstTooth"          = "첫 이빨";
+"preset.sleptThroughNight"   = "밤새 잠자기";
+"preset.startedSolidFoods"   = "이유식 시작";
+"preset.firstHaircut"        = "첫 이발";

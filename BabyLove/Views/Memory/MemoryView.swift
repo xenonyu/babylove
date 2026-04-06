@@ -650,7 +650,7 @@ struct AddMilestoneView: View {
                                 }
                                 Text(preset.title)
                                     .font(.system(size: 13, weight: isCurrent ? .semibold : .medium))
-                                Text(preset.ageRangeMonths + "mo")
+                                Text(preset.ageRangeMonths + String(localized: "preset.ageMonths"))
                                     .font(.system(size: 10, weight: .medium))
                                     .foregroundColor(
                                         isSelected ? .white.opacity(0.7) :
