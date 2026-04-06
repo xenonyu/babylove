@@ -508,3 +508,24 @@
 "notification.interval.2_5h"          = "2.5 hours";
 "notification.interval.3h"            = "3 hours";
 "notification.interval.4h"            = "4 hours";
+
+/* ===== Accessibility ===== */
+"a11y.feedingTime"           = "Feeding time";
+"a11y.diaperChangeTime"      = "Diaper change time";
+"a11y.fellAsleepTime"        = "Fell asleep time";
+"a11y.sleepStartTime"        = "Sleep start time";
+"a11y.wakeUpTime"            = "Wake up time";
+"a11y.measurementDate"       = "Measurement date";
+"a11y.previousDay"           = "Previous day";
+"a11y.previousDayHint"       = "Go to previous day";
+"a11y.nextDay"               = "Next day";
+"a11y.nextDayHint"           = "Go to next day";
+"a11y.earliestDate"          = "Already at earliest date";
+"a11y.tapEditSwipeDelete"    = "Tap to edit, swipe to delete";
+"a11y.longPressEditDelete"   = "Long press to edit or delete";
+"a11y.at %@"                 = "at %@";
+"a11y.note %@"               = "note: %@";
+"a11y.atAge %@"              = "at age %@";
+"a11y.logAction %@"          = "Log %@";
+"a11y.logHint %@"            = "Double tap to record a new %@ entry";
+"a11y.babyPhoto %@"          = "%@'s photo";

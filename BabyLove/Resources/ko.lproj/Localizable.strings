@@ -533,3 +533,24 @@
 "notification.interval.2_5h"          = "2.5시간";
 "notification.interval.3h"            = "3시간";
 "notification.interval.4h"            = "4시간";
+
+/* ===== 접근성 ===== */
+"a11y.feedingTime"           = "수유 시간";
+"a11y.diaperChangeTime"      = "기저귀 교체 시간";
+"a11y.fellAsleepTime"        = "잠든 시간";
+"a11y.sleepStartTime"        = "수면 시작 시간";
+"a11y.wakeUpTime"            = "깨어난 시간";
+"a11y.measurementDate"       = "측정 날짜";
+"a11y.previousDay"           = "이전 날";
+"a11y.previousDayHint"       = "이전 날 기록 보기";
+"a11y.nextDay"               = "다음 날";
+"a11y.nextDayHint"           = "다음 날 기록 보기";
+"a11y.earliestDate"          = "가장 이른 날짜입니다";
+"a11y.tapEditSwipeDelete"    = "탭하여 편집, 스와이프하여 삭제";
+"a11y.longPressEditDelete"   = "길게 눌러 편집 또는 삭제";
+"a11y.at %@"                 = "%@에";
+"a11y.note %@"               = "메모: %@";
+"a11y.atAge %@"              = "%@ 때";
+"a11y.logAction %@"          = "%@ 기록";
+"a11y.logHint %@"            = "이중 탭하여 새 %@ 기록";
+"a11y.babyPhoto %@"          = "%@의 사진";

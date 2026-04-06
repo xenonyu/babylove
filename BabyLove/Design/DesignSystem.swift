@@ -165,8 +165,8 @@ struct QuickLogCard: View {
             .blCard()
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Log \(label)")
-        .accessibilityHint("Double tap to record a new \(label.lowercased()) entry")
+        .accessibilityLabel(String(format: NSLocalizedString("a11y.logAction %@", comment: ""), label))
+        .accessibilityHint(String(format: NSLocalizedString("a11y.logHint %@", comment: ""), label.lowercased()))
     }
 }
 
@@ -312,7 +312,7 @@ struct BabyAvatarView: View {
                 }
             }
         }
-        .accessibilityLabel("\(baby.name)'s photo")
+        .accessibilityLabel(String(format: NSLocalizedString("a11y.babyPhoto %@", comment: ""), baby.name))
         .accessibilityElement(children: .ignore)
     }
 }

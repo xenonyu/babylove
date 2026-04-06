@@ -533,3 +533,24 @@
 "notification.interval.2_5h"          = "2.5 小时";
 "notification.interval.3h"            = "3 小时";
 "notification.interval.4h"            = "4 小时";
+
+/* ===== 无障碍 ===== */
+"a11y.feedingTime"           = "喂食时间";
+"a11y.diaperChangeTime"      = "换尿布时间";
+"a11y.fellAsleepTime"        = "入睡时间";
+"a11y.sleepStartTime"        = "睡眠开始时间";
+"a11y.wakeUpTime"            = "醒来时间";
+"a11y.measurementDate"       = "测量日期";
+"a11y.previousDay"           = "前一天";
+"a11y.previousDayHint"       = "查看前一天记录";
+"a11y.nextDay"               = "后一天";
+"a11y.nextDayHint"           = "查看后一天记录";
+"a11y.earliestDate"          = "已到最早日期";
+"a11y.tapEditSwipeDelete"    = "点击编辑，滑动删除";
+"a11y.longPressEditDelete"   = "长按可编辑或删除";
+"a11y.at %@"                 = "于 %@";
+"a11y.note %@"               = "备注：%@";
+"a11y.atAge %@"              = "%@ 时";
+"a11y.logAction %@"          = "记录%@";
+"a11y.logHint %@"            = "双击记录新的%@";
+"a11y.babyPhoto %@"          = "%@的照片";

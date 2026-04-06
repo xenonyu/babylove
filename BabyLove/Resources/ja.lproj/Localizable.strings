@@ -533,3 +533,24 @@
 "notification.interval.2_5h"          = "2.5 時間";
 "notification.interval.3h"            = "3 時間";
 "notification.interval.4h"            = "4 時間";
+
+/* ===== アクセシビリティ ===== */
+"a11y.feedingTime"           = "授乳時刻";
+"a11y.diaperChangeTime"      = "おむつ交換時刻";
+"a11y.fellAsleepTime"        = "寝た時刻";
+"a11y.sleepStartTime"        = "睡眠開始時刻";
+"a11y.wakeUpTime"            = "起きた時刻";
+"a11y.measurementDate"       = "測定日";
+"a11y.previousDay"           = "前の日";
+"a11y.previousDayHint"       = "前日の記録を見る";
+"a11y.nextDay"               = "次の日";
+"a11y.nextDayHint"           = "翌日の記録を見る";
+"a11y.earliestDate"          = "最も古い日付です";
+"a11y.tapEditSwipeDelete"    = "タップで編集、スワイプで削除";
+"a11y.longPressEditDelete"   = "長押しで編集または削除";
+"a11y.at %@"                 = "%@ に";
+"a11y.note %@"               = "メモ：%@";
+"a11y.atAge %@"              = "%@ の時";
+"a11y.logAction %@"          = "%@を記録";
+"a11y.logHint %@"            = "ダブルタップで新しい%@を記録";
+"a11y.babyPhoto %@"          = "%@の写真";
