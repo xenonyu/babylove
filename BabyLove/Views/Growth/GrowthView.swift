@@ -213,7 +213,54 @@ struct GrowthView: View {
                 )
                 .frame(height: 260)
                 .blCard()
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(chartAccessibilityLabel)
             }
+        }
+    }
+
+    /// VoiceOver summary for the growth chart
+    private var chartAccessibilityLabel: String {
+        let metricName = selectedMetric.rawValue.lowercased()
+        let unit = appState.measurementUnit
+        let dataRecords = records.filter { rawValueForMetric($0) > 0 }
+        guard !dataRecords.isEmpty else {
+            return "\(selectedMetric.rawValue) chart, no data"
+        }
+        let count = dataRecords.count
+        if let first = dataRecords.first, let last = dataRecords.last {
+            let firstVal = displayValueForMetric(first, unit: unit)
+            let lastVal = displayValueForMetric(last, unit: unit)
+            let unitLabel = selectedMetric == .weight ? unit.weightLabel : unit.heightLabel
+            var label = "\(selectedMetric.rawValue) chart with \(count) measurement\(count == 1 ? "" : "s")"
+            if count > 1 {
+                label += ", from \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", firstVal)) to \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", lastVal)) \(unitLabel)"
+            } else {
+                label += ", \(String(format: selectedMetric == .weight ? "%.2f" : "%.1f", lastVal)) \(unitLabel)"
+            }
+            if let pctl = whoPercentile(for: selectedMetric) {
+                label += ", currently at percentile \(pctl)"
+            }
+            return label
+        }
+        return "\(selectedMetric.rawValue) chart"
+    }
+
+    /// Raw value in storage units for a record given the selected metric
+    private func rawValueForMetric(_ r: CDGrowthRecord) -> Double {
+        switch selectedMetric {
+        case .weight: return r.weightKG
+        case .height: return r.heightCM
+        case .head:   return r.headCircumferenceCM
+        }
+    }
+
+    /// Display value for a record given the selected metric and unit
+    private func displayValueForMetric(_ r: CDGrowthRecord, unit: MeasurementUnit) -> Double {
+        switch selectedMetric {
+        case .weight: return unit.weightFromKG(r.weightKG)
+        case .height: return unit.lengthFromCM(r.heightCM)
+        case .head:   return unit.lengthFromCM(r.headCircumferenceCM)
         }
     }
 
@@ -263,6 +310,8 @@ struct GrowthView: View {
         }
         .padding(.vertical, 16)
         .blCard()
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Latest measurements")
     }
 
     private var dividerLine: some View {
@@ -313,6 +362,35 @@ struct GrowthView: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(metricAccessibilityLabel(value: value, label: label, percentile: percentile, measureDate: measureDate))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityHint("Double tap to view \(label.lowercased()) chart")
+    }
+
+    /// Build a comprehensive VoiceOver label for a metric column
+    private func metricAccessibilityLabel(value: String?, label: String, percentile: Int?, measureDate: Date?) -> String {
+        var parts: [String] = [label]
+        if let value {
+            parts.append(value)
+        } else {
+            parts.append("no data")
+        }
+        if let pctl = percentile {
+            let range = percentileRangeDescription(pctl)
+            parts.append("percentile \(pctl), \(range)")
+        }
+        if let date = measureDate {
+            parts.append("measured \(Self.shortMeasureDate(date))")
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    /// Human-readable description of what a percentile range means
+    private func percentileRangeDescription(_ pctl: Int) -> String {
+        if pctl < 3 || pctl > 97 { return "outside normal range" }
+        if pctl < 15 || pctl > 85 { return "worth monitoring" }
+        return "healthy range"
     }
 
     /// Short date text for measurement date: "Today", "Yesterday", or "Apr 3"
@@ -380,6 +458,28 @@ struct GrowthView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(growthRowAccessibilityLabel(r, unit: unit, baby: baby))
+    }
+
+    private func growthRowAccessibilityLabel(_ r: CDGrowthRecord, unit: MeasurementUnit, baby: Baby?) -> String {
+        var parts: [String] = []
+        if let date = r.date {
+            parts.append(DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none))
+        }
+        if let baby, let date = r.date {
+            parts.append(baby.ageText(at: date))
+        }
+        if r.weightKG > 0 {
+            parts.append("weight \(String(format: "%.2f", unit.weightFromKG(r.weightKG))) \(unit.weightLabel)")
+        }
+        if r.heightCM > 0 {
+            parts.append("height \(String(format: "%.1f", unit.lengthFromCM(r.heightCM))) \(unit.heightLabel)")
+        }
+        if r.headCircumferenceCM > 0 {
+            parts.append("head circumference \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
+        }
+        return parts.joined(separator: ", ")
     }
 
     private var emptyState: some View {
