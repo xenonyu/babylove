@@ -212,6 +212,9 @@ struct StatBadge: View {
                 Text(subtitle)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(color.opacity(0.7))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .multilineTextAlignment(.center)
             }
             if let timeSince, !timeSince.isEmpty {
                 Text(timeSince)
