@@ -14,6 +14,10 @@ struct DiaperLogView: View {
     @State private var notes = ""
     @State private var timestamp = Date()
     @State private var showTimePicker = false
+    /// Whether the current timestamp falls on a different calendar day than today
+    private var isTimestampPastDay: Bool {
+        !Calendar.current.isDateInToday(timestamp)
+    }
 
     private var isEditing: Bool { editingRecord != nil }
 
@@ -23,6 +27,26 @@ struct DiaperLogView: View {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Retroactive date banner — shown when logging to a past day
+                        if isTimestampPastDay {
+                            HStack(spacing: 10) {
+                                Image(systemName: "calendar.badge.clock")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.blDiaper)
+                                Text("Recording for \(timestamp.formatted(date: .long, time: .omitted))")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blTextPrimary)
+                                Spacer()
+                            }
+                            .padding(12)
+                            .background(Color.blDiaper.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(Color.blDiaper.opacity(0.2), lineWidth: 1)
+                            )
+                        }
+
                         // Type selection
                         VStack(alignment: .leading, spacing: 14) {
                             Text("Diaper Type")
@@ -64,7 +88,10 @@ struct DiaperLogView: View {
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
-                                    Text(timestamp.formatted(date: .omitted, time: .shortened))
+                                    // Show date + time when recording to a past day
+                                    Text(isTimestampPastDay
+                                         ? timestamp.formatted(date: .abbreviated, time: .shortened)
+                                         : timestamp.formatted(date: .omitted, time: .shortened))
                                         .font(.system(size: 15, weight: .medium))
                                         .foregroundColor(.blDiaper)
                                     Image(systemName: "chevron.right")

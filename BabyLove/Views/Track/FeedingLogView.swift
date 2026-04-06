@@ -18,6 +18,12 @@ struct FeedingLogView: View {
     @State private var notes = ""
     @State private var timestamp = Date()
     @State private var showTimePicker = false
+    /// True when this log view was opened for a past date (retroactive logging)
+    private var isRetroactive: Bool { initialDate != nil }
+    /// Whether the current timestamp falls on a different calendar day than today
+    private var isTimestampPastDay: Bool {
+        !Calendar.current.isDateInToday(timestamp)
+    }
     @State private var isTimerMode = false
     @State private var lastSideUsed: BreastSide?
     @State private var didAutoSuggestSide = false
@@ -83,6 +89,26 @@ struct FeedingLogView: View {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+
+                        // Retroactive date banner — shown when logging to a past day
+                        if isTimestampPastDay {
+                            HStack(spacing: 10) {
+                                Image(systemName: "calendar.badge.clock")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.blFeeding)
+                                Text("Recording for \(timestamp.formatted(date: .long, time: .omitted))")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blTextPrimary)
+                                Spacer()
+                            }
+                            .padding(12)
+                            .background(Color.blFeeding.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(Color.blFeeding.opacity(0.2), lineWidth: 1)
+                            )
+                        }
 
                         // Feed type picker
                         VStack(alignment: .leading, spacing: 10) {
@@ -277,9 +303,17 @@ struct FeedingLogView: View {
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
-                                    Text(timestamp.formatted(date: .omitted, time: .shortened))
-                                        .font(.system(size: 15, weight: .medium))
-                                        .foregroundColor(.blFeeding)
+                                    // Show date + time when recording to a past day,
+                                    // otherwise just the time for today.
+                                    if isTimestampPastDay {
+                                        Text(timestamp.formatted(date: .abbreviated, time: .shortened))
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundColor(.blFeeding)
+                                    } else {
+                                        Text(timestamp.formatted(date: .omitted, time: .shortened))
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundColor(.blFeeding)
+                                    }
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundColor(.blTextTertiary)

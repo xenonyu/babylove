@@ -19,6 +19,10 @@ struct GrowthLogView: View {
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
+    /// Whether the record date falls on a different calendar day than today
+    private var isRecordDatePastDay: Bool {
+        !Calendar.current.isDateInToday(recordDate)
+    }
 
     /// At least one measurement must be a valid positive number
     private var hasValidMeasurement: Bool {
@@ -56,6 +60,26 @@ struct GrowthLogView: View {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Retroactive date banner — shown when logging to a past day
+                        if isRecordDatePastDay && !isEditing {
+                            HStack(spacing: 10) {
+                                Image(systemName: "calendar.badge.clock")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.blGrowth)
+                                Text("Recording for \(recordDate.formatted(date: .long, time: .omitted))")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blTextPrimary)
+                                Spacer()
+                            }
+                            .padding(12)
+                            .background(Color.blGrowth.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(Color.blGrowth.opacity(0.2), lineWidth: 1)
+                            )
+                        }
+
                         measurementField(
                             label: "Weight",
                             unit: unit.weightLabel,
