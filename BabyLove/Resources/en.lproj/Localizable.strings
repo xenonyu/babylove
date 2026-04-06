@@ -497,3 +497,14 @@
 "preset.sleptThroughNight"   = "Slept through the night";
 "preset.startedSolidFoods"   = "Started solid foods";
 "preset.firstHaircut"        = "First haircut";
+
+/* ===== Notifications ===== */
+"notification.feedingTitle"            = "Time to Feed";
+"notification.feedingBody %@"          = "It's been %@ since the last feeding.";
+"notification.hours %lld"             = "%lld hours";
+"notification.hoursMinutes %lld %lld" = "%lldh %lldm";
+"notification.interval.1_5h"          = "1.5 hours";
+"notification.interval.2h"            = "2 hours";
+"notification.interval.2_5h"          = "2.5 hours";
+"notification.interval.3h"            = "3 hours";
+"notification.interval.4h"            = "4 hours";

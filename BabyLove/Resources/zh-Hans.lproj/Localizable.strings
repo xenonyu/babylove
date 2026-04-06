@@ -522,3 +522,14 @@
 "preset.sleptThroughNight"   = "整夜安睡";
 "preset.startedSolidFoods"   = "开始吃辅食";
 "preset.firstHaircut"        = "第一次理发";
+
+/* ===== Notifications ===== */
+"notification.feedingTitle"            = "该喂奶了";
+"notification.feedingBody %@"          = "距上次喂奶已过 %@。";
+"notification.hours %lld"             = "%lld 小时";
+"notification.hoursMinutes %lld %lld" = "%lld小时%lld分钟";
+"notification.interval.1_5h"          = "1.5 小时";
+"notification.interval.2h"            = "2 小时";
+"notification.interval.2_5h"          = "2.5 小时";
+"notification.interval.3h"            = "3 小时";
+"notification.interval.4h"            = "4 小时";

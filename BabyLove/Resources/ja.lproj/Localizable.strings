@@ -522,3 +522,14 @@
 "preset.sleptThroughNight"   = "夜通し眠った";
 "preset.startedSolidFoods"   = "離乳食を始めた";
 "preset.firstHaircut"        = "初めての散髪";
+
+/* ===== Notifications ===== */
+"notification.feedingTitle"            = "授乳の時間です";
+"notification.feedingBody %@"          = "前回の授乳から %@ 経ちました。";
+"notification.hours %lld"             = "%lld 時間";
+"notification.hoursMinutes %lld %lld" = "%lld時間%lld分";
+"notification.interval.1_5h"          = "1.5 時間";
+"notification.interval.2h"            = "2 時間";
+"notification.interval.2_5h"          = "2.5 時間";
+"notification.interval.3h"            = "3 時間";
+"notification.interval.4h"            = "4 時間";

@@ -38,14 +38,18 @@ final class NotificationManager: NSObject, Sendable {
 
     struct ReminderInterval: Identifiable {
         let id: Int  // minutes
-        let label: String
+        let labelKey: String
+
+        var label: String {
+            NSLocalizedString(labelKey, comment: "")
+        }
 
         static let options: [ReminderInterval] = [
-            .init(id: 90,  label: "1.5 hours"),
-            .init(id: 120, label: "2 hours"),
-            .init(id: 150, label: "2.5 hours"),
-            .init(id: 180, label: "3 hours"),
-            .init(id: 240, label: "4 hours"),
+            .init(id: 90,  labelKey: "notification.interval.1_5h"),
+            .init(id: 120, labelKey: "notification.interval.2h"),
+            .init(id: 150, labelKey: "notification.interval.2_5h"),
+            .init(id: 180, labelKey: "notification.interval.3h"),
+            .init(id: 240, labelKey: "notification.interval.4h"),
         ]
     }
 
@@ -85,8 +89,8 @@ final class NotificationManager: NSObject, Sendable {
         guard fireDate > Date() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Time to Feed"
-        content.body = "It's been \(formattedInterval()) since the last feeding."
+        content.title = NSLocalizedString("notification.feedingTitle", comment: "")
+        content.body = String(format: NSLocalizedString("notification.feedingBody %@", comment: ""), formattedInterval())
         content.sound = .default
         content.categoryIdentifier = "FEEDING_REMINDER"
 
@@ -120,8 +124,8 @@ final class NotificationManager: NSObject, Sendable {
         let hours = intervalMinutes / 60
         let mins = intervalMinutes % 60
         if mins == 0 {
-            return "\(hours) hour\(hours == 1 ? "" : "s")"
+            return String(format: NSLocalizedString("notification.hours %lld", comment: ""), hours)
         }
-        return "\(hours)h \(mins)m"
+        return String(format: NSLocalizedString("notification.hoursMinutes %lld %lld", comment: ""), hours, mins)
     }
 }

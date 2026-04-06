@@ -522,3 +522,14 @@
 "preset.sleptThroughNight"   = "밤새 잠자기";
 "preset.startedSolidFoods"   = "이유식 시작";
 "preset.firstHaircut"        = "첫 이발";
+
+/* ===== Notifications ===== */
+"notification.feedingTitle"            = "수유 시간이에요";
+"notification.feedingBody %@"          = "마지막 수유 후 %@ 지났습니다.";
+"notification.hours %lld"             = "%lld시간";
+"notification.hoursMinutes %lld %lld" = "%lld시간 %lld분";
+"notification.interval.1_5h"          = "1.5시간";
+"notification.interval.2h"            = "2시간";
+"notification.interval.2_5h"          = "2.5시간";
+"notification.interval.3h"            = "3시간";
+"notification.interval.4h"            = "4시간";
