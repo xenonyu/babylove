@@ -571,6 +571,7 @@ struct AddMilestoneView: View {
                         }
                         .buttonStyle(BLPrimaryButton())
                         .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .opacity(title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
                         .padding(.top, 8)
                     }
                     .padding(24)

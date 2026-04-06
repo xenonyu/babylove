@@ -607,6 +607,7 @@ struct EditBabyView: View {
                         dismiss()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
                 }
             }
             .onAppear {
