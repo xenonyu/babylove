@@ -164,10 +164,10 @@ struct HomeView: View {
         todayFeedings.reduce(0.0) { sum, r in sum + r.amountML }
     }
 
-    /// Formatted feeding volume subtitle (e.g. "480 ml" or "16.0 oz"), empty if no volume recorded
+    /// Formatted feeding volume subtitle (e.g. "480 ml · 32 min" or "16.0 oz"), empty if no volume recorded
     private var feedingVolumeSubtitle: String {
         var parts: [String] = []
-        // Volume total
+        // Volume total (formula, pump, solid)
         if totalFeedingVolumeML > 0 {
             let unit = appState.measurementUnit
             let display = unit.volumeFromML(totalFeedingVolumeML)
@@ -176,6 +176,17 @@ struct HomeView: View {
             } else {
                 parts.append(String(format: "%.1f %@", display, unit.volumeLabel))
             }
+        }
+        // Total breast/pump duration (completed sessions only — skip ongoing timers)
+        let totalBreastMinutes = todayFeedings.reduce(0) { sum, r in
+            let ft = FeedType(rawValue: r.feedType ?? "")
+            guard ft == .breast || ft == .pump, r.durationMinutes > 0 else { return sum }
+            return sum + Int(r.durationMinutes)
+        }
+        if totalBreastMinutes > 0 {
+            let h = totalBreastMinutes / 60
+            let m = totalBreastMinutes % 60
+            parts.append(h > 0 ? "\(h)h \(m)m" : "\(m) min")
         }
         // Last breast side (helps moms remember which side to use next)
         if let lastSide = lastBreastSide {
