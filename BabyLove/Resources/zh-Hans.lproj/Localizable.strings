@@ -439,3 +439,20 @@
 "memory.updated"            = "里程碑已更新";
 "memory.saveFailed"         = "保存失败，请重试";
 "memory.filterAll"          = "全部";
+
+/* ===== Accessibility 无障碍 ===== */
+"a11y.previousDay"         = "前一天";
+"a11y.previousDayHint"     = "查看前一天的记录";
+"a11y.earliestDate"        = "已到最早日期";
+"a11y.nextDay"             = "后一天";
+"a11y.nextDayHint"         = "查看后一天的记录";
+"a11y.longPressEditDelete" = "长按可编辑或删除";
+"a11y.tapEditSwipeDelete"  = "点按编辑，滑动删除";
+"a11y.at %@"               = "%@";
+"a11y.note %@"             = "备注：%@";
+"a11y.feedingTime"         = "喂食时间";
+"a11y.fellAsleepTime"      = "入睡时间";
+"a11y.sleepStartTime"      = "睡眠开始时间";
+"a11y.wakeUpTime"          = "醒来时间";
+"a11y.diaperChangeTime"    = "换尿布时间";
+"a11y.measurementDate"     = "测量日期";

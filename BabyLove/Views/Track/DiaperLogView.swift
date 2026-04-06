@@ -110,7 +110,7 @@ struct DiaperLogView: View {
                                     .datePickerStyle(.compact)
                                     .tint(.blDiaper)
                                     .labelsHidden()
-                                    .accessibilityLabel("Diaper change time")
+                                    .accessibilityLabel(NSLocalizedString("a11y.diaperChangeTime", comment: ""))
                                     .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }

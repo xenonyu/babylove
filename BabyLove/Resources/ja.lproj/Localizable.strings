@@ -439,3 +439,20 @@
 "memory.updated"            = "マイルストーンを更新しました";
 "memory.saveFailed"         = "保存に失敗しました。もう一度お試しください";
 "memory.filterAll"          = "すべて";
+
+/* ===== Accessibility アクセシビリティ ===== */
+"a11y.previousDay"         = "前日";
+"a11y.previousDayHint"     = "前日の記録を見る";
+"a11y.earliestDate"        = "最も古い日付です";
+"a11y.nextDay"             = "翌日";
+"a11y.nextDayHint"         = "翌日の記録を見る";
+"a11y.longPressEditDelete" = "長押しで編集または削除";
+"a11y.tapEditSwipeDelete"  = "タップで編集、スワイプで削除";
+"a11y.at %@"               = "%@";
+"a11y.note %@"             = "メモ：%@";
+"a11y.feedingTime"         = "授乳時間";
+"a11y.fellAsleepTime"      = "寝た時間";
+"a11y.sleepStartTime"      = "睡眠開始時間";
+"a11y.wakeUpTime"          = "起きた時間";
+"a11y.diaperChangeTime"    = "おむつ替え時間";
+"a11y.measurementDate"     = "計測日";

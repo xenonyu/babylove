@@ -169,7 +169,7 @@ struct GrowthLogView: View {
                                     .datePickerStyle(.compact)
                                     .tint(.blGrowth)
                                     .labelsHidden()
-                                    .accessibilityLabel("Measurement date")
+                                    .accessibilityLabel(NSLocalizedString("a11y.measurementDate", comment: ""))
                                     .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }

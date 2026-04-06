@@ -332,7 +332,7 @@ struct FeedingLogView: View {
                                     .datePickerStyle(.compact)
                                     .tint(.blFeeding)
                                     .labelsHidden()
-                                    .accessibilityLabel("Feeding time")
+                                    .accessibilityLabel(NSLocalizedString("a11y.feedingTime", comment: ""))
                                     .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }

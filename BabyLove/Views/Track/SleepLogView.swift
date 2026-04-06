@@ -125,7 +125,7 @@ struct SleepLogView: View {
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
-                                    .accessibilityLabel("Fell asleep time")
+                                    .accessibilityLabel(NSLocalizedString("a11y.fellAsleepTime", comment: ""))
                             }
 
                             if isEditing {
@@ -168,7 +168,7 @@ struct SleepLogView: View {
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
-                                    .accessibilityLabel("Sleep start time")
+                                    .accessibilityLabel(NSLocalizedString("a11y.sleepStartTime", comment: ""))
                             }
 
                             // End time
@@ -180,7 +180,7 @@ struct SleepLogView: View {
                                     .datePickerStyle(.compact)
                                     .tint(.blSleep)
                                     .labelsHidden()
-                                    .accessibilityLabel("Wake up time")
+                                    .accessibilityLabel(NSLocalizedString("a11y.wakeUpTime", comment: ""))
                             }
                         }
 

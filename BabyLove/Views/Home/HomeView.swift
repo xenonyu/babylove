@@ -1187,8 +1187,8 @@ struct HomeView: View {
                         .frame(width: 32, height: 32)
                 }
                 .disabled(!canNavigateBack)
-                .accessibilityLabel("Previous day")
-                .accessibilityHint(canNavigateBack ? "Go to the previous day" : "Already at earliest date")
+                .accessibilityLabel(NSLocalizedString("a11y.previousDay", comment: ""))
+                .accessibilityHint(canNavigateBack ? NSLocalizedString("a11y.previousDayHint", comment: "") : NSLocalizedString("a11y.earliestDate", comment: ""))
 
                 Spacer()
 
@@ -1214,8 +1214,8 @@ struct HomeView: View {
                             .foregroundColor(.blPrimary)
                             .frame(width: 32, height: 32)
                     }
-                    .accessibilityLabel("Next day")
-                    .accessibilityHint("Go to the next day")
+                    .accessibilityLabel(NSLocalizedString("a11y.nextDay", comment: ""))
+                    .accessibilityHint(NSLocalizedString("a11y.nextDayHint", comment: ""))
                 }
             }
 
@@ -1965,9 +1965,9 @@ struct TimeSinceRow: View {
     private var accessibilityText: String {
         var parts = [title]
         if !detail.isEmpty { parts.append(detail) }
-        parts.append("at \(timeLabel)")
+        parts.append(String(format: NSLocalizedString("a11y.at %@", comment: ""), timeLabel))
         if showTimeAgoHighlight && !timeAgo.isEmpty { parts.append(timeAgo) }
-        if let displayNotes { parts.append("note: \(displayNotes)") }
+        if let displayNotes { parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), displayNotes)) }
         return parts.joined(separator: ", ")
     }
 
@@ -2022,6 +2022,6 @@ struct TimeSinceRow: View {
         .padding(.vertical, 12)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
-        .accessibilityHint("Long press to edit or delete")
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
     }
 }

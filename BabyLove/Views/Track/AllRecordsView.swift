@@ -263,7 +263,7 @@ struct AllFeedingsView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
-        .accessibilityHint("Tap to edit, swipe to delete")
+        .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
     }
 }
 
@@ -502,7 +502,7 @@ struct AllSleepsView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
-        .accessibilityHint("Tap to edit, swipe to delete")
+        .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
     }
 }
 
@@ -707,7 +707,7 @@ struct AllDiapersView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
-        .accessibilityHint("Tap to edit, swipe to delete")
+        .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
     }
 }
 
@@ -881,7 +881,7 @@ struct AllGrowthView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
-        .accessibilityHint("Tap to edit, swipe to delete")
+        .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
     }
 
     private func growthMetricPill(icon: String, text: String) -> some View {
