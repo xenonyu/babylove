@@ -189,11 +189,11 @@ struct GrowthLogView: View {
                                ? NSLocalizedString("growthLog.updateMeasurements", comment: "")
                                : NSLocalizedString("growthLog.saveMeasurements", comment: "")) {
                             // Convert from display unit to metric for storage.
-                            // nil means "keep existing value" (editing) or "not measured" (adding).
-                            // Only non-empty fields overwrite the stored value.
-                            let wKG: Double? = Double(weightKG).map { unit.weightToKG($0) }
-                            let hCM: Double? = Double(heightCM).map { unit.lengthToCM($0) }
-                            let hd: Double? = Double(headCM).map { unit.lengthToCM($0) }
+                            // When EDITING: empty field → explicit 0 to clear measurement.
+                            // When ADDING:  empty field → nil (leave at CoreData default 0).
+                            let wKG: Double? = Self.parseMetric(weightKG, convert: unit.weightToKG, isEditing: isEditing)
+                            let hCM: Double? = Self.parseMetric(heightCM, convert: unit.lengthToCM, isEditing: isEditing)
+                            let hd: Double? = Self.parseMetric(headCM, convert: unit.lengthToCM, isEditing: isEditing)
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateGrowth(record, weightKG: wKG, heightCM: hCM, headCM: hd, date: recordDate, notes: notes)
@@ -341,5 +341,14 @@ struct GrowthLogView: View {
             .background(Color.blSurface)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
+    }
+
+    /// Parse a measurement text field to metric value for storage.
+    /// - When the text parses to a number, convert via the given unit function.
+    /// - When the text is empty and we're editing, return explicit 0 to clear the value.
+    /// - When the text is empty and we're adding, return nil (leave at CoreData default).
+    private static func parseMetric(_ text: String, convert: (Double) -> Double, isEditing: Bool) -> Double? {
+        if let val = Double(text) { return convert(val) }
+        return isEditing ? 0 : nil
     }
 }
