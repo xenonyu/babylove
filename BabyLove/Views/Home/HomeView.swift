@@ -1517,6 +1517,14 @@ struct HomeView: View {
                         notes: item.notes,
                         showTimeAgoHighlight: isSelectedDateToday
                     )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        switch item.record {
+                        case .feeding(let r): feedingToEdit = r
+                        case .sleep(let r):   sleepToEdit = r
+                        case .diaper(let r):  diaperToEdit = r
+                        }
+                    }
                     .contextMenu {
                         Button {
                             switch item.record {

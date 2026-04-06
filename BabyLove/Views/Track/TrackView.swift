@@ -100,6 +100,8 @@ struct TrackView: View {
                             recentSection(title: "Feedings", color: .blFeeding, destination: AllFeedingsView()) {
                                 ForEach(recentFeedings.prefix(5)) { r in
                                     feedingRow(r)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { feedingToEdit = r }
                                         .contextMenu {
                                             Button {
                                                 feedingToEdit = r
@@ -121,6 +123,8 @@ struct TrackView: View {
                             recentSection(title: "Sleep", color: .blSleep, destination: AllSleepsView()) {
                                 ForEach(recentSleeps.prefix(5)) { r in
                                     sleepRow(r)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { sleepToEdit = r }
                                         .contextMenu {
                                             Button {
                                                 sleepToEdit = r
@@ -142,6 +146,8 @@ struct TrackView: View {
                             recentSection(title: "Diapers", color: .blDiaper, destination: AllDiapersView()) {
                                 ForEach(recentDiapers.prefix(5)) { r in
                                     diaperRow(r)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { diaperToEdit = r }
                                         .contextMenu {
                                             Button {
                                                 diaperToEdit = r
@@ -163,6 +169,8 @@ struct TrackView: View {
                             recentSection(title: "Growth", color: .blGrowth, destination: AllGrowthView()) {
                                 ForEach(recentGrowth.prefix(5)) { r in
                                     growthRow(r)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { growthToEdit = r }
                                         .contextMenu {
                                             Button {
                                                 growthToEdit = r
