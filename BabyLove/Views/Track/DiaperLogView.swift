@@ -7,6 +7,8 @@ struct DiaperLogView: View {
 
     /// When non-nil, we are editing an existing record
     var editingRecord: CDDiaperRecord?
+    /// Optional initial date for the timestamp (used for retroactive logging from past dates)
+    var initialDate: Date? = nil
 
     @State private var diaperType: DiaperType = .wet
     @State private var notes = ""
@@ -135,7 +137,13 @@ struct DiaperLogView: View {
                     .foregroundColor(.blDiaper)
                 }
             }
-            .onAppear { populateFromRecord() }
+            .onAppear {
+                populateFromRecord()
+                // Apply initial date for retroactive logging (only when creating new records)
+                if !isEditing, let initialDate {
+                    timestamp = initialDate
+                }
+            }
         }
     }
 

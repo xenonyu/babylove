@@ -8,6 +8,8 @@ struct FeedingLogView: View {
 
     /// When non-nil, we are editing an existing record
     var editingRecord: CDFeedingRecord?
+    /// Optional initial date for the timestamp (used for retroactive logging from past dates)
+    var initialDate: Date? = nil
 
     @State private var feedType: FeedType = .breast
     @State private var side: BreastSide = .left
@@ -362,6 +364,10 @@ struct FeedingLogView: View {
             }
             .onAppear {
                 populateFromRecord()
+                // Apply initial date for retroactive logging (only when creating new records)
+                if !isEditing, let initialDate {
+                    timestamp = initialDate
+                }
                 if !isEditing { suggestNextSide() }
                 checkExistingOngoingFeeding()
             }

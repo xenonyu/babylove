@@ -8,6 +8,8 @@ struct SleepLogView: View {
 
     /// When non-nil, we are editing an existing record
     var editingRecord: CDSleepRecord?
+    /// Optional initial date for the timestamp (used for retroactive logging from past dates)
+    var initialDate: Date? = nil
 
     @State private var startTime = Date().addingTimeInterval(-3600)
     @State private var endTime   = Date()
@@ -256,6 +258,11 @@ struct SleepLogView: View {
             }
             .onAppear {
                 populateFromRecord()
+                // Apply initial date for retroactive logging (only when creating new records)
+                if !isEditing, let initialDate {
+                    startTime = initialDate.addingTimeInterval(-3600)
+                    endTime = initialDate
+                }
                 checkExistingOngoingSleep()
             }
             .onChange(of: isOngoing) { oldValue, newValue in

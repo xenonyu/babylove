@@ -124,6 +124,15 @@ struct HomeView: View {
         Calendar.current.isDateInToday(selectedDate)
     }
 
+    /// When viewing a past date, returns a timestamp on that date (at noon)
+    /// so new log sheets default to the selected day. Returns nil for today
+    /// (log views will use Date() as default).
+    private var retroactiveDate: Date? {
+        guard !isSelectedDateToday else { return nil }
+        let cal = Calendar.current
+        return cal.date(bySettingHour: 12, minute: 0, second: 0, of: selectedDate)
+    }
+
     /// Refresh predicates to reflect the selected date.
     /// Called on appear, when returning from background, and when selectedDate changes.
     private func updatePredicates() {
@@ -397,34 +406,32 @@ struct HomeView: View {
                             .padding(.horizontal, 20)
                         }
 
-                        // Quick log (only shown for today)
-                        if isSelectedDateToday {
-                            VStack(spacing: 12) {
-                                BLSectionHeader(title: "Quick Log")
-                                    .padding(.horizontal, 20)
-
-                                LazyVGrid(columns: [
-                                    GridItem(.flexible()),
-                                    GridItem(.flexible())
-                                ], spacing: 12) {
-                                    QuickLogCard(icon: "drop.fill",
-                                                 label: "Feeding",
-                                                 color: .blFeeding,
-                                                 hint: quickLogFeedingHint) { showFeedingLog = true }
-                                    QuickLogCard(icon: "moon.zzz.fill",
-                                                 label: "Sleep",
-                                                 color: .blSleep,
-                                                 hint: quickLogSleepHint) { showSleepLog = true }
-                                    QuickLogCard(icon: "oval.fill",
-                                                 label: "Diaper",
-                                                 color: .blDiaper,
-                                                 hint: quickLogDiaperHint) { showDiaperLog = true }
-                                    QuickLogCard(icon: "chart.bar.fill",
-                                                 label: "Growth",
-                                                 color: .blGrowth) { showGrowthLog = true }
-                                }
+                        // Quick log — available for all dates (retroactive logging)
+                        VStack(spacing: 12) {
+                            BLSectionHeader(title: isSelectedDateToday ? "Quick Log" : "Add Record")
                                 .padding(.horizontal, 20)
+
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
+                                QuickLogCard(icon: "drop.fill",
+                                             label: "Feeding",
+                                             color: .blFeeding,
+                                             hint: isSelectedDateToday ? quickLogFeedingHint : nil) { showFeedingLog = true }
+                                QuickLogCard(icon: "moon.zzz.fill",
+                                             label: "Sleep",
+                                             color: .blSleep,
+                                             hint: isSelectedDateToday ? quickLogSleepHint : nil) { showSleepLog = true }
+                                QuickLogCard(icon: "oval.fill",
+                                             label: "Diaper",
+                                             color: .blDiaper,
+                                             hint: isSelectedDateToday ? quickLogDiaperHint : nil) { showDiaperLog = true }
+                                QuickLogCard(icon: "chart.bar.fill",
+                                             label: "Growth",
+                                             color: .blGrowth) { showGrowthLog = true }
                             }
+                            .padding(.horizontal, 20)
                         }
 
                         // Weekly summary (only on today view, only if there's any data)
@@ -505,16 +512,16 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showFeedingLog) {
-            FeedingLogView(vm: vm)
+            FeedingLogView(vm: vm, initialDate: retroactiveDate)
         }
         .sheet(isPresented: $showSleepLog) {
-            SleepLogView(vm: vm)
+            SleepLogView(vm: vm, initialDate: retroactiveDate)
         }
         .sheet(isPresented: $showDiaperLog) {
-            DiaperLogView(vm: vm)
+            DiaperLogView(vm: vm, initialDate: retroactiveDate)
         }
         .sheet(isPresented: $showGrowthLog) {
-            GrowthLogView(vm: vm)
+            GrowthLogView(vm: vm, initialDate: retroactiveDate)
         }
         // Timeline edit sheets
         .sheet(item: $feedingToEdit) { record in

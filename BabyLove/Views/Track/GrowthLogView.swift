@@ -7,6 +7,8 @@ struct GrowthLogView: View {
 
     /// When non-nil, we are editing an existing record
     var editingRecord: CDGrowthRecord?
+    /// Optional initial date for the record (used for retroactive logging from past dates)
+    var initialDate: Date? = nil
 
     @State private var weightKG = ""
     @State private var heightCM = ""
@@ -191,7 +193,13 @@ struct GrowthLogView: View {
                     .foregroundColor(.blGrowth)
                 }
             }
-            .onAppear { populateFromRecord() }
+            .onAppear {
+                populateFromRecord()
+                // Apply initial date for retroactive logging (only when creating new records)
+                if !isEditing, let initialDate {
+                    recordDate = initialDate
+                }
+            }
         }
     }
 
