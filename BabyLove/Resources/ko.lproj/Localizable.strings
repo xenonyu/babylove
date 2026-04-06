@@ -241,3 +241,28 @@
 "track.diaperDeleted"    = "기저귀 기록 삭제됨";
 "track.growthDeleted"    = "성장 기록 삭제됨";
 "track.recordDeleted"    = "기록 삭제됨";
+
+/* ===== All Records Views ===== */
+"allRecords.allFeedings"           = "모든 수유";
+"allRecords.allSleep"              = "모든 수면";
+"allRecords.allDiapers"            = "모든 기저귀";
+"allRecords.allGrowth"             = "모든 성장";
+"allRecords.noFeedingsYet"         = "수유 기록이 없어요";
+"allRecords.noSleepsYet"           = "수면 기록이 없어요";
+"allRecords.noDiapersYet"          = "기저귀 기록이 없어요";
+"allRecords.noGrowthYet"           = "성장 기록이 없어요";
+"allRecords.noFilteredFeedings %@" = "%@ 수유 기록 없음";
+"allRecords.noFilteredSleeps %@"   = "%@ 수면 기록 없음";
+"allRecords.noFilteredDiapers %@"  = "%@ 기저귀 기록 없음";
+"allRecords.showAll"               = "모두 보기";
+"allRecords.filterAll"             = "전체";
+"allRecords.inProgress"            = "진행 중";
+"allRecords.timerRunning"          = "타이머 작동 중";
+"allRecords.ongoing"               = "진행 중";
+"allRecords.deleteRecord"          = "기록을 삭제할까요?";
+"allRecords.delete"                = "삭제";
+"allRecords.deleteConfirmMsg"      = "이 기록은 영구적으로 삭제됩니다.";
+"allRecords.feedingDeleted"        = "수유 기록 삭제됨";
+"allRecords.sleepDeleted"          = "수면 기록 삭제됨";
+"allRecords.diaperDeleted"         = "기저귀 기록 삭제됨";
+"allRecords.growthDeleted"         = "성장 기록 삭제됨";

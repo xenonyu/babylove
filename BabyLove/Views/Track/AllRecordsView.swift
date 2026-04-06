@@ -31,7 +31,7 @@ struct AllFeedingsView: View {
             Color.blBackground.ignoresSafeArea()
 
             if records.isEmpty {
-                emptyState("No feeding records yet", icon: "drop.fill", color: .blFeeding)
+                emptyState(String(localized: "allRecords.noFeedingsYet"), icon: "drop.fill", color: .blFeeding)
             } else {
                 VStack(spacing: 0) {
                     // Filter chips
@@ -43,13 +43,13 @@ struct AllFeedingsView: View {
                             Image(systemName: "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blFeeding.opacity(0.4))
-                            Text("No \(selectedFilter?.displayName.lowercased() ?? "") feedings")
+                            Text(String(localized: "allRecords.noFilteredFeedings \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
                             Button {
                                 withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
                             } label: {
-                                Text("Show All")
+                                Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blFeeding)
                             }
@@ -92,7 +92,7 @@ struct AllFeedingsView: View {
                 }
             }
         }
-        .navigationTitle("All Feedings")
+        .navigationTitle(String(localized: "allRecords.allFeedings"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -109,21 +109,21 @@ struct AllFeedingsView: View {
         .sheet(item: $recordToEdit) { record in
             FeedingLogView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(String(localized: "allRecords.deleteRecord"), isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "common.cancel"), role: .cancel) { recordToDelete = nil }
+            Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast("Feeding deleted", icon: "trash.fill", color: .blFeeding)
+                    appState.showToast(String(localized: "allRecords.feedingDeleted"), icon: "trash.fill", color: .blFeeding)
                 }
                 recordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(String(localized: "allRecords.deleteConfirmMsg"))
         }
     }
 
@@ -131,7 +131,7 @@ struct AllFeedingsView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 FilterChip(
-                    label: "All",
+                    label: String(localized: "allRecords.filterAll"),
                     count: records.count,
                     isSelected: selectedFilter == nil,
                     color: .blFeeding
@@ -214,7 +214,7 @@ struct AllFeedingsView: View {
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
                     if isOngoing {
-                        Text("In Progress")
+                        Text(String(localized: "allRecords.inProgress"))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 7)
@@ -225,7 +225,7 @@ struct AllFeedingsView: View {
                 }
                 HStack(spacing: 8) {
                     if isOngoing {
-                        Text("Timer running")
+                        Text(String(localized: "allRecords.timerRunning"))
                             .font(.system(size: 13))
                             .foregroundColor(.blFeeding)
                     } else if r.durationMinutes > 0 {
@@ -297,7 +297,7 @@ struct AllSleepsView: View {
             Color.blBackground.ignoresSafeArea()
 
             if records.isEmpty {
-                emptyState("No sleep records yet", icon: "moon.zzz.fill", color: .blSleep)
+                emptyState(String(localized: "allRecords.noSleepsYet"), icon: "moon.zzz.fill", color: .blSleep)
             } else {
                 VStack(spacing: 0) {
                     // Filter chips
@@ -309,13 +309,13 @@ struct AllSleepsView: View {
                             Image(systemName: "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blSleep.opacity(0.4))
-                            Text("No \(selectedFilter?.displayName.lowercased() ?? "") sleeps")
+                            Text(String(localized: "allRecords.noFilteredSleeps \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
                             Button {
                                 withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
                             } label: {
-                                Text("Show All")
+                                Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blSleep)
                             }
@@ -358,7 +358,7 @@ struct AllSleepsView: View {
                 }
             }
         }
-        .navigationTitle("All Sleep")
+        .navigationTitle(String(localized: "allRecords.allSleep"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -375,21 +375,21 @@ struct AllSleepsView: View {
         .sheet(item: $recordToEdit) { record in
             SleepLogView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(String(localized: "allRecords.deleteRecord"), isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "common.cancel"), role: .cancel) { recordToDelete = nil }
+            Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast("Sleep record deleted", icon: "trash.fill", color: .blSleep)
+                    appState.showToast(String(localized: "allRecords.sleepDeleted"), icon: "trash.fill", color: .blSleep)
                 }
                 recordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(String(localized: "allRecords.deleteConfirmMsg"))
         }
     }
 
@@ -397,7 +397,7 @@ struct AllSleepsView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 FilterChip(
-                    label: "All",
+                    label: String(localized: "allRecords.filterAll"),
                     count: records.count,
                     isSelected: selectedFilter == nil,
                     color: .blSleep
@@ -474,7 +474,7 @@ struct AllSleepsView: View {
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.blSleep)
                     } else {
-                        Text("Ongoing")
+                        Text(String(localized: "allRecords.ongoing"))
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.blSleep)
                     }
@@ -535,7 +535,7 @@ struct AllDiapersView: View {
             Color.blBackground.ignoresSafeArea()
 
             if records.isEmpty {
-                emptyState("No diaper records yet", icon: "oval.fill", color: .blDiaper)
+                emptyState(String(localized: "allRecords.noDiapersYet"), icon: "oval.fill", color: .blDiaper)
             } else {
                 VStack(spacing: 0) {
                     // Filter chips
@@ -547,13 +547,13 @@ struct AllDiapersView: View {
                             Image(systemName: "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blDiaper.opacity(0.4))
-                            Text("No \(selectedFilter?.displayName.lowercased() ?? "") diapers")
+                            Text(String(localized: "allRecords.noFilteredDiapers \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
                             Button {
                                 withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
                             } label: {
-                                Text("Show All")
+                                Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.blDiaper)
                             }
@@ -596,7 +596,7 @@ struct AllDiapersView: View {
                 }
             }
         }
-        .navigationTitle("All Diapers")
+        .navigationTitle(String(localized: "allRecords.allDiapers"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -613,21 +613,21 @@ struct AllDiapersView: View {
         .sheet(item: $recordToEdit) { record in
             DiaperLogView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(String(localized: "allRecords.deleteRecord"), isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "common.cancel"), role: .cancel) { recordToDelete = nil }
+            Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast("Diaper record deleted", icon: "trash.fill", color: .blDiaper)
+                    appState.showToast(String(localized: "allRecords.diaperDeleted"), icon: "trash.fill", color: .blDiaper)
                 }
                 recordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(String(localized: "allRecords.deleteConfirmMsg"))
         }
     }
 
@@ -635,7 +635,7 @@ struct AllDiapersView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 FilterChip(
-                    label: "All",
+                    label: String(localized: "allRecords.filterAll"),
                     count: records.count,
                     isSelected: selectedFilter == nil,
                     color: .blDiaper
@@ -730,7 +730,7 @@ struct AllGrowthView: View {
             Color.blBackground.ignoresSafeArea()
 
             if records.isEmpty {
-                emptyState("No growth records yet", icon: "chart.bar.fill", color: .blGrowth)
+                emptyState(String(localized: "allRecords.noGrowthYet"), icon: "chart.bar.fill", color: .blGrowth)
             } else {
                 List {
                     ForEach(groupedByDate(records, keyPath: \.date), id: \.key) { section in
@@ -765,7 +765,7 @@ struct AllGrowthView: View {
                 .scrollContentBackground(.hidden)
             }
         }
-        .navigationTitle("All Growth")
+        .navigationTitle(String(localized: "allRecords.allGrowth"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -782,21 +782,21 @@ struct AllGrowthView: View {
         .sheet(item: $recordToEdit) { record in
             GrowthLogView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(String(localized: "allRecords.deleteRecord"), isPresented: Binding(
             get: { recordToDelete != nil },
             set: { if !$0 { recordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "common.cancel"), role: .cancel) { recordToDelete = nil }
+            Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
                     withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast("Growth record deleted", icon: "trash.fill", color: .blGrowth)
+                    appState.showToast(String(localized: "allRecords.growthDeleted"), icon: "trash.fill", color: .blGrowth)
                 }
                 recordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(String(localized: "allRecords.deleteConfirmMsg"))
         }
     }
 

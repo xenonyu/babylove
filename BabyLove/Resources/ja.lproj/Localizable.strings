@@ -241,3 +241,28 @@
 "track.diaperDeleted"    = "おむつ記録を削除しました";
 "track.growthDeleted"    = "成長記録を削除しました";
 "track.recordDeleted"    = "記録を削除しました";
+
+/* ===== All Records Views ===== */
+"allRecords.allFeedings"           = "すべての授乳";
+"allRecords.allSleep"              = "すべての睡眠";
+"allRecords.allDiapers"            = "すべてのおむつ";
+"allRecords.allGrowth"             = "すべての成長";
+"allRecords.noFeedingsYet"         = "授乳記録はまだありません";
+"allRecords.noSleepsYet"           = "睡眠記録はまだありません";
+"allRecords.noDiapersYet"          = "おむつ記録はまだありません";
+"allRecords.noGrowthYet"           = "成長記録はまだありません";
+"allRecords.noFilteredFeedings %@" = "%@の授乳記録はありません";
+"allRecords.noFilteredSleeps %@"   = "%@の睡眠記録はありません";
+"allRecords.noFilteredDiapers %@"  = "%@のおむつ記録はありません";
+"allRecords.showAll"               = "すべて表示";
+"allRecords.filterAll"             = "すべて";
+"allRecords.inProgress"            = "進行中";
+"allRecords.timerRunning"          = "タイマー稼働中";
+"allRecords.ongoing"               = "進行中";
+"allRecords.deleteRecord"          = "記録を削除しますか？";
+"allRecords.delete"                = "削除";
+"allRecords.deleteConfirmMsg"      = "この記録は完全に削除されます。";
+"allRecords.feedingDeleted"        = "授乳記録を削除しました";
+"allRecords.sleepDeleted"          = "睡眠記録を削除しました";
+"allRecords.diaperDeleted"         = "おむつ記録を削除しました";
+"allRecords.growthDeleted"         = "成長記録を削除しました";
