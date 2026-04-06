@@ -13,7 +13,7 @@ struct BabyLoveApp: App {
         if args.contains("--uitesting") && args.contains("--skip-onboarding") {
             let testBaby = Baby(
                 name: "Test Baby",
-                birthDate: Calendar.current.date(byAdding: .month, value: -3, to: Date())!,
+                birthDate: Calendar.current.date(byAdding: .month, value: -3, to: Date()) ?? Date(),
                 gender: .girl
             )
             state.completeOnboarding(with: testBaby)

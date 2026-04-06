@@ -1,6 +1,11 @@
 import SwiftUI
 import CoreData
 
+private let _trackToday = Calendar.current.startOfDay(for: Date())
+private func _trackSafeAdd(_ component: Calendar.Component, value: Int, to date: Date) -> Date {
+    Calendar.current.date(byAdding: component, value: value, to: date) ?? date
+}
+
 struct TrackView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
@@ -24,19 +29,19 @@ struct TrackView: View {
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@",
-                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _trackSafeAdd(.day, value: -14, to: _trackToday) as NSDate)
     ) private var recentFeedings: FetchedResults<CDFeedingRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
         predicate: NSPredicate(format: "startTime >= %@",
-                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _trackSafeAdd(.day, value: -14, to: _trackToday) as NSDate)
     ) private var recentSleeps: FetchedResults<CDSleepRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@",
-                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _trackSafeAdd(.day, value: -14, to: _trackToday) as NSDate)
     ) private var recentDiapers: FetchedResults<CDDiaperRecord>
 
     // Growth records are infrequent (monthly), so keep unbounded

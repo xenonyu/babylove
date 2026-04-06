@@ -1,6 +1,18 @@
 import SwiftUI
 import CoreData
 
+// MARK: - Safe Calendar Helpers
+
+/// Calendar.date(byAdding:) technically returns Optional. These helpers
+/// provide a safe fallback so we never force-unwrap in @FetchRequest
+/// predicates (which are evaluated at struct-init time — a crash there
+/// kills the entire view hierarchy).
+private let _cal = Calendar.current
+private let _today = Calendar.current.startOfDay(for: Date())
+private func _safeAdd(_ component: Calendar.Component, value: Int, to date: Date) -> Date {
+    _cal.date(byAdding: component, value: value, to: date) ?? date
+}
+
 struct HomeView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) var ctx
@@ -50,9 +62,8 @@ struct HomeView: View {
         sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
         predicate: NSPredicate(
             format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)",
-            Calendar.current.date(byAdding: .day, value: 1,
-                                  to: Calendar.current.startOfDay(for: Date()))! as NSDate,
-            Calendar.current.startOfDay(for: Date()) as NSDate
+            _safeAdd(.day, value: 1, to: _today) as NSDate,
+            _today as NSDate
         )
     )
     private var todaySleeps: FetchedResults<CDSleepRecord>
@@ -91,45 +102,45 @@ struct HomeView: View {
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@",
-                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _safeAdd(.day, value: -7, to: _today) as NSDate)
     )
     private var weekFeedings: FetchedResults<CDFeedingRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
         predicate: NSPredicate(format: "startTime >= %@",
-                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _safeAdd(.day, value: -7, to: _today) as NSDate)
     )
     private var weekSleeps: FetchedResults<CDSleepRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@",
-                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _safeAdd(.day, value: -7, to: _today) as NSDate)
     )
     private var weekDiapers: FetchedResults<CDDiaperRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@ AND timestamp < %@",
-                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate,
-                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _safeAdd(.day, value: -14, to: _today) as NSDate,
+                               _safeAdd(.day, value: -7, to: _today) as NSDate)
     )
     private var prevWeekFeedings: FetchedResults<CDFeedingRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
         predicate: NSPredicate(format: "startTime >= %@ AND startTime < %@",
-                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate,
-                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _safeAdd(.day, value: -14, to: _today) as NSDate,
+                               _safeAdd(.day, value: -7, to: _today) as NSDate)
     )
     private var prevWeekSleeps: FetchedResults<CDSleepRecord>
 
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.timestamp, order: .reverse)],
         predicate: NSPredicate(format: "timestamp >= %@ AND timestamp < %@",
-                               Calendar.current.date(byAdding: .day, value: -14, to: Calendar.current.startOfDay(for: Date()))! as NSDate,
-                               Calendar.current.date(byAdding: .day, value: -7, to: Calendar.current.startOfDay(for: Date()))! as NSDate)
+                               _safeAdd(.day, value: -14, to: _today) as NSDate,
+                               _safeAdd(.day, value: -7, to: _today) as NSDate)
     )
     private var prevWeekDiapers: FetchedResults<CDDiaperRecord>
 
@@ -153,7 +164,7 @@ struct HomeView: View {
     private func updatePredicates() {
         let cal = Calendar.current
         let startOfDay = cal.startOfDay(for: selectedDate) as NSDate
-        let endOfDay = cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: selectedDate))! as NSDate
+        let endOfDay = (cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: selectedDate)) ?? cal.startOfDay(for: selectedDate)) as NSDate
         todayFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
         // Overlap predicate: include sleeps that started before the day ends
         // AND (ended after the day starts OR are still ongoing).
@@ -172,7 +183,7 @@ struct HomeView: View {
 
         let weekStartNS = weekStart as NSDate
         let prevWeekStartNS = prevWeekStart as NSDate
-        let todayEndNS = cal.date(byAdding: .day, value: 1, to: today)! as NSDate
+        let todayEndNS = (cal.date(byAdding: .day, value: 1, to: today) ?? today) as NSDate
 
         // Current week (last 7 days up to end of today — excludes future-dated records)
         weekFeedings.nsPredicate = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", weekStartNS, todayEndNS)
@@ -1370,7 +1381,7 @@ struct HomeView: View {
     private var currentWeekActiveDays: Double {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        let weekStart = cal.date(byAdding: .day, value: -7, to: today)!
+        let weekStart = cal.date(byAdding: .day, value: -7, to: today) ?? today
         // If we have a baby birth date, cap the window to days since birth
         if let birth = baby?.birthDate {
             let birthStart = cal.startOfDay(for: birth)
@@ -1390,8 +1401,8 @@ struct HomeView: View {
     private var prevWeekActiveDays: Double {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        let prevWeekStart = cal.date(byAdding: .day, value: -14, to: today)!
-        let prevWeekEnd = cal.date(byAdding: .day, value: -7, to: today)!
+        let prevWeekStart = cal.date(byAdding: .day, value: -14, to: today) ?? today
+        let prevWeekEnd = cal.date(byAdding: .day, value: -7, to: today) ?? today
         if let birth = baby?.birthDate {
             let birthStart = cal.startOfDay(for: birth)
             // If baby wasn't born during the prev week, the full 7 days apply
