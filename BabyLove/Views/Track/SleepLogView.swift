@@ -18,6 +18,8 @@ struct SleepLogView: View {
     @State private var isOngoing = false
     /// True when another sleep timer is already running (prevents duplicates)
     @State private var hasExistingOngoingSleep = false
+    /// Timer that keeps the displayed ongoing duration up to date
+    @State private var elapsedTimer: Timer?
     /// Whether the start time falls on a different calendar day than today
     private var isStartTimePastDay: Bool {
         !Calendar.current.isDateInToday(startTime)
@@ -44,8 +46,12 @@ struct SleepLogView: View {
         let h = duration / 60, m = duration % 60
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
     }
+    /// Elapsed minutes for the ongoing sleep, updated by `elapsedTimer`.
+    @State private var ongoingElapsedMinutes: Int = 0
+
     private var ongoingDurationText: String {
-        let mins = max(0, Int(Date().timeIntervalSince(startTime) / 60))
+        // Reference the state var so SwiftUI triggers re-render when it changes
+        let mins = ongoingElapsedMinutes
         let h = mins / 60, m = mins % 60
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
     }
@@ -294,12 +300,41 @@ struct SleepLogView: View {
                     endTime = initialDate
                 }
                 checkExistingOngoingSleep()
+                updateOngoingElapsed()
+                startElapsedTimerIfNeeded()
+            }
+            .onDisappear {
+                elapsedTimer?.invalidate()
+                elapsedTimer = nil
             }
             .onChange(of: isOngoing) { oldValue, newValue in
                 // When toggling from ongoing → finished, snap endTime to now
                 if oldValue == true && newValue == false {
                     endTime = Date()
+                    elapsedTimer?.invalidate()
+                    elapsedTimer = nil
+                } else if oldValue == false && newValue == true {
+                    updateOngoingElapsed()
+                    startElapsedTimerIfNeeded()
                 }
+            }
+            .onChange(of: startTime) { _, _ in
+                updateOngoingElapsed()
+            }
+        }
+    }
+
+    /// Recalculate the displayed elapsed minutes from the current startTime.
+    private func updateOngoingElapsed() {
+        ongoingElapsedMinutes = max(0, Int(Date().timeIntervalSince(startTime) / 60))
+    }
+
+    /// Start a 15-second timer that keeps the displayed ongoing duration fresh.
+    private func startElapsedTimerIfNeeded() {
+        guard isOngoing, elapsedTimer == nil else { return }
+        elapsedTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { _ in
+            Task { @MainActor in
+                updateOngoingElapsed()
             }
         }
     }
