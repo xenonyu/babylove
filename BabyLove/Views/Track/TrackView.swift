@@ -384,10 +384,25 @@ struct TrackView: View {
     }
 
     private func diaperRow(_ r: CDDiaperRecord) -> some View {
-        HStack {
-            Text(DiaperType(rawValue: r.diaperType ?? "")?.displayName ?? "Diaper")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.blTextPrimary)
+        let dtype = DiaperType(rawValue: r.diaperType ?? "")
+        return HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    if let dtype {
+                        Text(dtype.icon)
+                            .font(.system(size: 14))
+                    }
+                    Text(dtype?.displayName ?? "Diaper")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                }
+                if let notes = r.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                        .lineLimit(1)
+                }
+            }
             Spacer()
             Text(Self.timestampText(r.timestamp))
                 .font(.system(size: 13))
