@@ -9,11 +9,22 @@ struct AllFeedingsView: View {
     @State private var recordToDelete: CDFeedingRecord?
     @State private var recordToEdit: CDFeedingRecord?
     @State private var showAddSheet = false
+    @State private var selectedFilter: FeedType? = nil
 
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)]
     ) private var records: FetchedResults<CDFeedingRecord>
+
+    private var filteredRecords: [CDFeedingRecord] {
+        guard let filter = selectedFilter else { return Array(records) }
+        return records.filter { FeedType(rawValue: $0.feedType ?? "") == filter }
+    }
+
+    /// Count of records for a given feed type (for chip badge)
+    private func countFor(_ type: FeedType) -> Int {
+        records.filter { FeedType(rawValue: $0.feedType ?? "") == type }.count
+    }
 
     var body: some View {
         ZStack {
@@ -22,37 +33,63 @@ struct AllFeedingsView: View {
             if records.isEmpty {
                 emptyState("No feeding records yet", icon: "drop.fill", color: .blFeeding)
             } else {
-                List {
-                    ForEach(groupedByDate(records, keyPath: \.timestamp), id: \.key) { section in
-                        Section {
-                            ForEach(section.records) { r in
-                                feedingRow(r)
-                                    .listRowBackground(Color.blCard)
-                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                    .contentShape(Rectangle())
-                                    .onTapGesture { recordToEdit = r }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) { recordToDelete = r } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
-                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                        Button { recordToEdit = r } label: {
-                                            Label("Edit", systemImage: "pencil")
-                                        }
-                                        .tint(.blFeeding)
-                                    }
-                            }
-                        } header: {
-                            Text(section.key)
-                                .font(.system(size: 14, weight: .semibold))
+                VStack(spacing: 0) {
+                    // Filter chips
+                    feedingFilterBar
+
+                    if filteredRecords.isEmpty {
+                        VStack(spacing: 12) {
+                            Spacer()
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.system(size: 36))
+                                .foregroundColor(.blFeeding.opacity(0.4))
+                            Text("No \(selectedFilter?.displayName.lowercased() ?? "") feedings")
+                                .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
-                                .textCase(nil)
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                            } label: {
+                                Text("Show All")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blFeeding)
+                            }
+                            Spacer()
                         }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        List {
+                            ForEach(groupedByDate(filteredRecords, keyPath: \.timestamp), id: \.key) { section in
+                                Section {
+                                    ForEach(section.records) { r in
+                                        feedingRow(r)
+                                            .listRowBackground(Color.blCard)
+                                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { recordToEdit = r }
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                Button(role: .destructive) { recordToDelete = r } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                }
+                                            }
+                                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                                Button { recordToEdit = r } label: {
+                                                    Label("Edit", systemImage: "pencil")
+                                                }
+                                                .tint(.blFeeding)
+                                            }
+                                    }
+                                } header: {
+                                    Text(section.key)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                        .textCase(nil)
+                                }
+                            }
+                        }
+                        .listStyle(.insetGrouped)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
             }
         }
         .navigationTitle("All Feedings")
@@ -88,6 +125,41 @@ struct AllFeedingsView: View {
         } message: {
             Text("This record will be permanently removed.")
         }
+    }
+
+    private var feedingFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                FilterChip(
+                    label: "All",
+                    count: records.count,
+                    isSelected: selectedFilter == nil,
+                    color: .blFeeding
+                ) {
+                    Haptic.selection()
+                    withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                }
+                ForEach(FeedType.allCases, id: \.self) { type in
+                    let count = countFor(type)
+                    if count > 0 {
+                        FilterChip(
+                            label: type.displayName,
+                            count: count,
+                            isSelected: selectedFilter == type,
+                            color: .blFeeding
+                        ) {
+                            Haptic.selection()
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedFilter = selectedFilter == type ? nil : type
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+        }
+        .background(Color.blBackground)
     }
 
     /// Whether a feeding record represents an ongoing timer (breast/pump with durationMinutes == 0).
@@ -370,11 +442,21 @@ struct AllDiapersView: View {
     @State private var recordToDelete: CDDiaperRecord?
     @State private var recordToEdit: CDDiaperRecord?
     @State private var showAddSheet = false
+    @State private var selectedFilter: DiaperType? = nil
 
     @FetchRequest(
         entity: CDDiaperRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "timestamp", ascending: false)]
     ) private var records: FetchedResults<CDDiaperRecord>
+
+    private var filteredRecords: [CDDiaperRecord] {
+        guard let filter = selectedFilter else { return Array(records) }
+        return records.filter { DiaperType(rawValue: $0.diaperType ?? "") == filter }
+    }
+
+    private func countFor(_ type: DiaperType) -> Int {
+        records.filter { DiaperType(rawValue: $0.diaperType ?? "") == type }.count
+    }
 
     var body: some View {
         ZStack {
@@ -383,37 +465,63 @@ struct AllDiapersView: View {
             if records.isEmpty {
                 emptyState("No diaper records yet", icon: "oval.fill", color: .blDiaper)
             } else {
-                List {
-                    ForEach(groupedByDate(records, keyPath: \.timestamp), id: \.key) { section in
-                        Section {
-                            ForEach(section.records) { r in
-                                diaperRow(r)
-                                    .listRowBackground(Color.blCard)
-                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                    .contentShape(Rectangle())
-                                    .onTapGesture { recordToEdit = r }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) { recordToDelete = r } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
-                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                        Button { recordToEdit = r } label: {
-                                            Label("Edit", systemImage: "pencil")
-                                        }
-                                        .tint(.blDiaper)
-                                    }
-                            }
-                        } header: {
-                            Text(section.key)
-                                .font(.system(size: 14, weight: .semibold))
+                VStack(spacing: 0) {
+                    // Filter chips
+                    diaperFilterBar
+
+                    if filteredRecords.isEmpty {
+                        VStack(spacing: 12) {
+                            Spacer()
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.system(size: 36))
+                                .foregroundColor(.blDiaper.opacity(0.4))
+                            Text("No \(selectedFilter?.displayName.lowercased() ?? "") diapers")
+                                .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
-                                .textCase(nil)
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                            } label: {
+                                Text("Show All")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blDiaper)
+                            }
+                            Spacer()
                         }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        List {
+                            ForEach(groupedByDate(filteredRecords, keyPath: \.timestamp), id: \.key) { section in
+                                Section {
+                                    ForEach(section.records) { r in
+                                        diaperRow(r)
+                                            .listRowBackground(Color.blCard)
+                                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { recordToEdit = r }
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                Button(role: .destructive) { recordToDelete = r } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                }
+                                            }
+                                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                                Button { recordToEdit = r } label: {
+                                                    Label("Edit", systemImage: "pencil")
+                                                }
+                                                .tint(.blDiaper)
+                                            }
+                                    }
+                                } header: {
+                                    Text(section.key)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                        .textCase(nil)
+                                }
+                            }
+                        }
+                        .listStyle(.insetGrouped)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
             }
         }
         .navigationTitle("All Diapers")
@@ -449,6 +557,41 @@ struct AllDiapersView: View {
         } message: {
             Text("This record will be permanently removed.")
         }
+    }
+
+    private var diaperFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                FilterChip(
+                    label: "All",
+                    count: records.count,
+                    isSelected: selectedFilter == nil,
+                    color: .blDiaper
+                ) {
+                    Haptic.selection()
+                    withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                }
+                ForEach(DiaperType.allCases, id: \.self) { type in
+                    let count = countFor(type)
+                    if count > 0 {
+                        FilterChip(
+                            label: type.displayName,
+                            count: count,
+                            isSelected: selectedFilter == type,
+                            color: .blDiaper
+                        ) {
+                            Haptic.selection()
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedFilter = selectedFilter == type ? nil : type
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+        }
+        .background(Color.blBackground)
     }
 
     private func diaperRow(_ r: CDDiaperRecord) -> some View {
@@ -682,6 +825,42 @@ struct AllGrowthView: View {
     }
 }
 
+// MARK: - Filter Chip
+
+private struct FilterChip: View {
+    let label: String
+    let count: Int
+    let isSelected: Bool
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Text(label)
+                    .font(.system(size: 13, weight: isSelected ? .bold : .medium))
+                Text("\(count)")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundColor(isSelected ? color : .blTextTertiary)
+            }
+            .foregroundColor(isSelected ? .white : .blTextSecondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(
+                Capsule()
+                    .fill(isSelected ? color : Color.blSurface)
+            )
+            .overlay(
+                Capsule()
+                    .strokeBorder(isSelected ? color : Color.blSurface, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(label), \(count) records")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
 // MARK: - Shared Helpers
 
 private struct DateSection<T>: Identifiable {
@@ -691,11 +870,15 @@ private struct DateSection<T>: Identifiable {
 }
 
 private func groupedByDate<T: NSManagedObject>(_ results: FetchedResults<T>, keyPath: KeyPath<T, Date?>) -> [DateSection<T>] {
+    groupedByDate(Array(results), keyPath: keyPath)
+}
+
+private func groupedByDate<T: NSManagedObject>(_ items: [T], keyPath: KeyPath<T, Date?>) -> [DateSection<T>] {
     let cal = Calendar.current
     var dict: [String: [T]] = [:]
     var order: [String] = []
 
-    for record in results {
+    for record in items {
         let date = record[keyPath: keyPath] ?? Date()
         let key: String
         if cal.isDateInToday(date) || cal.isDateInYesterday(date) {
