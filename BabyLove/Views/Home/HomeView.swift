@@ -998,6 +998,8 @@ struct HomeView: View {
     }
 
     /// The actual number of days to use as divisor for the previous 7-day window.
+    /// Note: prevWeekEnd is exclusive (predicate uses `< weekStart`), so
+    /// dateComponents already gives the correct inclusive day count without +1.
     private var prevWeekActiveDays: Double {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
@@ -1012,7 +1014,7 @@ struct HomeView: View {
                 return 7.0 // won't matter since prevWeek data will be empty
             }
             let effectiveStart = max(prevWeekStart, birthStart)
-            let days = (cal.dateComponents([.day], from: effectiveStart, to: prevWeekEnd).day ?? 6) + 1
+            let days = cal.dateComponents([.day], from: effectiveStart, to: prevWeekEnd).day ?? 7
             return Double(max(1, min(7, days)))
         }
         return 7.0
@@ -1048,11 +1050,12 @@ struct HomeView: View {
     }
 
     /// Average sleep hours per day previous week
+    /// Note: Ongoing sessions (endTime == nil) are skipped because historical
+    /// averages must not use the current time as a stand-in end time.
     private var prevWeekAvgSleepHours: Double {
         guard !prevWeekSleeps.isEmpty else { return 0 }
         let totalMinutes = prevWeekSleeps.reduce(0) { sum, r in
-            guard let s = r.startTime else { return sum }
-            let e = r.endTime ?? Date()
+            guard let s = r.startTime, let e = r.endTime else { return sum }
             return sum + Int(e.timeIntervalSince(s) / 60)
         }
         return Double(totalMinutes) / 60.0 / prevWeekActiveDays
