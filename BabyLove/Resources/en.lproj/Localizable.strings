@@ -277,6 +277,31 @@
 "track.growthDeleted"    = "Growth record deleted";
 "track.recordDeleted"    = "Record deleted";
 
+/* ===== All Records Views ===== */
+"allRecords.allFeedings"           = "All Feedings";
+"allRecords.allSleep"              = "All Sleep";
+"allRecords.allDiapers"            = "All Diapers";
+"allRecords.allGrowth"             = "All Growth";
+"allRecords.noFeedingsYet"         = "No feedings yet";
+"allRecords.noSleepsYet"           = "No sleep records yet";
+"allRecords.noDiapersYet"          = "No diaper records yet";
+"allRecords.noGrowthYet"           = "No growth records yet";
+"allRecords.noFilteredFeedings %@" = "No %@ feedings found";
+"allRecords.noFilteredSleeps %@"   = "No %@ sleep records found";
+"allRecords.noFilteredDiapers %@"  = "No %@ diaper records found";
+"allRecords.showAll"               = "Show All";
+"allRecords.filterAll"             = "All";
+"allRecords.inProgress"            = "In Progress";
+"allRecords.timerRunning"          = "Timer Running";
+"allRecords.ongoing"               = "Ongoing";
+"allRecords.deleteRecord"          = "Delete Record?";
+"allRecords.delete"                = "Delete";
+"allRecords.deleteConfirmMsg"      = "This record will be permanently removed.";
+"allRecords.feedingDeleted"        = "Feeding deleted";
+"allRecords.sleepDeleted"          = "Sleep deleted";
+"allRecords.diaperDeleted"         = "Diaper deleted";
+"allRecords.growthDeleted"         = "Growth record deleted";
+
 /* ===== Log Views (Shared) ===== */
 "log.recordingFor %@"     = "Recording for %@";
 "log.cancel"              = "Cancel";
