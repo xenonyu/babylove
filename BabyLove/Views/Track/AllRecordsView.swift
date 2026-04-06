@@ -275,11 +275,22 @@ struct AllSleepsView: View {
     @State private var recordToDelete: CDSleepRecord?
     @State private var recordToEdit: CDSleepRecord?
     @State private var showAddSheet = false
+    @State private var selectedFilter: SleepLocation? = nil
 
     @FetchRequest(
         entity: CDSleepRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "startTime", ascending: false)]
     ) private var records: FetchedResults<CDSleepRecord>
+
+    private var filteredRecords: [CDSleepRecord] {
+        guard let filter = selectedFilter else { return Array(records) }
+        return records.filter { SleepLocation(rawValue: $0.location ?? "") == filter }
+    }
+
+    /// Count of records for a given sleep location (for chip badge)
+    private func countFor(_ location: SleepLocation) -> Int {
+        records.filter { SleepLocation(rawValue: $0.location ?? "") == location }.count
+    }
 
     var body: some View {
         ZStack {
@@ -288,37 +299,63 @@ struct AllSleepsView: View {
             if records.isEmpty {
                 emptyState("No sleep records yet", icon: "moon.zzz.fill", color: .blSleep)
             } else {
-                List {
-                    ForEach(groupedByDate(records, keyPath: \.startTime), id: \.key) { section in
-                        Section {
-                            ForEach(section.records) { r in
-                                sleepRow(r)
-                                    .listRowBackground(Color.blCard)
-                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                    .contentShape(Rectangle())
-                                    .onTapGesture { recordToEdit = r }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) { recordToDelete = r } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
-                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                        Button { recordToEdit = r } label: {
-                                            Label("Edit", systemImage: "pencil")
-                                        }
-                                        .tint(.blSleep)
-                                    }
-                            }
-                        } header: {
-                            Text(section.key)
-                                .font(.system(size: 14, weight: .semibold))
+                VStack(spacing: 0) {
+                    // Filter chips
+                    sleepFilterBar
+
+                    if filteredRecords.isEmpty {
+                        VStack(spacing: 12) {
+                            Spacer()
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.system(size: 36))
+                                .foregroundColor(.blSleep.opacity(0.4))
+                            Text("No \(selectedFilter?.displayName.lowercased() ?? "") sleeps")
+                                .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
-                                .textCase(nil)
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                            } label: {
+                                Text("Show All")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blSleep)
+                            }
+                            Spacer()
                         }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        List {
+                            ForEach(groupedByDate(filteredRecords, keyPath: \.startTime), id: \.key) { section in
+                                Section {
+                                    ForEach(section.records) { r in
+                                        sleepRow(r)
+                                            .listRowBackground(Color.blCard)
+                                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { recordToEdit = r }
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                Button(role: .destructive) { recordToDelete = r } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                }
+                                            }
+                                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                                Button { recordToEdit = r } label: {
+                                                    Label("Edit", systemImage: "pencil")
+                                                }
+                                                .tint(.blSleep)
+                                            }
+                                    }
+                                } header: {
+                                    Text(section.key)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                        .textCase(nil)
+                                }
+                            }
+                        }
+                        .listStyle(.insetGrouped)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
             }
         }
         .navigationTitle("All Sleep")
@@ -354,6 +391,41 @@ struct AllSleepsView: View {
         } message: {
             Text("This record will be permanently removed.")
         }
+    }
+
+    private var sleepFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                FilterChip(
+                    label: "All",
+                    count: records.count,
+                    isSelected: selectedFilter == nil,
+                    color: .blSleep
+                ) {
+                    Haptic.selection()
+                    withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                }
+                ForEach(SleepLocation.allCases, id: \.self) { location in
+                    let count = countFor(location)
+                    if count > 0 {
+                        FilterChip(
+                            label: location.displayName,
+                            count: count,
+                            isSelected: selectedFilter == location,
+                            color: .blSleep
+                        ) {
+                            Haptic.selection()
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedFilter = selectedFilter == location ? nil : location
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+        }
+        .background(Color.blBackground)
     }
 
     private func sleepRow(_ r: CDSleepRecord) -> some View {

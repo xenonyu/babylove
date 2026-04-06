@@ -98,66 +98,36 @@ EYE_COLOR   = (0xFF, 0x7B, 0x6B, 255)   # #FF7B6B coral
 CHEEK_COLOR = (0xFF, 0xB3, 0xA8, 153)   # #FFB3A8 @ ~60% opacity (153/255)
 SMILE_COLOR = (0xFF, 0x7B, 0x6B, 255)   # #FF7B6B coral
 
-# Eyes: radius 30, centers at (460,435) and (564,435)
+# Eyes: radius 30, shifted up so face is centred in the heart's visual mass
 EYE_R = 30
-for ex, ey in [(460, 435), (564, 435)]:
+for ex, ey in [(460, 400), (564, 400)]:
     fdraw.ellipse(
         [(ex - EYE_R, ey - EYE_R), (ex + EYE_R, ey + EYE_R)],
         fill=EYE_COLOR,
     )
 
-# Rosy cheeks: 50×35 ellipses at (390,490) and (634,490), blended at 60% opacity
-for chx, chy in [(390, 490), (634, 490)]:
+# Rosy cheeks: symmetric, shifted up to match eyes
+for chx, chy in [(390, 450), (634, 450)]:
     fdraw.ellipse(
         [(chx - 25, chy - 17), (chx + 25, chy + 17)],
         fill=CHEEK_COLOR,
     )
 
-# Smile: arc, center (512,515), ~80 px wide, ~20 px curve depth
-# Bounding box for the arc ellipse: semi-axes 40 px wide, 20 px tall
-SMILE_CX, SMILE_CY = 512, 515
-SMILE_W, SMILE_H = 80, 40   # bounding box full width/height
+# Smile: bigger + darker coral + thicker stroke so it survives at 60px
+SMILE_CX, SMILE_CY = 512, 478
+SMILE_W, SMILE_H = 110, 55   # wider and taller for better legibility
 smile_bbox = [
     SMILE_CX - SMILE_W // 2,
     SMILE_CY - SMILE_H // 2,
     SMILE_CX + SMILE_W // 2,
     SMILE_CY + SMILE_H // 2,
 ]
-fdraw.arc(smile_bbox, start=10, end=170, fill=SMILE_COLOR, width=8)
+fdraw.arc(smile_bbox, start=15, end=165, fill=(0xE8, 0x55, 0x45, 255), width=14)
 
 canvas = Image.alpha_composite(canvas, face_layer)
 
 
-# ── 7. Baby footprint accent (lower-right inside heart) ──────────────────────
-foot_layer = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
-ftdraw = ImageDraw.Draw(foot_layer)
-FOOT_COLOR = (0xFF, 0xE0, 0xDA, 210)   # #FFE0DA, very pale coral
-
-# Footprint anchor: ~(600, 555)
-FX, FY = 600, 565
-
-# Heel oval: 35×50 px
-ftdraw.ellipse(
-    [(FX - 17, FY - 10), (FX + 17, FY + 40)],
-    fill=FOOT_COLOR,
-)
-
-# Five toes: tiny circles radius ~7-8 px
-# Spread across top of foot, slightly fanned
-toe_data = [
-    (-16, -22, 7),   # big toe (leftmost)
-    ( -7, -30, 7),
-    (  3, -33, 7),
-    ( 13, -30, 7),
-    ( 21, -22, 7),   # little toe (rightmost)
-]
-for tx, ty, tr in toe_data:
-    ftdraw.ellipse(
-        [(FX + tx - tr, FY + ty - tr), (FX + tx + tr, FY + ty + tr)],
-        fill=FOOT_COLOR,
-    )
-
-canvas = Image.alpha_composite(canvas, foot_layer)
+# ── 7. (footprint removed — was read as noise at small sizes) ─────────────────
 
 
 # ── 8. Apply squircle mask ─────────────────────────────────────────────────────
