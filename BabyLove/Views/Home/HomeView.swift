@@ -207,11 +207,11 @@ struct HomeView: View {
         }
         // Last breast side (helps moms remember which side to use next)
         if let lastSide = lastBreastSide {
-            parts.append("Last: \(lastSide.displayName)")
+            parts.append(String(format: NSLocalizedString("home.lastSide %@", comment: ""), lastSide.displayName))
         }
         // Average feeding interval (only meaningful with 2+ completed feedings)
         if let avgText = avgFeedingIntervalText {
-            parts.append("every \(avgText)")
+            parts.append(String(format: NSLocalizedString("home.every %@", comment: ""), avgText))
         }
         return parts.joined(separator: " · ")
     }
@@ -260,23 +260,25 @@ struct HomeView: View {
         guard let date else { return "" }
         let seconds = Int(Date().timeIntervalSince(date))
         guard seconds >= 0 else { return "" }
-        if seconds < 60 { return "just now" }
+        if seconds < 60 { return NSLocalizedString("home.justNow", comment: "") }
         let minutes = seconds / 60
-        if minutes < 60 { return "\(minutes)m ago" }
+        if minutes < 60 { return String(format: NSLocalizedString("home.minsAgo %lld", comment: ""), minutes) }
         let hours = minutes / 60
         let remMins = minutes % 60
         if hours < 24 {
-            return remMins > 0 ? "\(hours)h \(remMins)m ago" : "\(hours)h ago"
+            return remMins > 0
+                ? String(format: NSLocalizedString("home.hoursMinAgo %lld %lld", comment: ""), hours, remMins)
+                : String(format: NSLocalizedString("home.hoursAgo %lld", comment: ""), hours)
         }
         let days = hours / 24
-        return days == 1 ? "1d ago" : "\(days)d ago"
+        return String(format: NSLocalizedString("home.daysAgo %lld", comment: ""), days)
     }
 
     /// Time since last feeding (global — not limited to selected day), or "feeding now" if ongoing.
     /// References `minuteTick` so the label refreshes every 60 seconds.
     private var feedingTimeSince: String {
         _ = minuteTick
-        if globalLastFeedingIsOngoing { return "feeding now" }
+        if globalLastFeedingIsOngoing { return NSLocalizedString("home.feedingNow", comment: "") }
         return Self.timeSinceText(from: globalLastFeedingTime)
     }
 
@@ -284,7 +286,7 @@ struct HomeView: View {
     /// References `minuteTick` so the label refreshes every 60 seconds.
     private var sleepTimeSince: String {
         _ = minuteTick
-        if globalLastSleepIsOngoing { return "sleeping now" }
+        if globalLastSleepIsOngoing { return NSLocalizedString("home.sleepingNow", comment: "") }
         return Self.timeSinceText(from: globalLastSleepEnd)
     }
 
@@ -329,7 +331,8 @@ struct HomeView: View {
 
         // Feedings
         if feedCount > 0 {
-            var feedPart = "\(feedCount) feeding\(feedCount == 1 ? "" : "s")"
+            let feedKey = feedCount == 1 ? "home.summary.feedingsSingular %lld" : "home.summary.feedingsPlural %lld"
+            var feedPart = String(format: NSLocalizedString(feedKey, comment: ""), feedCount)
             if totalFeedingVolumeML > 0 {
                 let unit = appState.measurementUnit
                 let display = unit.volumeFromML(totalFeedingVolumeML)
@@ -349,35 +352,38 @@ struct HomeView: View {
             let sleepStr = h > 0
                 ? (m > 0 ? "\(h)h \(m)m" : "\(h)h")
                 : "\(m)m"
-            parts.append("\(sleepStr) of sleep")
+            parts.append(String(format: NSLocalizedString("home.summary.sleepOf %@", comment: ""), sleepStr))
         }
 
         // Diapers
         if diaperCount > 0 {
-            parts.append("\(diaperCount) diaper change\(diaperCount == 1 ? "" : "s")")
+            let diaperKey = diaperCount == 1 ? "home.summary.diapersSingular %lld" : "home.summary.diapersPlural %lld"
+            parts.append(String(format: NSLocalizedString(diaperKey, comment: ""), diaperCount))
         }
 
         // Assemble natural sentence
         guard !parts.isEmpty else { return nil }
+        let andStr = NSLocalizedString("home.summary.and", comment: "")
+        let commaAndStr = NSLocalizedString("home.summary.commaAnd", comment: "")
         let joined: String
         if parts.count == 1 {
             joined = parts[0]
         } else if parts.count == 2 {
-            joined = "\(parts[0]) and \(parts[1])"
+            joined = "\(parts[0])\(andStr)\(parts[1])"
         } else {
-            joined = "\(parts[0...(parts.count - 2)].joined(separator: ", ")), and \(parts[parts.count - 1])"
+            joined = "\(parts[0...(parts.count - 2)].joined(separator: ", "))\(commaAndStr)\(parts[parts.count - 1])"
         }
 
         var sentence: String
         if isSelectedDateToday {
-            sentence = "\(babyName) has had \(joined) so far today."
+            sentence = String(format: NSLocalizedString("home.summary.todayFormat %@ %@", comment: ""), babyName, joined)
         } else {
-            sentence = "\(babyName) had \(joined)."
+            sentence = String(format: NSLocalizedString("home.summary.pastFormat %@ %@", comment: ""), babyName, joined)
         }
 
         // Append average feeding interval as a helpful insight
         if feedCount >= 2, let intervalText = avgFeedingIntervalText {
-            sentence += " Feeding about every \(intervalText)."
+            sentence += String(format: NSLocalizedString("home.summary.feedingEvery %@", comment: ""), intervalText)
         }
 
         return sentence
@@ -389,11 +395,11 @@ struct HomeView: View {
     /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogFeedingHint: String? {
         _ = minuteTick
-        if globalLastFeedingIsOngoing { return "In progress" }
+        if globalLastFeedingIsOngoing { return NSLocalizedString("home.inProgress", comment: "") }
         // Show "Next: Right/Left" if we know the last breast side
         if let lastSide = lastBreastSide, lastSide != .both {
-            let nextSide = lastSide == .left ? "Right" : "Left"
-            return "Next: \(nextSide)"
+            let nextSide = lastSide == .left ? BreastSide.right.displayName : BreastSide.left.displayName
+            return String(format: NSLocalizedString("home.next %@", comment: ""), nextSide)
         }
         // Otherwise show time since last feeding
         guard let lastTime = globalLastFeedingTime else { return nil }
@@ -404,7 +410,7 @@ struct HomeView: View {
     /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogSleepHint: String? {
         _ = minuteTick
-        if globalLastSleepIsOngoing { return "Sleeping now" }
+        if globalLastSleepIsOngoing { return NSLocalizedString("home.sleepingNow", comment: "") }
         guard let lastTime = globalLastSleepEnd else { return nil }
         return Self.timeSinceText(from: lastTime)
     }
@@ -448,7 +454,7 @@ struct HomeView: View {
         guard count > 0 else { return "" }
         var parts: [String] = []
         // Nap/session count
-        parts.append(count == 1 ? "1 nap" : "\(count) naps")
+        parts.append(count == 1 ? NSLocalizedString("home.naps.singular", comment: "") : String(format: NSLocalizedString("home.naps.plural %lld", comment: ""), count))
         // Longest nap duration (helps parents spot patterns)
         if count > 1 {
             let cal = Calendar.current
@@ -467,7 +473,7 @@ struct HomeView: View {
                 let h = longestMinutes / 60
                 let m = longestMinutes % 60
                 let longestText = h > 0 ? "\(h)h \(m)m" : "\(m)m"
-                parts.append("longest \(longestText)")
+                parts.append(String(format: NSLocalizedString("home.naps.longest %@", comment: ""), longestText))
             }
         }
         return parts.joined(separator: " · ")
@@ -503,22 +509,22 @@ struct HomeView: View {
 
                         // Day stats
                         VStack(spacing: 12) {
-                            BLSectionHeader(title: isSelectedDateToday ? "Today's Summary" : "Day Summary")
+                            BLSectionHeader(title: isSelectedDateToday ? NSLocalizedString("home.todaysSummary", comment: "") : NSLocalizedString("home.daySummary", comment: ""))
                                 .padding(.horizontal, 20)
 
                             HStack(spacing: 12) {
                                 StatBadge(value: "\(todayFeedings.count)",
-                                          label: "Feedings",
+                                          label: NSLocalizedString("home.feedings", comment: ""),
                                           color: .blFeeding,
                                           subtitle: feedingVolumeSubtitle,
                                           timeSince: isSelectedDateToday ? feedingTimeSince : nil)
                                 StatBadge(value: sleepText,
-                                          label: "Sleep",
+                                          label: NSLocalizedString("home.sleep", comment: ""),
                                           color: .blSleep,
                                           subtitle: sleepSubtitle,
                                           timeSince: isSelectedDateToday ? sleepTimeSince : nil)
                                 StatBadge(value: "\(todayDiapers.count)",
-                                          label: "Diapers",
+                                          label: NSLocalizedString("home.diapers", comment: ""),
                                           color: .blDiaper,
                                           subtitle: diaperBreakdownSubtitle,
                                           timeSince: isSelectedDateToday ? diaperTimeSince : nil)
@@ -550,7 +556,7 @@ struct HomeView: View {
 
                         // Quick log — available for all dates (retroactive logging)
                         VStack(spacing: 12) {
-                            BLSectionHeader(title: isSelectedDateToday ? "Quick Log" : "Add Record")
+                            BLSectionHeader(title: isSelectedDateToday ? NSLocalizedString("home.quickLog", comment: "") : NSLocalizedString("home.addRecord", comment: ""))
                                 .padding(.horizontal, 20)
 
                             LazyVGrid(columns: [
@@ -558,19 +564,19 @@ struct HomeView: View {
                                 GridItem(.flexible())
                             ], spacing: 12) {
                                 QuickLogCard(icon: "drop.fill",
-                                             label: "Feeding",
+                                             label: NSLocalizedString("home.feeding", comment: ""),
                                              color: .blFeeding,
                                              hint: isSelectedDateToday ? quickLogFeedingHint : nil) { showFeedingLog = true }
                                 QuickLogCard(icon: "moon.zzz.fill",
-                                             label: "Sleep",
+                                             label: NSLocalizedString("home.sleep", comment: ""),
                                              color: .blSleep,
                                              hint: isSelectedDateToday ? quickLogSleepHint : nil) { showSleepLog = true }
                                 QuickLogCard(icon: "oval.fill",
-                                             label: "Diaper",
+                                             label: NSLocalizedString("home.diaper", comment: ""),
                                              color: .blDiaper,
                                              hint: isSelectedDateToday ? quickLogDiaperHint : nil) { showDiaperLog = true }
                                 QuickLogCard(icon: "chart.bar.fill",
-                                             label: "Growth",
+                                             label: NSLocalizedString("home.growth", comment: ""),
                                              color: .blGrowth) { showGrowthLog = true }
                             }
                             .padding(.horizontal, 20)
@@ -684,24 +690,23 @@ struct HomeView: View {
             DiaperLogView(vm: vm, editingRecord: record)
         }
         // Timeline delete confirmation
-        .alert("Delete Record?", isPresented: Binding(
+        .alert(NSLocalizedString("home.deleteRecord", comment: ""), isPresented: Binding(
             get: { timelineRecordToDelete != nil },
             set: { if !$0 { timelineRecordToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { timelineRecordToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { timelineRecordToDelete = nil }
+            Button(NSLocalizedString("home.delete", comment: ""), role: .destructive) {
                 Haptic.warning()
                 if let record = timelineRecordToDelete {
-                    // Determine record type for a contextual toast message
                     let (msg, icon, color): (String, String, Color) = {
                         if record is CDFeedingRecord {
-                            return ("Feeding deleted", "trash.fill", Color.blFeeding)
+                            return (NSLocalizedString("home.feedingDeleted", comment: ""), "trash.fill", Color.blFeeding)
                         } else if record is CDSleepRecord {
-                            return ("Sleep deleted", "trash.fill", Color.blSleep)
+                            return (NSLocalizedString("home.sleepDeleted", comment: ""), "trash.fill", Color.blSleep)
                         } else if record is CDDiaperRecord {
-                            return ("Diaper deleted", "trash.fill", Color.blDiaper)
+                            return (NSLocalizedString("home.diaperDeleted", comment: ""), "trash.fill", Color.blDiaper)
                         }
-                        return ("Record deleted", "trash.fill", Color.blPrimary)
+                        return (NSLocalizedString("home.recordDeleted", comment: ""), "trash.fill", Color.blPrimary)
                     }()
                     withAnimation { vm.deleteObject(record, in: ctx) }
                     appState.showToast(msg, icon: icon, color: color)
@@ -709,44 +714,44 @@ struct HomeView: View {
                 timelineRecordToDelete = nil
             }
         } message: {
-            Text("This record will be permanently removed.")
+            Text(NSLocalizedString("home.deleteConfirmMsg", comment: ""))
         }
         // End sleep timer confirmation
-        .alert("End Sleep?", isPresented: $showEndSleepConfirm) {
-            Button("Cancel", role: .cancel) {}
-            Button("End Sleep") {
+        .alert(NSLocalizedString("home.endSleepQ", comment: ""), isPresented: $showEndSleepConfirm) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) {}
+            Button(NSLocalizedString("home.endSleep", comment: "")) {
                 endOngoingSleep()
             }
         } message: {
-            Text("Record \(elapsedText) of sleep for \(appState.currentBaby?.name ?? "baby")?")
+            Text(String(format: NSLocalizedString("home.endSleepMsg %@ %@", comment: ""), elapsedText, appState.currentBaby?.name ?? "baby"))
         }
         // End feeding timer confirmation
-        .alert("End Feeding?", isPresented: $showEndFeedingConfirm) {
-            Button("Cancel", role: .cancel) {}
-            Button("End Feeding") {
+        .alert(NSLocalizedString("home.endFeedingQ", comment: ""), isPresented: $showEndFeedingConfirm) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) {}
+            Button(NSLocalizedString("home.endFeeding", comment: "")) {
                 endOngoingFeeding()
             }
         } message: {
-            let feedType = FeedType(rawValue: ongoingFeeding?.feedType ?? "")?.displayName ?? "Feeding"
-            Text("Record \(feedingElapsedText) of \(feedType.lowercased()) for \(appState.currentBaby?.name ?? "baby")?")
+            let feedType = FeedType(rawValue: ongoingFeeding?.feedType ?? "")?.displayName ?? NSLocalizedString("home.feeding", comment: "")
+            Text(String(format: NSLocalizedString("home.endFeedingMsg %@ %@ %@", comment: ""), feedingElapsedText, feedType.lowercased(), appState.currentBaby?.name ?? "baby"))
         }
         // Stale sleep timer warning
-        .alert("Sleep Timer Still Running", isPresented: $showStaleSleepAlert) {
-            Button("Keep Running") {}
-            Button("End Sleep", role: .destructive) {
+        .alert(NSLocalizedString("home.sleepTimerStale", comment: ""), isPresented: $showStaleSleepAlert) {
+            Button(NSLocalizedString("home.keepRunning", comment: "")) {}
+            Button(NSLocalizedString("home.endSleep", comment: ""), role: .destructive) {
                 endOngoingSleep()
             }
         } message: {
-            Text("\(appState.currentBaby?.name ?? "Baby")'s sleep timer has been running for \(staleTimerDuration). Did you forget to end it?")
+            Text(String(format: NSLocalizedString("home.sleepTimerStaleMsg %@ %@", comment: ""), appState.currentBaby?.name ?? "Baby", staleTimerDuration))
         }
         // Stale feeding timer warning
-        .alert("Feeding Timer Still Running", isPresented: $showStaleFeedingAlert) {
-            Button("Keep Running") {}
-            Button("End Feeding", role: .destructive) {
+        .alert(NSLocalizedString("home.feedingTimerStale", comment: ""), isPresented: $showStaleFeedingAlert) {
+            Button(NSLocalizedString("home.keepRunning", comment: "")) {}
+            Button(NSLocalizedString("home.endFeeding", comment: ""), role: .destructive) {
                 endOngoingFeeding()
             }
         } message: {
-            Text("\(appState.currentBaby?.name ?? "Baby")'s feeding timer has been running for \(staleTimerDuration). Did you forget to end it?")
+            Text(String(format: NSLocalizedString("home.feedingTimerStaleMsg %@ %@", comment: ""), appState.currentBaby?.name ?? "Baby", staleTimerDuration))
         }
     }
 
@@ -887,10 +892,10 @@ struct HomeView: View {
         if ok {
             Haptic.success()
             stopSleepTimer()
-            appState.showToast("Sleep ended · \(durationText)", icon: "sun.and.horizon.fill", color: .blSleep)
+            appState.showToast(String(format: NSLocalizedString("home.sleepEnded %@", comment: ""), durationText), icon: "sun.and.horizon.fill", color: .blSleep)
         } else {
             Haptic.error()
-            appState.showToast("Save failed — try again", icon: "exclamationmark.triangle.fill", color: .red)
+            appState.showToast(NSLocalizedString("home.saveFailed", comment: ""), icon: "exclamationmark.triangle.fill", color: .red)
         }
     }
 
@@ -910,11 +915,11 @@ struct HomeView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Baby is sleeping")
+                    Text(NSLocalizedString("home.babySleeping", comment: ""))
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.blTextPrimary)
                     if let start = record.startTime {
-                        Text("Since \(start.formatted(date: .omitted, time: .shortened))")
+                        Text(String(format: NSLocalizedString("home.since %@", comment: ""), start.formatted(date: .omitted, time: .shortened)))
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }
@@ -937,7 +942,7 @@ struct HomeView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "sun.and.horizon.fill")
                         .font(.system(size: 14, weight: .medium))
-                    Text("End Sleep")
+                    Text(NSLocalizedString("home.endSleep", comment: ""))
                         .font(.system(size: 15, weight: .semibold))
                 }
                 .foregroundColor(.white)
@@ -956,7 +961,7 @@ struct HomeView: View {
                 .stroke(Color.blSleep.opacity(0.3), lineWidth: 1)
         )
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Baby is sleeping, elapsed \(elapsedText)")
+        .accessibilityLabel("\(NSLocalizedString("home.babySleeping", comment: "")), \(elapsedText)")
     }
 
     // MARK: - Feeding Timer
@@ -1054,10 +1059,10 @@ struct HomeView: View {
         if ok {
             Haptic.success()
             stopFeedingTimer()
-            appState.showToast("Feeding ended · \(durationText)", icon: "checkmark.circle.fill", color: .blFeeding)
+            appState.showToast(String(format: NSLocalizedString("home.feedingEnded %@", comment: ""), durationText), icon: "checkmark.circle.fill", color: .blFeeding)
         } else {
             Haptic.error()
-            appState.showToast("Save failed — try again", icon: "exclamationmark.triangle.fill", color: .red)
+            appState.showToast(NSLocalizedString("home.saveFailed", comment: ""), icon: "exclamationmark.triangle.fill", color: .red)
         }
     }
 
@@ -1080,7 +1085,7 @@ struct HomeView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Feeding in progress")
+                    Text(NSLocalizedString("home.feedingInProgress", comment: ""))
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.blTextPrimary)
                     HStack(spacing: 4) {
@@ -1117,7 +1122,7 @@ struct HomeView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 14, weight: .medium))
-                    Text("End Feeding")
+                    Text(NSLocalizedString("home.endFeeding", comment: ""))
                         .font(.system(size: 15, weight: .semibold))
                 }
                 .foregroundColor(.white)
@@ -1136,7 +1141,7 @@ struct HomeView: View {
                 .stroke(Color.blFeeding.opacity(0.3), lineWidth: 1)
         )
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Feeding in progress, elapsed \(feedingElapsedText)")
+        .accessibilityLabel("\(NSLocalizedString("home.feedingInProgress", comment: "")), \(feedingElapsedText)")
     }
 
     // MARK: - Date Navigation Bar
@@ -1271,7 +1276,7 @@ struct HomeView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.uturn.left")
                             .font(.system(size: 11, weight: .semibold))
-                        Text("Back to Today")
+                        Text(NSLocalizedString("home.backToToday", comment: ""))
                             .font(.system(size: 13, weight: .semibold))
                     }
                     .foregroundColor(.blPrimary)
@@ -1433,9 +1438,12 @@ struct HomeView: View {
     private var weeklySummaryTitle: String {
         let days = Int(currentWeekActiveDays)
         if days < 7 {
-            return "Last \(days) Day\(days == 1 ? "" : "s")"
+            if days == 1 {
+                return NSLocalizedString("home.lastOneDay", comment: "")
+            }
+            return String(format: NSLocalizedString("home.lastNDays %lld", comment: ""), days)
         }
-        return "This Week"
+        return NSLocalizedString("home.thisWeek", comment: "")
     }
 
     private var weeklySummaryCard: some View {
@@ -1449,10 +1457,10 @@ struct HomeView: View {
                     weeklyRow(
                         icon: "drop.fill",
                         color: .blFeeding,
-                        title: "Feedings",
+                        title: NSLocalizedString("home.weekly.feedings", comment: ""),
                         value: String(format: "%.1f", weekAvgFeedings),
-                        unit: "/day",
-                        total: "\(weekFeedings.count) total",
+                        unit: NSLocalizedString("home.weekly.perDay", comment: ""),
+                        total: String(format: NSLocalizedString("home.weekly.total %lld", comment: ""), weekFeedings.count),
                         current: weekAvgFeedings,
                         previous: prevWeekAvgFeedings
                     )
@@ -1473,9 +1481,9 @@ struct HomeView: View {
                     weeklyRow(
                         icon: "cross.vial.fill",
                         color: .blFeeding,
-                        title: "Volume",
+                        title: NSLocalizedString("home.weekly.volume", comment: ""),
                         value: valueText,
-                        unit: "\(unit.volumeLabel)/day",
+                        unit: "\(unit.volumeLabel)\(NSLocalizedString("home.weekly.perDay", comment: ""))",
                         total: totalText,
                         current: weekAvgVolumeMlPerDay,
                         previous: prevWeekAvgVolumeMlPerDay
@@ -1491,10 +1499,10 @@ struct HomeView: View {
                     weeklyRow(
                         icon: "moon.zzz.fill",
                         color: .blSleep,
-                        title: "Sleep",
+                        title: NSLocalizedString("home.weekly.sleep", comment: ""),
                         value: String(format: "%.1fh", weekAvgSleepHours),
-                        unit: "/day",
-                        total: "\(weekSleeps.count) naps",
+                        unit: NSLocalizedString("home.weekly.perDay", comment: ""),
+                        total: String(format: NSLocalizedString("home.weekly.naps %lld", comment: ""), weekSleeps.count),
                         current: weekAvgSleepHours,
                         previous: prevWeekAvgSleepHours
                     )
@@ -1509,10 +1517,10 @@ struct HomeView: View {
                     weeklyRow(
                         icon: "oval.fill",
                         color: .blDiaper,
-                        title: "Diapers",
+                        title: NSLocalizedString("home.weekly.diapers", comment: ""),
                         value: String(format: "%.1f", weekAvgDiapers),
-                        unit: "/day",
-                        total: "\(weekDiapers.count) total",
+                        unit: NSLocalizedString("home.weekly.perDay", comment: ""),
+                        total: String(format: NSLocalizedString("home.weekly.total %lld", comment: ""), weekDiapers.count),
                         current: weekAvgDiapers,
                         previous: prevWeekAvgDiapers
                     )
@@ -1584,11 +1592,11 @@ struct HomeView: View {
         let diff = (current - previous) / previous
         let pct = Int(abs(diff * 100))
         if diff > 0.1 {
-            return "up \(pct)% from last week"
+            return String(format: NSLocalizedString("home.weekly.upPct %lld", comment: ""), pct)
         } else if diff < -0.1 {
-            return "down \(pct)% from last week"
+            return String(format: NSLocalizedString("home.weekly.downPct %lld", comment: ""), pct)
         } else {
-            return "same as last week"
+            return NSLocalizedString("home.weekly.same", comment: "")
         }
     }
 
@@ -1644,7 +1652,7 @@ struct HomeView: View {
 
     private var emptyDaySection: some View {
         VStack(spacing: 16) {
-            BLSectionHeader(title: "Recent Activity")
+            BLSectionHeader(title: NSLocalizedString("home.recentActivity", comment: ""))
                 .padding(.horizontal, 20)
 
             VStack(spacing: 14) {
@@ -1659,13 +1667,13 @@ struct HomeView: View {
                     )
                     .padding(.top, 4)
 
-                Text(isSelectedDateToday ? "No activity yet today" : "No activity on this day")
+                Text(isSelectedDateToday ? NSLocalizedString("home.noActivityToday", comment: "") : NSLocalizedString("home.noActivityThisDay", comment: ""))
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.blTextSecondary)
 
                 Text(isSelectedDateToday
-                     ? "Tap a Quick Log button above to start tracking \(baby?.name ?? "baby")'s day"
-                     : "No records were logged for \(baby?.name ?? "baby") on this date")
+                     ? String(format: NSLocalizedString("home.tapToStart %@", comment: ""), baby?.name ?? "baby")
+                     : String(format: NSLocalizedString("home.noRecordsLogged %@", comment: ""), baby?.name ?? "baby"))
                     .font(.system(size: 14))
                     .foregroundColor(.blTextTertiary)
                     .multilineTextAlignment(.center)
@@ -1685,19 +1693,21 @@ struct HomeView: View {
     /// Format a time interval as a human-readable "time ago" string
     private static func timeAgoText(from date: Date) -> String {
         let seconds = Int(Date().timeIntervalSince(date))
-        if seconds < 60 { return "Just now" }
+        if seconds < 60 { return NSLocalizedString("home.justNow", comment: "").capitalized }
         let minutes = seconds / 60
-        if minutes < 60 { return "\(minutes)m ago" }
+        if minutes < 60 { return String(format: NSLocalizedString("home.minsAgo %lld", comment: ""), minutes) }
         let hours = minutes / 60
         let remainMinutes = minutes % 60
         if hours < 24 {
-            return remainMinutes > 0 ? "\(hours)h \(remainMinutes)m ago" : "\(hours)h ago"
+            return remainMinutes > 0
+                ? String(format: NSLocalizedString("home.hoursMinAgo %lld %lld", comment: ""), hours, remainMinutes)
+                : String(format: NSLocalizedString("home.hoursAgo %lld", comment: ""), hours)
         }
         let days = hours / 24
         if days == 1 {
             return BLDateFormatters.relativeShort.string(from: Date(timeIntervalSinceNow: -86400))
         }
-        return "\(days)d ago"
+        return String(format: NSLocalizedString("home.daysAgo %lld", comment: ""), days)
     }
 
     /// Whether a feeding record represents an ongoing timer (breast/pump with durationMinutes == 0).
@@ -1712,7 +1722,7 @@ struct HomeView: View {
         let unit = appState.measurementUnit
         var parts: [String] = []
         if Self.isFeedingOngoing(r) {
-            parts.append("Ongoing")
+            parts.append(NSLocalizedString("home.ongoing", comment: ""))
         } else if r.durationMinutes > 0 {
             parts.append(DurationFormat.compact(r.durationMinutes))
         }
@@ -1776,8 +1786,8 @@ struct HomeView: View {
             let ft = FeedType(rawValue: r.feedType ?? "")
             let isOngoing = Self.isFeedingOngoing(r)
             let title = isOngoing
-                ? "\(ft?.displayName ?? "Feeding") (in progress)"
-                : (ft?.displayName ?? "Feeding")
+                ? "\(ft?.displayName ?? NSLocalizedString("home.feeding", comment: "")) (\(NSLocalizedString("home.inProgress", comment: "").lowercased()))"
+                : (ft?.displayName ?? NSLocalizedString("home.feeding", comment: ""))
             items.append(ActivityItem(
                 id: "f-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
                 date: ts,
@@ -1802,7 +1812,7 @@ struct HomeView: View {
                 }
                 // Duration or Ongoing
                 if r.endTime == nil {
-                    parts.append("Ongoing")
+                    parts.append(NSLocalizedString("home.ongoing", comment: ""))
                 } else if let e = r.endTime {
                     let mins = Int(e.timeIntervalSince(st) / 60)
                     let h = mins / 60, m = mins % 60
@@ -1816,7 +1826,7 @@ struct HomeView: View {
                 date: st,
                 icon: isOngoing ? "moon.fill" : "moon.zzz.fill",
                 color: .blSleep,
-                title: isOngoing ? "Sleep (in progress)" : "Sleep",
+                title: isOngoing ? "\(NSLocalizedString("home.sleep", comment: "")) (\(NSLocalizedString("home.inProgress", comment: "").lowercased()))" : NSLocalizedString("home.sleep", comment: ""),
                 detail: detail,
                 timeLabel: st.formatted(date: .omitted, time: .shortened),
                 notes: r.notes,
@@ -1836,7 +1846,7 @@ struct HomeView: View {
                 date: ts,
                 icon: "oval.fill",
                 color: .blDiaper,
-                title: "Diaper",
+                title: NSLocalizedString("home.diaper", comment: ""),
                 detail: diaperDetail,
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
                 notes: r.notes,
@@ -1854,10 +1864,10 @@ struct HomeView: View {
 
         return VStack(spacing: 12) {
             HStack {
-                BLSectionHeader(title: isSelectedDateToday ? "Today's Timeline" : "Day Timeline")
+                BLSectionHeader(title: isSelectedDateToday ? NSLocalizedString("home.todaysTimeline", comment: "") : NSLocalizedString("home.dayTimeline", comment: ""))
                 Spacer()
                 if items.count > 0 {
-                    Text("\(items.count) events")
+                    Text(String(format: NSLocalizedString("home.events %lld", comment: ""), items.count))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.blTextTertiary)
                 }
@@ -1869,7 +1879,7 @@ struct HomeView: View {
                     let timeAgo: String = {
                         if isSelectedDateToday {
                             // For sleep that's ongoing, show "Now"
-                            if item.detail.contains("Ongoing") { return "Now" }
+                            if item.detail.contains(NSLocalizedString("home.ongoing", comment: "")) { return NSLocalizedString("home.now", comment: "") }
                             return Self.timeAgoText(from: item.date)
                         }
                         return item.timeLabel
@@ -1901,7 +1911,7 @@ struct HomeView: View {
                             case .diaper(let r):  diaperToEdit = r
                             }
                         } label: {
-                            Label("Edit", systemImage: "pencil")
+                            Label(NSLocalizedString("home.edit", comment: ""), systemImage: "pencil")
                         }
                         Button(role: .destructive) {
                             switch item.record {
@@ -1910,7 +1920,7 @@ struct HomeView: View {
                             case .diaper(let r):  timelineRecordToDelete = r
                             }
                         } label: {
-                            Label("Delete", systemImage: "trash")
+                            Label(NSLocalizedString("home.delete", comment: ""), systemImage: "trash")
                         }
                     }
 
@@ -1923,7 +1933,7 @@ struct HomeView: View {
             .padding(.horizontal, 20)
 
             if items.count > 20 {
-                Text("Showing latest 20 of \(items.count) events")
+                Text(String(format: NSLocalizedString("home.showingLatest %lld", comment: ""), items.count))
                     .font(.system(size: 12))
                     .foregroundColor(.blTextTertiary)
                     .padding(.horizontal, 20)

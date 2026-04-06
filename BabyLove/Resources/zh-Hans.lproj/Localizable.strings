@@ -97,6 +97,116 @@
 "onboarding.readyToTrack %@" = "准备开始记录\n%@的成长之旅 💛";
 "onboarding.yourBaby"        = "宝宝";
 
+/* ===== Home View ===== */
+"home.todaysSummary"       = "今日概览";
+"home.daySummary"          = "当日概览";
+"home.quickLog"            = "快速记录";
+"home.addRecord"           = "添加记录";
+"home.recentActivity"      = "最近活动";
+"home.todaysTimeline"      = "今日时间线";
+"home.dayTimeline"         = "当日时间线";
+"home.thisWeek"            = "本周";
+"home.lastNDays %lld"      = "最近 %lld 天";
+"home.lastOneDay"          = "最近 1 天";
+"home.events %lld"         = "%lld 条记录";
+"home.showingLatest %lld"  = "显示最近 20 条（共 %lld 条）";
+"home.backToToday"         = "返回今天";
+
+/* Quick Log Cards */
+"home.feeding"             = "喂食";
+"home.sleep"               = "睡眠";
+"home.diaper"              = "换尿布";
+"home.growth"              = "生长";
+
+/* Stat Labels */
+"home.feedings"            = "喂食";
+"home.diapers"             = "尿布";
+
+/* Timer Banners */
+"home.babySleeping"        = "宝宝正在睡觉";
+"home.since %@"            = "从 %@ 开始";
+"home.endSleep"            = "结束睡眠";
+"home.feedingInProgress"   = "正在喂食";
+"home.endFeeding"          = "结束喂食";
+
+/* Alerts */
+"home.deleteRecord"        = "删除记录？";
+"home.deleteConfirmMsg"    = "此记录将被永久删除。";
+"home.endSleepQ"           = "结束睡眠？";
+"home.endSleepMsg %@ %@"  = "记录 %2$@ 的 %1$@ 睡眠？";
+"home.endFeedingQ"         = "结束喂食？";
+"home.endFeedingMsg %@ %@ %@" = "记录 %3$@ 的 %1$@ %2$@？";
+"home.sleepTimerStale"     = "睡眠计时器仍在运行";
+"home.sleepTimerStaleMsg %@ %@" = "%1$@ 的睡眠计时器已运行 %2$@，是否忘记结束了？";
+"home.feedingTimerStale"   = "喂食计时器仍在运行";
+"home.feedingTimerStaleMsg %@ %@" = "%1$@ 的喂食计时器已运行 %2$@，是否忘记结束了？";
+"home.keepRunning"         = "继续运行";
+
+/* Time Since */
+"home.justNow"             = "刚刚";
+"home.minsAgo %lld"        = "%lld分钟前";
+"home.hoursMinAgo %lld %lld" = "%lld小时%lld分钟前";
+"home.hoursAgo %lld"       = "%lld小时前";
+"home.daysAgo %lld"        = "%lld天前";
+"home.feedingNow"          = "正在喂食";
+"home.sleepingNow"         = "正在睡觉";
+
+/* Quick Log Hints */
+"home.inProgress"          = "进行中";
+"home.next %@"             = "下次：%@";
+
+/* Toasts */
+"home.sleepEnded %@"       = "睡眠结束 · %@";
+"home.feedingEnded %@"     = "喂食结束 · %@";
+"home.saveFailed"          = "保存失败，请重试";
+"home.feedingDeleted"      = "喂食记录已删除";
+"home.sleepDeleted"        = "睡眠记录已删除";
+"home.diaperDeleted"       = "尿布记录已删除";
+"home.recordDeleted"       = "记录已删除";
+
+/* Empty State */
+"home.noActivityToday"     = "今天还没有记录";
+"home.noActivityThisDay"   = "当天没有记录";
+"home.tapToStart %@"       = "点击上方快速记录按钮，开始记录%@的一天";
+"home.noRecordsLogged %@"  = "%@当天没有记录";
+
+/* Timeline */
+"home.ongoing"             = "进行中";
+"home.now"                 = "现在";
+"home.edit"                = "编辑";
+"home.delete"              = "删除";
+
+/* Weekly Summary */
+"home.weekly.feedings"     = "喂食";
+"home.weekly.volume"       = "奶量";
+"home.weekly.sleep"        = "睡眠";
+"home.weekly.diapers"      = "尿布";
+"home.weekly.perDay"       = "/天";
+"home.weekly.total %lld"   = "共 %lld 次";
+"home.weekly.naps %lld"    = "共 %lld 次小睡";
+"home.weekly.upPct %lld"   = "比上周增加 %lld%%";
+"home.weekly.downPct %lld" = "比上周减少 %lld%%";
+"home.weekly.same"         = "与上周持平";
+
+/* Daily Summary */
+"home.summary.feedingsSingular %lld" = "%lld 次喂食";
+"home.summary.feedingsPlural %lld"   = "%lld 次喂食";
+"home.summary.sleepOf %@"   = "%@ 睡眠";
+"home.summary.diapersSingular %lld" = "%lld 次换尿布";
+"home.summary.diapersPlural %lld"   = "%lld 次换尿布";
+"home.summary.todayFormat %@ %@"    = "%1$@ 今天已有 %2$@。";
+"home.summary.pastFormat %@ %@"     = "%1$@ 有 %2$@。";
+"home.summary.feedingEvery %@"      = " 平均每 %@ 喂一次。";
+"home.summary.and"          = "和";
+"home.summary.commaAnd"     = "、";
+
+/* Stat Subtitles */
+"home.naps.singular"       = "1 次小睡";
+"home.naps.plural %lld"    = "%lld 次小睡";
+"home.naps.longest %@"     = "最长 %@";
+"home.lastSide %@"         = "上次：%@";
+"home.every %@"            = "每 %@";
+
 "editBaby.title"            = "编辑宝宝";
 "editBaby.addPhoto"         = "添加照片";
 "editBaby.changePhoto"      = "更换照片";

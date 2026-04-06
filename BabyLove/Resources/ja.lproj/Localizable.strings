@@ -97,6 +97,116 @@
 "onboarding.readyToTrack %@" = "%@の成長記録を\n始めましょう 💛";
 "onboarding.yourBaby"        = "赤ちゃん";
 
+/* ===== Home View ===== */
+"home.todaysSummary"       = "今日のまとめ";
+"home.daySummary"          = "この日のまとめ";
+"home.quickLog"            = "クイック記録";
+"home.addRecord"           = "記録を追加";
+"home.recentActivity"      = "最近のアクティビティ";
+"home.todaysTimeline"      = "今日のタイムライン";
+"home.dayTimeline"         = "この日のタイムライン";
+"home.thisWeek"            = "今週";
+"home.lastNDays %lld"      = "過去 %lld 日間";
+"home.lastOneDay"          = "過去 1 日間";
+"home.events %lld"         = "%lld 件";
+"home.showingLatest %lld"  = "最新20件を表示（全%lld件）";
+"home.backToToday"         = "今日に戻る";
+
+/* Quick Log Cards */
+"home.feeding"             = "授乳";
+"home.sleep"               = "睡眠";
+"home.diaper"              = "おむつ";
+"home.growth"              = "成長";
+
+/* Stat Labels */
+"home.feedings"            = "授乳";
+"home.diapers"             = "おむつ";
+
+/* Timer Banners */
+"home.babySleeping"        = "赤ちゃんが寝ています";
+"home.since %@"            = "%@ から";
+"home.endSleep"            = "睡眠を終了";
+"home.feedingInProgress"   = "授乳中";
+"home.endFeeding"          = "授乳を終了";
+
+/* Alerts */
+"home.deleteRecord"        = "記録を削除しますか？";
+"home.deleteConfirmMsg"    = "この記録は完全に削除されます。";
+"home.endSleepQ"           = "睡眠を終了しますか？";
+"home.endSleepMsg %@ %@"  = "%2$@の睡眠 %1$@ を記録しますか？";
+"home.endFeedingQ"         = "授乳を終了しますか？";
+"home.endFeedingMsg %@ %@ %@" = "%3$@の%2$@ %1$@ を記録しますか？";
+"home.sleepTimerStale"     = "睡眠タイマーがまだ動いています";
+"home.sleepTimerStaleMsg %@ %@" = "%1$@の睡眠タイマーが%2$@経過しています。終了を忘れていませんか？";
+"home.feedingTimerStale"   = "授乳タイマーがまだ動いています";
+"home.feedingTimerStaleMsg %@ %@" = "%1$@の授乳タイマーが%2$@経過しています。終了を忘れていませんか？";
+"home.keepRunning"         = "続ける";
+
+/* Time Since */
+"home.justNow"             = "たった今";
+"home.minsAgo %lld"        = "%lld分前";
+"home.hoursMinAgo %lld %lld" = "%lld時間%lld分前";
+"home.hoursAgo %lld"       = "%lld時間前";
+"home.daysAgo %lld"        = "%lld日前";
+"home.feedingNow"          = "授乳中";
+"home.sleepingNow"         = "睡眠中";
+
+/* Quick Log Hints */
+"home.inProgress"          = "進行中";
+"home.next %@"             = "次：%@";
+
+/* Toasts */
+"home.sleepEnded %@"       = "睡眠終了 · %@";
+"home.feedingEnded %@"     = "授乳終了 · %@";
+"home.saveFailed"          = "保存に失敗しました。もう一度お試しください";
+"home.feedingDeleted"      = "授乳記録を削除しました";
+"home.sleepDeleted"        = "睡眠記録を削除しました";
+"home.diaperDeleted"       = "おむつ記録を削除しました";
+"home.recordDeleted"       = "記録を削除しました";
+
+/* Empty State */
+"home.noActivityToday"     = "今日はまだ記録がありません";
+"home.noActivityThisDay"   = "この日の記録はありません";
+"home.tapToStart %@"       = "上のクイック記録ボタンをタップして、%@の一日を記録しましょう";
+"home.noRecordsLogged %@"  = "%@のこの日の記録はありません";
+
+/* Timeline */
+"home.ongoing"             = "進行中";
+"home.now"                 = "今";
+"home.edit"                = "編集";
+"home.delete"              = "削除";
+
+/* Weekly Summary */
+"home.weekly.feedings"     = "授乳";
+"home.weekly.volume"       = "ミルク量";
+"home.weekly.sleep"        = "睡眠";
+"home.weekly.diapers"      = "おむつ";
+"home.weekly.perDay"       = "/日";
+"home.weekly.total %lld"   = "計 %lld 回";
+"home.weekly.naps %lld"    = "計 %lld 回のお昼寝";
+"home.weekly.upPct %lld"   = "先週より %lld%% 増加";
+"home.weekly.downPct %lld" = "先週より %lld%% 減少";
+"home.weekly.same"         = "先週と同じ";
+
+/* Daily Summary */
+"home.summary.feedingsSingular %lld" = "授乳 %lld 回";
+"home.summary.feedingsPlural %lld"   = "授乳 %lld 回";
+"home.summary.sleepOf %@"   = "睡眠 %@";
+"home.summary.diapersSingular %lld" = "おむつ交換 %lld 回";
+"home.summary.diapersPlural %lld"   = "おむつ交換 %lld 回";
+"home.summary.todayFormat %@ %@"    = "%1$@ は今日 %2$@ です。";
+"home.summary.pastFormat %@ %@"     = "%1$@ は %2$@ でした。";
+"home.summary.feedingEvery %@"      = " 約 %@ ごとに授乳。";
+"home.summary.and"          = "と";
+"home.summary.commaAnd"     = "、";
+
+/* Stat Subtitles */
+"home.naps.singular"       = "1 回のお昼寝";
+"home.naps.plural %lld"    = "%lld 回のお昼寝";
+"home.naps.longest %@"     = "最長 %@";
+"home.lastSide %@"         = "前回：%@";
+"home.every %@"            = "%@ ごと";
+
 "editBaby.title"            = "赤ちゃんを編集";
 "editBaby.addPhoto"         = "写真を追加";
 "editBaby.changePhoto"      = "写真を変更";

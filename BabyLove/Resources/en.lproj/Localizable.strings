@@ -97,6 +97,116 @@
 "onboarding.readyToTrack %@" = "Ready to start tracking\n%@'s journey 💛";
 "onboarding.yourBaby"        = "your baby";
 
+/* ===== Home View ===== */
+"home.todaysSummary"       = "Today's Summary";
+"home.daySummary"          = "Day Summary";
+"home.quickLog"            = "Quick Log";
+"home.addRecord"           = "Add Record";
+"home.recentActivity"      = "Recent Activity";
+"home.todaysTimeline"      = "Today's Timeline";
+"home.dayTimeline"         = "Day Timeline";
+"home.thisWeek"            = "This Week";
+"home.lastNDays %lld"      = "Last %lld Days";
+"home.lastOneDay"          = "Last 1 Day";
+"home.events %lld"         = "%lld events";
+"home.showingLatest %lld"  = "Showing latest 20 of %lld events";
+"home.backToToday"         = "Back to Today";
+
+/* Quick Log Cards */
+"home.feeding"             = "Feeding";
+"home.sleep"               = "Sleep";
+"home.diaper"              = "Diaper";
+"home.growth"              = "Growth";
+
+/* Stat Labels */
+"home.feedings"            = "Feedings";
+"home.diapers"             = "Diapers";
+
+/* Timer Banners */
+"home.babySleeping"        = "Baby is sleeping";
+"home.since %@"            = "Since %@";
+"home.endSleep"            = "End Sleep";
+"home.feedingInProgress"   = "Feeding in progress";
+"home.endFeeding"          = "End Feeding";
+
+/* Alerts */
+"home.deleteRecord"        = "Delete Record?";
+"home.deleteConfirmMsg"    = "This record will be permanently removed.";
+"home.endSleepQ"           = "End Sleep?";
+"home.endSleepMsg %@ %@"  = "Record %@ of sleep for %@?";
+"home.endFeedingQ"         = "End Feeding?";
+"home.endFeedingMsg %@ %@ %@" = "Record %@ of %@ for %@?";
+"home.sleepTimerStale"     = "Sleep Timer Still Running";
+"home.sleepTimerStaleMsg %@ %@" = "%@'s sleep timer has been running for %@. Did you forget to end it?";
+"home.feedingTimerStale"   = "Feeding Timer Still Running";
+"home.feedingTimerStaleMsg %@ %@" = "%@'s feeding timer has been running for %@. Did you forget to end it?";
+"home.keepRunning"         = "Keep Running";
+
+/* Time Since */
+"home.justNow"             = "just now";
+"home.minsAgo %lld"        = "%lldm ago";
+"home.hoursMinAgo %lld %lld" = "%lldh %lldm ago";
+"home.hoursAgo %lld"       = "%lldh ago";
+"home.daysAgo %lld"        = "%lldd ago";
+"home.feedingNow"          = "feeding now";
+"home.sleepingNow"         = "sleeping now";
+
+/* Quick Log Hints */
+"home.inProgress"          = "In progress";
+"home.next %@"             = "Next: %@";
+
+/* Toasts */
+"home.sleepEnded %@"       = "Sleep ended · %@";
+"home.feedingEnded %@"     = "Feeding ended · %@";
+"home.saveFailed"          = "Save failed — try again";
+"home.feedingDeleted"      = "Feeding deleted";
+"home.sleepDeleted"        = "Sleep deleted";
+"home.diaperDeleted"       = "Diaper deleted";
+"home.recordDeleted"       = "Record deleted";
+
+/* Empty State */
+"home.noActivityToday"     = "No activity yet today";
+"home.noActivityThisDay"   = "No activity on this day";
+"home.tapToStart %@"       = "Tap a Quick Log button above to start tracking %@'s day";
+"home.noRecordsLogged %@"  = "No records were logged for %@ on this date";
+
+/* Timeline */
+"home.ongoing"             = "Ongoing";
+"home.now"                 = "Now";
+"home.edit"                = "Edit";
+"home.delete"              = "Delete";
+
+/* Weekly Summary */
+"home.weekly.feedings"     = "Feedings";
+"home.weekly.volume"       = "Volume";
+"home.weekly.sleep"        = "Sleep";
+"home.weekly.diapers"      = "Diapers";
+"home.weekly.perDay"       = "/day";
+"home.weekly.total %lld"   = "%lld total";
+"home.weekly.naps %lld"    = "%lld naps";
+"home.weekly.upPct %lld"   = "up %lld%% from last week";
+"home.weekly.downPct %lld" = "down %lld%% from last week";
+"home.weekly.same"         = "same as last week";
+
+/* Daily Summary */
+"home.summary.feedingsSingular %lld" = "%lld feeding";
+"home.summary.feedingsPlural %lld"   = "%lld feedings";
+"home.summary.sleepOf %@"   = "%@ of sleep";
+"home.summary.diapersSingular %lld" = "%lld diaper change";
+"home.summary.diapersPlural %lld"   = "%lld diaper changes";
+"home.summary.todayFormat %@ %@"    = "%@ has had %@ so far today.";
+"home.summary.pastFormat %@ %@"     = "%@ had %@.";
+"home.summary.feedingEvery %@"      = " Feeding about every %@.";
+"home.summary.and"          = " and ";
+"home.summary.commaAnd"     = ", and ";
+
+/* Stat Subtitles */
+"home.naps.singular"       = "1 nap";
+"home.naps.plural %lld"    = "%lld naps";
+"home.naps.longest %@"     = "longest %@";
+"home.lastSide %@"         = "Last: %@";
+"home.every %@"            = "every %@";
+
 "editBaby.title"            = "Edit Baby";
 "editBaby.addPhoto"         = "Add Photo";
 "editBaby.changePhoto"      = "Change Photo";

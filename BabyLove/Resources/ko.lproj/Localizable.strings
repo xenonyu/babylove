@@ -97,6 +97,116 @@
 "onboarding.readyToTrack %@" = "%@의 성장 기록을\n시작할 준비가 되었어요 💛";
 "onboarding.yourBaby"        = "아기";
 
+/* ===== Home View ===== */
+"home.todaysSummary"       = "오늘 요약";
+"home.daySummary"          = "일일 요약";
+"home.quickLog"            = "빠른 기록";
+"home.addRecord"           = "기록 추가";
+"home.recentActivity"      = "최근 활동";
+"home.todaysTimeline"      = "오늘 타임라인";
+"home.dayTimeline"         = "일일 타임라인";
+"home.thisWeek"            = "이번 주";
+"home.lastNDays %lld"      = "최근 %lld일";
+"home.lastOneDay"          = "최근 1일";
+"home.events %lld"         = "%lld건";
+"home.showingLatest %lld"  = "최근 20건 표시 (전체 %lld건)";
+"home.backToToday"         = "오늘로 돌아가기";
+
+/* Quick Log Cards */
+"home.feeding"             = "수유";
+"home.sleep"               = "수면";
+"home.diaper"              = "기저귀";
+"home.growth"              = "성장";
+
+/* Stat Labels */
+"home.feedings"            = "수유";
+"home.diapers"             = "기저귀";
+
+/* Timer Banners */
+"home.babySleeping"        = "아기가 자고 있어요";
+"home.since %@"            = "%@부터";
+"home.endSleep"            = "수면 종료";
+"home.feedingInProgress"   = "수유 중";
+"home.endFeeding"          = "수유 종료";
+
+/* Alerts */
+"home.deleteRecord"        = "기록을 삭제할까요?";
+"home.deleteConfirmMsg"    = "이 기록은 영구적으로 삭제됩니다.";
+"home.endSleepQ"           = "수면을 종료할까요?";
+"home.endSleepMsg %@ %@"  = "%2$@의 수면 %1$@을 기록할까요?";
+"home.endFeedingQ"         = "수유를 종료할까요?";
+"home.endFeedingMsg %@ %@ %@" = "%3$@의 %2$@ %1$@을 기록할까요?";
+"home.sleepTimerStale"     = "수면 타이머가 계속 실행 중";
+"home.sleepTimerStaleMsg %@ %@" = "%1$@의 수면 타이머가 %2$@ 동안 실행 중입니다. 종료를 잊으셨나요?";
+"home.feedingTimerStale"   = "수유 타이머가 계속 실행 중";
+"home.feedingTimerStaleMsg %@ %@" = "%1$@의 수유 타이머가 %2$@ 동안 실행 중입니다. 종료를 잊으셨나요?";
+"home.keepRunning"         = "계속 실행";
+
+/* Time Since */
+"home.justNow"             = "방금";
+"home.minsAgo %lld"        = "%lld분 전";
+"home.hoursMinAgo %lld %lld" = "%lld시간 %lld분 전";
+"home.hoursAgo %lld"       = "%lld시간 전";
+"home.daysAgo %lld"        = "%lld일 전";
+"home.feedingNow"          = "수유 중";
+"home.sleepingNow"         = "수면 중";
+
+/* Quick Log Hints */
+"home.inProgress"          = "진행 중";
+"home.next %@"             = "다음: %@";
+
+/* Toasts */
+"home.sleepEnded %@"       = "수면 종료 · %@";
+"home.feedingEnded %@"     = "수유 종료 · %@";
+"home.saveFailed"          = "저장 실패 — 다시 시도해 주세요";
+"home.feedingDeleted"      = "수유 기록 삭제됨";
+"home.sleepDeleted"        = "수면 기록 삭제됨";
+"home.diaperDeleted"       = "기저귀 기록 삭제됨";
+"home.recordDeleted"       = "기록 삭제됨";
+
+/* Empty State */
+"home.noActivityToday"     = "오늘 아직 기록이 없어요";
+"home.noActivityThisDay"   = "이 날의 기록이 없어요";
+"home.tapToStart %@"       = "위의 빠른 기록 버튼을 눌러 %@의 하루를 기록해 보세요";
+"home.noRecordsLogged %@"  = "%@의 이 날 기록이 없습니다";
+
+/* Timeline */
+"home.ongoing"             = "진행 중";
+"home.now"                 = "지금";
+"home.edit"                = "편집";
+"home.delete"              = "삭제";
+
+/* Weekly Summary */
+"home.weekly.feedings"     = "수유";
+"home.weekly.volume"       = "수유량";
+"home.weekly.sleep"        = "수면";
+"home.weekly.diapers"      = "기저귀";
+"home.weekly.perDay"       = "/일";
+"home.weekly.total %lld"   = "총 %lld회";
+"home.weekly.naps %lld"    = "총 %lld회 낮잠";
+"home.weekly.upPct %lld"   = "지난주 대비 %lld%% 증가";
+"home.weekly.downPct %lld" = "지난주 대비 %lld%% 감소";
+"home.weekly.same"         = "지난주와 동일";
+
+/* Daily Summary */
+"home.summary.feedingsSingular %lld" = "수유 %lld회";
+"home.summary.feedingsPlural %lld"   = "수유 %lld회";
+"home.summary.sleepOf %@"   = "수면 %@";
+"home.summary.diapersSingular %lld" = "기저귀 교체 %lld회";
+"home.summary.diapersPlural %lld"   = "기저귀 교체 %lld회";
+"home.summary.todayFormat %@ %@"    = "%1$@은(는) 오늘 %2$@입니다.";
+"home.summary.pastFormat %@ %@"     = "%1$@은(는) %2$@이었습니다.";
+"home.summary.feedingEvery %@"      = " 약 %@ 간격으로 수유.";
+"home.summary.and"          = "과(와) ";
+"home.summary.commaAnd"     = ", ";
+
+/* Stat Subtitles */
+"home.naps.singular"       = "낮잠 1회";
+"home.naps.plural %lld"    = "낮잠 %lld회";
+"home.naps.longest %@"     = "최장 %@";
+"home.lastSide %@"         = "이전: %@";
+"home.every %@"            = "%@ 간격";
+
 "editBaby.title"            = "아기 편집";
 "editBaby.addPhoto"         = "사진 추가";
 "editBaby.changePhoto"      = "사진 변경";
