@@ -179,6 +179,7 @@
 "home.feedingDeleted"      = "喂食记录已删除";
 "home.sleepDeleted"        = "睡眠记录已删除";
 "home.diaperDeleted"       = "尿布记录已删除";
+"home.growthDeleted"       = "生长记录已删除";
 "home.recordDeleted"       = "记录已删除";
 
 /* Empty State */

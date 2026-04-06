@@ -179,6 +179,7 @@
 "home.feedingDeleted"      = "Feeding deleted";
 "home.sleepDeleted"        = "Sleep deleted";
 "home.diaperDeleted"       = "Diaper deleted";
+"home.growthDeleted"       = "Growth record deleted";
 "home.recordDeleted"       = "Record deleted";
 
 /* Empty State */

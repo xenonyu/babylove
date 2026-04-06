@@ -179,6 +179,7 @@
 "home.feedingDeleted"      = "수유 기록 삭제됨";
 "home.sleepDeleted"        = "수면 기록 삭제됨";
 "home.diaperDeleted"       = "기저귀 기록 삭제됨";
+"home.growthDeleted"       = "성장 기록 삭제됨";
 "home.recordDeleted"       = "기록 삭제됨";
 
 /* Empty State */

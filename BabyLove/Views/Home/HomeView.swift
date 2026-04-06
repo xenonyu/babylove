@@ -62,6 +62,12 @@ struct HomeView: View {
     )
     private var todayDiapers: FetchedResults<CDDiaperRecord>
 
+    @FetchRequest(
+        sortDescriptors: [SortDescriptor(\.date, order: .reverse)],
+        predicate: NSPredicate(format: "date >= %@", Calendar.current.startOfDay(for: Date()) as NSDate)
+    )
+    private var todayGrowth: FetchedResults<CDGrowthRecord>
+
     // Ongoing sleep: endTime is nil means baby is currently sleeping
     @FetchRequest(
         sortDescriptors: [SortDescriptor(\.startTime, order: .reverse)],
@@ -152,6 +158,7 @@ struct HomeView: View {
         // AND (ended after the day starts OR are still ongoing).
         todaySleeps.nsPredicate   = NSPredicate(format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)", endOfDay, startOfDay)
         todayDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@ AND timestamp < %@", startOfDay, endOfDay)
+        todayGrowth.nsPredicate   = NSPredicate(format: "date >= %@ AND date < %@", startOfDay, endOfDay)
     }
 
     /// Refresh the 7-day and 14-day weekly predicates so the weekly summary
@@ -591,7 +598,7 @@ struct HomeView: View {
                         }
 
                         // Recent activity or empty state
-                        if !todayFeedings.isEmpty || !todaySleeps.isEmpty || !todayDiapers.isEmpty {
+                        if !todayFeedings.isEmpty || !todaySleeps.isEmpty || !todayDiapers.isEmpty || !todayGrowth.isEmpty {
                             recentActivitySection
                         } else {
                             emptyDaySection
@@ -653,6 +660,7 @@ struct HomeView: View {
             .onChange(of: todayFeedings.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
             .onChange(of: todaySleeps.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
             .onChange(of: todayDiapers.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
+            .onChange(of: todayGrowth.count) { _, _ in refreshActiveDays() }
             .onChange(of: ongoingSleeps.count) { _, count in
                 refreshGlobalLastTimes()
                 if count > 0 {
@@ -692,6 +700,9 @@ struct HomeView: View {
         .sheet(item: $diaperToEdit) { record in
             DiaperLogView(vm: vm, editingRecord: record)
         }
+        .sheet(item: $growthToEdit) { record in
+            GrowthLogView(vm: vm, editingRecord: record)
+        }
         // Timeline delete confirmation
         .alert(NSLocalizedString("home.deleteRecord", comment: ""), isPresented: Binding(
             get: { timelineRecordToDelete != nil },
@@ -708,6 +719,8 @@ struct HomeView: View {
                             return (NSLocalizedString("home.sleepDeleted", comment: ""), "trash.fill", Color.blSleep)
                         } else if record is CDDiaperRecord {
                             return (NSLocalizedString("home.diaperDeleted", comment: ""), "trash.fill", Color.blDiaper)
+                        } else if record is CDGrowthRecord {
+                            return (NSLocalizedString("home.growthDeleted", comment: ""), "trash.fill", Color.blGrowth)
                         }
                         return (NSLocalizedString("home.recordDeleted", comment: ""), "trash.fill", Color.blPrimary)
                     }()
@@ -850,6 +863,16 @@ struct HomeView: View {
         if let results = try? ctx.fetch(diaperReq) {
             for r in results {
                 if let ts = r.timestamp { days.insert(cal.startOfDay(for: ts)) }
+            }
+        }
+
+        // Growth dates
+        let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+        growthReq.predicate = NSPredicate(format: "date >= %@", rangeStartNS)
+        growthReq.propertiesToFetch = ["date"]
+        if let results = try? ctx.fetch(growthReq) {
+            for r in results {
+                if let d = r.date { days.insert(cal.startOfDay(for: d)) }
             }
         }
 
@@ -1766,6 +1789,7 @@ struct HomeView: View {
     @State private var feedingToEdit: CDFeedingRecord?
     @State private var sleepToEdit: CDSleepRecord?
     @State private var diaperToEdit: CDDiaperRecord?
+    @State private var growthToEdit: CDGrowthRecord?
     @State private var timelineRecordToDelete: NSManagedObject?
 
     /// A unified activity item for the chronological timeline.
@@ -1774,6 +1798,7 @@ struct HomeView: View {
             case feeding(CDFeedingRecord)
             case sleep(CDSleepRecord)
             case diaper(CDDiaperRecord)
+            case growth(CDGrowthRecord)
         }
         let id: String  // unique key
         let date: Date
@@ -1863,6 +1888,35 @@ struct HomeView: View {
             ))
         }
 
+        for r in todayGrowth {
+            guard let d = r.date else { continue }
+            let unit = appState.measurementUnit
+            let detail: String = {
+                var parts: [String] = []
+                if r.weightKG > 0 {
+                    parts.append(String(format: "⚖️ %.2f %@", unit.weightFromKG(r.weightKG), unit.weightLabel))
+                }
+                if r.heightCM > 0 {
+                    parts.append(String(format: "📏 %.1f %@", unit.lengthFromCM(r.heightCM), unit.heightLabel))
+                }
+                if r.headCircumferenceCM > 0 {
+                    parts.append(String(format: "🔵 %.1f %@", unit.lengthFromCM(r.headCircumferenceCM), unit.heightLabel))
+                }
+                return parts.joined(separator: " · ")
+            }()
+            items.append(ActivityItem(
+                id: "g-\(r.id?.uuidString ?? r.objectID.uriRepresentation().lastPathComponent)",
+                date: d,
+                icon: "chart.line.uptrend.xyaxis",
+                color: .blGrowth,
+                title: NSLocalizedString("home.growth", comment: ""),
+                detail: detail,
+                timeLabel: d.formatted(date: .omitted, time: .shortened),
+                notes: r.notes,
+                record: .growth(r)
+            ))
+        }
+
         // Newest first
         return items.sorted { $0.date > $1.date }
     }
@@ -1910,6 +1964,7 @@ struct HomeView: View {
                         case .feeding(let r): feedingToEdit = r
                         case .sleep(let r):   sleepToEdit = r
                         case .diaper(let r):  diaperToEdit = r
+                        case .growth(let r):  growthToEdit = r
                         }
                     }
                     .contextMenu {
@@ -1918,6 +1973,7 @@ struct HomeView: View {
                             case .feeding(let r): feedingToEdit = r
                             case .sleep(let r):   sleepToEdit = r
                             case .diaper(let r):  diaperToEdit = r
+                            case .growth(let r):  growthToEdit = r
                             }
                         } label: {
                             Label(NSLocalizedString("home.edit", comment: ""), systemImage: "pencil")
@@ -1927,6 +1983,7 @@ struct HomeView: View {
                             case .feeding(let r): timelineRecordToDelete = r
                             case .sleep(let r):   timelineRecordToDelete = r
                             case .diaper(let r):  timelineRecordToDelete = r
+                            case .growth(let r):  timelineRecordToDelete = r
                             }
                         } label: {
                             Label(NSLocalizedString("home.delete", comment: ""), systemImage: "trash")

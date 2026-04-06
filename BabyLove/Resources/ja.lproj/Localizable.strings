@@ -179,6 +179,7 @@
 "home.feedingDeleted"      = "授乳記録を削除しました";
 "home.sleepDeleted"        = "睡眠記録を削除しました";
 "home.diaperDeleted"       = "おむつ記録を削除しました";
+"home.growthDeleted"       = "成長記録を削除しました";
 "home.recordDeleted"       = "記録を削除しました";
 
 /* Empty State */
