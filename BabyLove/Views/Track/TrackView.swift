@@ -326,24 +326,57 @@ struct TrackView: View {
     }
 
     private func sleepRow(_ r: CDSleepRecord) -> some View {
-        HStack {
-            Text("Sleep")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.blTextPrimary)
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    if let loc = r.location, let sl = SleepLocation(rawValue: loc) {
+                        Text(sl.displayName)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.blTextPrimary)
+                    } else {
+                        Text("Sleep")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.blTextPrimary)
+                    }
+                    if r.endTime == nil {
+                        Text("In Progress")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.blSleep)
+                            .clipShape(Capsule())
+                    }
+                }
+                // Time range: "8:00 PM – 6:00 AM" or "8:00 PM – …"
+                HStack(spacing: 4) {
+                    Text(r.startTime?.formatted(date: .omitted, time: .shortened) ?? "")
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                    if r.endTime != nil || r.startTime != nil {
+                        Text("–")
+                            .font(.system(size: 12))
+                            .foregroundColor(.blTextTertiary)
+                        Text(r.endTime?.formatted(date: .omitted, time: .shortened) ?? "…")
+                            .font(.system(size: 12))
+                            .foregroundColor(.blTextTertiary)
+                    }
+                }
+            }
             Spacer()
             if let s = r.startTime, let e = r.endTime {
                 let mins = Int(e.timeIntervalSince(s) / 60)
                 let h = mins / 60, m = mins % 60
                 Text(h > 0 ? "\(h)h \(m)m" : "\(m)m")
-                    .font(.system(size: 14))
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blSleep)
             } else {
                 Text("Ongoing")
-                    .font(.system(size: 14))
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.blSleep)
             }
-            Text(Self.timestampText(r.startTime))
-                .font(.system(size: 13))
+            Text(Self.relativeDatePrefix(r.startTime) ?? "")
+                .font(.system(size: 12))
                 .foregroundColor(.blTextTertiary)
         }
         .padding(.horizontal, 16)
