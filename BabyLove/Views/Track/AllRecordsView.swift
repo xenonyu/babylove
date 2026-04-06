@@ -100,8 +100,32 @@ struct AllFeedingsView: View {
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
         let unit = appState.measurementUnit
         let isOngoing = Self.isFeedingOngoing(r)
+        let feedType = FeedType(rawValue: r.feedType ?? "")
+        let a11yLabel: String = {
+            var parts = [feedType?.displayName ?? "Feeding"]
+            if isOngoing {
+                parts.append("in progress")
+            } else if r.durationMinutes > 0 {
+                parts.append(DurationFormat.standard(r.durationMinutes))
+            }
+            if r.amountML > 0 {
+                let val = unit.volumeFromML(r.amountML)
+                parts.append(unit == .metric
+                    ? "\(Int(val)) \(unit.volumeLabel)"
+                    : String(format: "%.1f %@", val, unit.volumeLabel))
+            }
+            if let side = r.breastSide, !side.isEmpty {
+                parts.append(BreastSide(rawValue: side)?.displayName ?? side)
+            }
+            if let t = r.timestamp {
+                parts.append("at \(t.formatted(date: .omitted, time: .shortened))")
+            }
+            if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                parts.append("note: \(notes)")
+            }
+            return parts.joined(separator: ", ")
+        }()
         return HStack(spacing: 12) {
-            let feedType = FeedType(rawValue: r.feedType ?? "")
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Color.blFeeding.opacity(isOngoing ? 0.25 : 0.15))
@@ -165,6 +189,9 @@ struct AllFeedingsView: View {
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(a11yLabel)
+        .accessibilityHint("Tap to edit, swipe to delete")
     }
 }
 
@@ -258,7 +285,29 @@ struct AllSleepsView: View {
     }
 
     private func sleepRow(_ r: CDSleepRecord) -> some View {
-        HStack(spacing: 12) {
+        let locationName: String = {
+            if let loc = r.location, let sl = SleepLocation(rawValue: loc) { return sl.displayName }
+            return "Sleep"
+        }()
+        let a11yLabel: String = {
+            var parts = [locationName]
+            if let s = r.startTime, let e = r.endTime {
+                let mins = Int(e.timeIntervalSince(s) / 60)
+                let h = mins / 60, m = mins % 60
+                parts.append(h > 0 ? "\(h) hours \(m) minutes" : "\(m) minutes")
+                parts.append("\(s.formatted(date: .omitted, time: .shortened)) to \(e.formatted(date: .omitted, time: .shortened))")
+            } else {
+                parts.append("ongoing")
+                if let s = r.startTime {
+                    parts.append("started at \(s.formatted(date: .omitted, time: .shortened))")
+                }
+            }
+            if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                parts.append("note: \(notes)")
+            }
+            return parts.joined(separator: ", ")
+        }()
+        return HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Color.blSleep.opacity(0.15))
@@ -270,15 +319,9 @@ struct AllSleepsView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    if let loc = r.location, let sl = SleepLocation(rawValue: loc) {
-                        Text(sl.displayName)
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundColor(.blTextPrimary)
-                    } else {
-                        Text("Sleep")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundColor(.blTextPrimary)
-                    }
+                    Text(locationName)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
 
                     if let s = r.startTime, let e = r.endTime {
                         let mins = Int(e.timeIntervalSince(s) / 60)
@@ -313,6 +356,9 @@ struct AllSleepsView: View {
 
             Spacer()
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(a11yLabel)
+        .accessibilityHint("Tap to edit, swipe to delete")
     }
 }
 
@@ -407,6 +453,16 @@ struct AllDiapersView: View {
 
     private func diaperRow(_ r: CDDiaperRecord) -> some View {
         let diaperType = DiaperType(rawValue: r.diaperType ?? "")
+        let a11yLabel: String = {
+            var parts = ["\(diaperType?.displayName ?? "Diaper") diaper"]
+            if let t = r.timestamp {
+                parts.append("at \(t.formatted(date: .omitted, time: .shortened))")
+            }
+            if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                parts.append("note: \(notes)")
+            }
+            return parts.joined(separator: ", ")
+        }()
         return HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -434,6 +490,9 @@ struct AllDiapersView: View {
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(a11yLabel)
+        .accessibilityHint("Tap to edit, swipe to delete")
     }
 }
 
@@ -529,6 +588,28 @@ struct AllGrowthView: View {
     private func growthRow(_ r: CDGrowthRecord) -> some View {
         let unit = appState.measurementUnit
         let baby = appState.currentBaby
+        let a11yLabel: String = {
+            var parts = ["Growth measurement"]
+            if r.weightKG > 0 {
+                parts.append(String(format: "weight %.2f %@", unit.weightFromKG(r.weightKG), unit.weightLabel))
+            }
+            if r.heightCM > 0 {
+                parts.append(String(format: "height %.1f %@", unit.lengthFromCM(r.heightCM), unit.heightLabel))
+            }
+            if r.headCircumferenceCM > 0 {
+                parts.append(String(format: "head %.1f %@", unit.lengthFromCM(r.headCircumferenceCM), unit.heightLabel))
+            }
+            if let baby, let date = r.date {
+                parts.append("at age \(baby.ageText(at: date))")
+            }
+            if let date = r.date {
+                parts.append(DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none))
+            }
+            if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                parts.append("note: \(notes)")
+            }
+            return parts.joined(separator: ", ")
+        }()
         return HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -583,6 +664,9 @@ struct AllGrowthView: View {
                     .foregroundColor(.blTextTertiary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(a11yLabel)
+        .accessibilityHint("Tap to edit, swipe to delete")
     }
 
     private func growthMetricPill(icon: String, text: String) -> some View {
