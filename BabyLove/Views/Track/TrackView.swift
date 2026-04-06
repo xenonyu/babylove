@@ -240,8 +240,14 @@ struct TrackView: View {
                         }
                         return (String(localized: "track.recordDeleted"), "trash.fill", Color.blPrimary)
                     }()
-                    withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast(msg, icon: icon, color: color)
+                    let success = vm.deleteObject(obj, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(msg, icon: icon, color: color)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 recordToDelete = nil
             }

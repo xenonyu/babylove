@@ -448,3 +448,6 @@
 "a11y.wakeUpTime"          = "Wake up time";
 "a11y.diaperChangeTime"    = "Diaper change time";
 "a11y.measurementDate"     = "Measurement date";
+
+// MARK: - Common Error
+"common.deleteFailed"      = "Failed to delete. Please try again.";

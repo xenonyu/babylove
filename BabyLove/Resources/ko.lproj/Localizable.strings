@@ -473,3 +473,6 @@
 "a11y.wakeUpTime"          = "깬 시간";
 "a11y.diaperChangeTime"    = "기저귀 교체 시간";
 "a11y.measurementDate"     = "측정 날짜";
+
+// MARK: - Common Error
+"common.deleteFailed"      = "삭제에 실패했습니다. 다시 시도해 주세요.";

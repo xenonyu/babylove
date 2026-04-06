@@ -117,8 +117,14 @@ struct AllFeedingsView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast(String(localized: "allRecords.feedingDeleted"), icon: "trash.fill", color: .blFeeding)
+                    let success = vm.deleteObject(obj, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(String(localized: "allRecords.feedingDeleted"), icon: "trash.fill", color: .blFeeding)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 recordToDelete = nil
             }
@@ -383,8 +389,14 @@ struct AllSleepsView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast(String(localized: "allRecords.sleepDeleted"), icon: "trash.fill", color: .blSleep)
+                    let success = vm.deleteObject(obj, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(String(localized: "allRecords.sleepDeleted"), icon: "trash.fill", color: .blSleep)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 recordToDelete = nil
             }
@@ -621,8 +633,14 @@ struct AllDiapersView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast(String(localized: "allRecords.diaperDeleted"), icon: "trash.fill", color: .blDiaper)
+                    let success = vm.deleteObject(obj, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(String(localized: "allRecords.diaperDeleted"), icon: "trash.fill", color: .blDiaper)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 recordToDelete = nil
             }
@@ -790,8 +808,14 @@ struct AllGrowthView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast(String(localized: "allRecords.growthDeleted"), icon: "trash.fill", color: .blGrowth)
+                    let success = vm.deleteObject(obj, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(String(localized: "allRecords.growthDeleted"), icon: "trash.fill", color: .blGrowth)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 recordToDelete = nil
             }

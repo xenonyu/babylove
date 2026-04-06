@@ -158,8 +158,14 @@ struct GrowthView: View {
             Button(String(localized: "growth.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    withAnimation { vm.deleteObject(obj, in: ctx) }
-                    appState.showToast(String(localized: "growth.deleted"), icon: "trash.fill", color: .blGrowth)
+                    let success = vm.deleteObject(obj, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(String(localized: "growth.deleted"), icon: "trash.fill", color: .blGrowth)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 recordToDelete = nil
             }

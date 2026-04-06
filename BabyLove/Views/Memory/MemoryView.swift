@@ -181,8 +181,14 @@ struct MemoryView: View {
             Button(String(localized: "memory.delete"), role: .destructive) {
                 Haptic.warning()
                 if let m = milestoneToDelete {
-                    withAnimation { vm.deleteObject(m, in: ctx) }
-                    appState.showToast(String(localized: "memory.deleted"), icon: "trash.fill", color: .blPrimary)
+                    let success = vm.deleteObject(m, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(String(localized: "memory.deleted"), icon: "trash.fill", color: .blPrimary)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 milestoneToDelete = nil
             }

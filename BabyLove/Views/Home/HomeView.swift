@@ -711,8 +711,14 @@ struct HomeView: View {
                         }
                         return (NSLocalizedString("home.recordDeleted", comment: ""), "trash.fill", Color.blPrimary)
                     }()
-                    withAnimation { vm.deleteObject(record, in: ctx) }
-                    appState.showToast(msg, icon: icon, color: color)
+                    let success = vm.deleteObject(record, in: ctx)
+                    if success {
+                        withAnimation { /* row removed */ }
+                        appState.showToast(msg, icon: icon, color: color)
+                    } else {
+                        Haptic.error()
+                        appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
+                    }
                 }
                 timelineRecordToDelete = nil
             }

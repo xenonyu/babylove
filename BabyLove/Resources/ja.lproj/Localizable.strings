@@ -473,3 +473,6 @@
 "a11y.wakeUpTime"          = "起きた時間";
 "a11y.diaperChangeTime"    = "おむつ替え時間";
 "a11y.measurementDate"     = "計測日";
+
+// MARK: - Common Error
+"common.deleteFailed"      = "削除に失敗しました。もう一度お試しください。";

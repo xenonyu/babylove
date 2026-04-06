@@ -473,3 +473,6 @@
 "a11y.wakeUpTime"          = "醒来时间";
 "a11y.diaperChangeTime"    = "换尿布时间";
 "a11y.measurementDate"     = "测量日期";
+
+// MARK: - Common Error
+"common.deleteFailed"      = "删除失败，请重试";
