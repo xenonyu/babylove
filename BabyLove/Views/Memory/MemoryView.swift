@@ -16,7 +16,7 @@ struct MemoryView: View {
 
         var label: String {
             switch self {
-            case .all: return "All"
+            case .all: return String(localized: "memory.filterAll")
             case .category(let c): return c.displayName
             }
         }
@@ -100,7 +100,7 @@ struct MemoryView: View {
                                         Image(systemName: "checkmark.circle.fill")
                                             .font(.system(size: 12))
                                             .foregroundColor(.blDiaper)
-                                        Text("\(achievedCount) Achieved")
+                                        Text("memory.achieved \(achievedCount)")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.blTextSecondary)
                                     }
@@ -108,7 +108,7 @@ struct MemoryView: View {
                                         Image(systemName: "clock")
                                             .font(.system(size: 12))
                                             .foregroundColor(.blGrowth)
-                                        Text("\(upcomingCount) Upcoming")
+                                        Text("memory.upcoming \(upcomingCount)")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.blTextSecondary)
                                     }
@@ -153,7 +153,7 @@ struct MemoryView: View {
                     }
                 }
             }
-            .navigationTitle("Memories")
+            .navigationTitle(String(localized: "memory.title"))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -173,21 +173,21 @@ struct MemoryView: View {
         .sheet(item: $milestoneToEdit) { record in
             AddMilestoneView(vm: vm, editingRecord: record)
         }
-        .alert("Delete Milestone?", isPresented: Binding(
+        .alert(String(localized: "memory.deleteTitle"), isPresented: Binding(
             get: { milestoneToDelete != nil },
             set: { if !$0 { milestoneToDelete = nil } }
         )) {
-            Button("Cancel", role: .cancel) { milestoneToDelete = nil }
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "common.cancel"), role: .cancel) { milestoneToDelete = nil }
+            Button(String(localized: "memory.delete"), role: .destructive) {
                 Haptic.warning()
                 if let m = milestoneToDelete {
                     withAnimation { vm.deleteObject(m, in: ctx) }
-                    appState.showToast("Milestone deleted", icon: "trash.fill", color: .blPrimary)
+                    appState.showToast(String(localized: "memory.deleted"), icon: "trash.fill", color: .blPrimary)
                 }
                 milestoneToDelete = nil
             }
         } message: {
-            Text("This memory will be permanently removed.")
+            Text("memory.deleteMessage")
         }
     }
 
@@ -238,12 +238,12 @@ struct MemoryView: View {
                 Button {
                     milestoneToEdit = m
                 } label: {
-                    Label("Edit", systemImage: "pencil")
+                    Label(String(localized: "memory.edit"), systemImage: "pencil")
                 }
                 Button(role: .destructive) {
                     milestoneToDelete = m
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label(String(localized: "memory.delete"), systemImage: "trash")
                 }
             }
             .padding(.leading, 8)
@@ -291,13 +291,13 @@ struct MemoryView: View {
             Image(systemName: selectedFilter.icon)
                 .font(.system(size: 36))
                 .foregroundColor(selectedFilter.color.opacity(0.4))
-            Text("No \(selectedFilter.label.lowercased()) milestones yet")
+            Text(String(format: String(localized: "memory.noMilestones"), selectedFilter.label.lowercased()))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.blTextSecondary)
             Button {
                 showAddMilestone = true
             } label: {
-                Text("Add One")
+                Text("memory.addOne")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(selectedFilter.color)
             }
@@ -312,15 +312,15 @@ struct MemoryView: View {
         VStack(spacing: 20) {
             Text("💛")
                 .font(.system(size: 64))
-            Text("Start capturing memories")
+            Text("memory.emptyTitle")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.blTextPrimary)
-            Text("Record milestones, first moments,\nand everything in between.")
+            Text("memory.emptySubtitle")
                 .font(.system(size: 16))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextSecondary)
                 .padding(.horizontal, 40)
-            Button("Add First Milestone") { showAddMilestone = true }
+            Button(String(localized: "memory.addFirst")) { showAddMilestone = true }
                 .buttonStyle(BLPrimaryButton())
                 .frame(width: 240)
         }
@@ -363,7 +363,7 @@ struct MilestoneCard: View {
                         .foregroundColor(isCompleted ? .blTextPrimary : .blTextSecondary)
                         .strikethrough(isCompleted, color: .blTextSecondary.opacity(0.4))
                     Spacer()
-                    Text(isCompleted ? "Achieved" : "Upcoming")
+                    Text(isCompleted ? String(localized: "memory.achievedBadge") : String(localized: "memory.upcomingBadge"))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(isCompleted ? Color(hex: category.color) : .blTextSecondary)
                         .padding(.horizontal, 8)
@@ -449,7 +449,7 @@ struct AddMilestoneView: View {
                         // Title with suggestions
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
-                                Label("Milestone", systemImage: "star.fill")
+                                Label(String(localized: "memory.milestone"), systemImage: "star.fill")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.blTextSecondary)
                                 Spacer()
@@ -462,14 +462,14 @@ struct AddMilestoneView: View {
                                         HStack(spacing: 4) {
                                             Image(systemName: showSuggestions ? "lightbulb.fill" : "lightbulb")
                                                 .font(.system(size: 12, weight: .medium))
-                                            Text("Suggestions")
+                                            Text("memory.suggestions")
                                                 .font(.system(size: 13, weight: .medium))
                                         }
                                         .foregroundColor(showSuggestions ? .blPrimary : .blTextTertiary)
                                     }
                                 }
                             }
-                            TextField("e.g. First smile, First steps…", text: $title)
+                            TextField(String(localized: "memory.placeholder"), text: $title)
                                 .font(.system(size: 17))
                                 .padding(14)
                                 .background(Color.blSurface)
@@ -483,7 +483,7 @@ struct AddMilestoneView: View {
 
                         // Category
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Category", systemImage: "tag.fill")
+                            Label(String(localized: "memory.category"), systemImage: "tag.fill")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
@@ -512,26 +512,26 @@ struct AddMilestoneView: View {
 
                         // Date
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Date", systemImage: "calendar")
+                            Label(String(localized: "memory.date"), systemImage: "calendar")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            DatePicker("Milestone date", selection: $date, in: ...Date(), displayedComponents: .date)
+                            DatePicker(String(localized: "memory.milestoneDate"), selection: $date, in: ...Date(), displayedComponents: .date)
                                 .datePickerStyle(.compact)
                                 .tint(.blPrimary)
                                 .labelsHidden()
-                                .accessibilityLabel("Milestone date")
+                                .accessibilityLabel(String(localized: "memory.milestoneDate"))
                         }
 
                         // Status
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Status", systemImage: "flag.fill")
+                            Label(String(localized: "memory.status"), systemImage: "flag.fill")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
                             HStack(spacing: 12) {
-                                statusButton(label: "Achieved", icon: "checkmark.circle.fill", selected: isCompleted) {
+                                statusButton(label: String(localized: "memory.achievedBadge"), icon: "checkmark.circle.fill", selected: isCompleted) {
                                     withAnimation(.spring(response: 0.3)) { isCompleted = true }
                                 }
-                                statusButton(label: "Upcoming", icon: "clock", selected: !isCompleted) {
+                                statusButton(label: String(localized: "memory.upcomingBadge"), icon: "clock", selected: !isCompleted) {
                                     withAnimation(.spring(response: 0.3)) { isCompleted = false }
                                 }
                             }
@@ -539,26 +539,26 @@ struct AddMilestoneView: View {
 
                         // Notes
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Notes", systemImage: "note.text")
+                            Label(String(localized: "memory.notes"), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
-                            TextField("Describe this special moment…", text: $notes, axis: .vertical)
+                            TextField(String(localized: "memory.notesPlaceholder"), text: $notes, axis: .vertical)
                                 .lineLimit(3...6)
                                 .padding(14)
                                 .background(Color.blSurface)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(isEditing ? "Update Milestone ⭐️" : "Save Milestone ⭐️") {
+                        Button(isEditing ? String(localized: "memory.update") : String(localized: "memory.save")) {
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
-                                appState.showToast(ok ? "Milestone updated" : "Save failed — try again",
+                                appState.showToast(ok ? String(localized: "memory.updated") : String(localized: "memory.saveFailed"),
                                                    icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blPrimary : .red)
                             } else {
                                 ok = vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
-                                appState.showToast(ok ? "Milestone saved" : "Save failed — try again",
+                                appState.showToast(ok ? String(localized: "memory.saved") : String(localized: "memory.saveFailed"),
                                                    icon: ok ? "star.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blPrimary : .red)
                             }
@@ -572,15 +572,15 @@ struct AddMilestoneView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(isEditing ? "Edit Milestone" : "Add Milestone")
+            .navigationTitle(isEditing ? String(localized: "memory.editTitle") : String(localized: "memory.addTitle"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "common.cancel")) { dismiss() }
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(String(localized: "common.done")) {
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
                     .font(.system(size: 16, weight: .semibold))
@@ -610,14 +610,14 @@ struct AddMilestoneView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 10))
-                    Text("Sorted for \(age)mo old")
+                    Text("memory.sortedForAge \(age)")
                         .font(.system(size: 11, weight: .medium))
                 }
                 .foregroundColor(.blTextTertiary)
             }
 
             if currentSuggestions.isEmpty {
-                Text("No suggestions for this category")
+                Text("memory.noSuggestions")
                     .font(.system(size: 13))
                     .foregroundColor(.blTextTertiary)
                     .padding(.vertical, 4)
