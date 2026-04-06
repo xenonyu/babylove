@@ -115,7 +115,37 @@ struct PresetMilestone: Identifiable {
     let id = UUID()
     let title: String
     let category: MilestoneCategory
-    let ageRangeMonths: String  // e.g. "0-2" for display
+    let ageRangeMonths: String  // e.g. "1-3" for display
+
+    /// Parsed minimum age in months from ageRangeMonths string
+    var ageMin: Int {
+        let parts = ageRangeMonths.split(separator: "-")
+        return Int(parts.first ?? "0") ?? 0
+    }
+
+    /// Parsed maximum age in months from ageRangeMonths string
+    var ageMax: Int {
+        let parts = ageRangeMonths.split(separator: "-")
+        return Int(parts.last ?? "24") ?? 24
+    }
+
+    /// Age relevance relative to the baby's current age
+    enum AgeRelevance: Int, Comparable {
+        case current = 0   // Baby is within the milestone's age range
+        case upcoming = 1  // Baby hasn't reached this age range yet
+        case past = 2      // Baby has passed this age range
+
+        static func < (lhs: AgeRelevance, rhs: AgeRelevance) -> Bool {
+            lhs.rawValue < rhs.rawValue
+        }
+    }
+
+    /// Determine how relevant this milestone is for a baby of the given age
+    func relevance(forBabyAgeMonths age: Int) -> AgeRelevance {
+        if age >= ageMin && age <= ageMax { return .current }
+        if age < ageMin { return .upcoming }
+        return .past
+    }
 
     static let all: [PresetMilestone] = [
         // Social
@@ -151,6 +181,19 @@ struct PresetMilestone: Identifiable {
 
     static func forCategory(_ category: MilestoneCategory) -> [PresetMilestone] {
         all.filter { $0.category == category }
+    }
+
+    /// Returns milestones for a category, sorted by age relevance:
+    /// current (in range) first, then upcoming, then past.
+    /// Within each group, sorted by ageMin ascending.
+    static func forCategory(_ category: MilestoneCategory, babyAgeMonths: Int) -> [PresetMilestone] {
+        all.filter { $0.category == category }
+            .sorted { a, b in
+                let ra = a.relevance(forBabyAgeMonths: babyAgeMonths)
+                let rb = b.relevance(forBabyAgeMonths: babyAgeMonths)
+                if ra != rb { return ra < rb }
+                return a.ageMin < b.ageMin
+            }
     }
 }
 

@@ -427,9 +427,17 @@ struct AddMilestoneView: View {
 
     private var isEditing: Bool { editingRecord != nil }
 
-    /// Suggestions for the currently selected category
+    /// Baby's current age in months (nil if no baby profile)
+    private var babyAgeMonths: Int? {
+        appState.currentBaby?.ageInMonths
+    }
+
+    /// Suggestions for the currently selected category, sorted by age relevance
     private var currentSuggestions: [PresetMilestone] {
-        PresetMilestone.forCategory(category)
+        if let age = babyAgeMonths {
+            return PresetMilestone.forCategory(category, babyAgeMonths: age)
+        }
+        return PresetMilestone.forCategory(category)
     }
 
     var body: some View {
@@ -595,7 +603,19 @@ struct AddMilestoneView: View {
     // MARK: - Suggestions Grid
 
     private var suggestionsGrid: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let age = babyAgeMonths
+        return VStack(alignment: .leading, spacing: 8) {
+            // Age context hint
+            if let age {
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 10))
+                    Text("Sorted for \(age)mo old")
+                        .font(.system(size: 11, weight: .medium))
+                }
+                .foregroundColor(.blTextTertiary)
+            }
+
             if currentSuggestions.isEmpty {
                 Text("No suggestions for this category")
                     .font(.system(size: 13))
@@ -604,6 +624,12 @@ struct AddMilestoneView: View {
             } else {
                 FlowLayout(spacing: 8) {
                     ForEach(currentSuggestions) { preset in
+                        let isSelected = title == preset.title
+                        let relevance = age.map { preset.relevance(forBabyAgeMonths: $0) }
+                        let isCurrent = relevance == .current
+                        let isPast = relevance == .past
+                        let catColor = Color(hex: category.color)
+
                         Button {
                             withAnimation(.spring(response: 0.3)) {
                                 title = preset.title
@@ -611,17 +637,38 @@ struct AddMilestoneView: View {
                             }
                         } label: {
                             HStack(spacing: 4) {
+                                // Show a star for age-appropriate milestones
+                                if isCurrent {
+                                    Image(systemName: "star.fill")
+                                        .font(.system(size: 8))
+                                }
                                 Text(preset.title)
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.system(size: 13, weight: isCurrent ? .semibold : .medium))
                                 Text(preset.ageRangeMonths + "mo")
                                     .font(.system(size: 10, weight: .medium))
-                                    .foregroundColor(Color(hex: category.color).opacity(0.6))
+                                    .foregroundColor(
+                                        isSelected ? .white.opacity(0.7) :
+                                        isPast ? catColor.opacity(0.3) :
+                                        catColor.opacity(0.6)
+                                    )
                             }
-                            .foregroundColor(title == preset.title ? .white : Color(hex: category.color))
+                            .foregroundColor(
+                                isSelected ? .white :
+                                isPast ? catColor.opacity(0.4) :
+                                catColor
+                            )
                             .padding(.horizontal, 10)
                             .padding(.vertical, 7)
-                            .background(title == preset.title ? Color(hex: category.color) : Color(hex: category.color).opacity(0.1))
+                            .background(
+                                isSelected ? catColor :
+                                isCurrent ? catColor.opacity(0.18) :
+                                catColor.opacity(isPast ? 0.05 : 0.1)
+                            )
                             .clipShape(Capsule())
+                            .overlay(
+                                isCurrent && !isSelected ?
+                                Capsule().strokeBorder(catColor.opacity(0.35), lineWidth: 1) : nil
+                            )
                         }
                         .buttonStyle(.plain)
                     }
