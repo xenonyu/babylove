@@ -21,31 +21,31 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             HomeView()
                 .tabItem {
-                    Label("Today", systemImage: selectedTab == 0 ? "house.fill" : "house")
+                    Label(String(localized: "tab.today"), systemImage: selectedTab == 0 ? "house.fill" : "house")
                 }
                 .tag(0)
 
             TrackView()
                 .tabItem {
-                    Label("Track", systemImage: selectedTab == 1 ? "plus.circle.fill" : "plus.circle")
+                    Label(String(localized: "tab.track"), systemImage: selectedTab == 1 ? "plus.circle.fill" : "plus.circle")
                 }
                 .tag(1)
 
             GrowthView()
                 .tabItem {
-                    Label("Growth", systemImage: selectedTab == 2 ? "chart.bar.fill" : "chart.bar")
+                    Label(String(localized: "tab.growth"), systemImage: selectedTab == 2 ? "chart.bar.fill" : "chart.bar")
                 }
                 .tag(2)
 
             MemoryView()
                 .tabItem {
-                    Label("Memories", systemImage: selectedTab == 3 ? "heart.fill" : "heart")
+                    Label(String(localized: "tab.memories"), systemImage: selectedTab == 3 ? "heart.fill" : "heart")
                 }
                 .tag(3)
 
             SettingsView()
                 .tabItem {
-                    Label("More", systemImage: "ellipsis.circle\(selectedTab == 4 ? ".fill" : "")")
+                    Label(String(localized: "tab.more"), systemImage: "ellipsis.circle\(selectedTab == 4 ? ".fill" : "")")
                 }
                 .tag(4)
         }

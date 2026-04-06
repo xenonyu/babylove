@@ -40,3 +40,52 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@ old";
+
+/* ===== Tab Bar ===== */
+"tab.today"    = "Today";
+"tab.track"    = "Track";
+"tab.growth"   = "Growth";
+"tab.memories" = "Memories";
+"tab.more"     = "More";
+
+/* ===== Common Actions ===== */
+"common.cancel" = "Cancel";
+"common.save"   = "Save";
+"common.done"   = "Done";
+"common.ok"     = "OK";
+
+/* ===== Settings ===== */
+"settings.title"                      = "Settings";
+"settings.section.babyProfile"        = "Baby Profile";
+"settings.section.measurements"       = "Measurements";
+"settings.units"                      = "Units";
+"settings.section.reminders"          = "Reminders";
+"settings.feedingReminders"           = "Feeding Reminders";
+"settings.interval"                   = "Interval";
+"settings.reminders.footer.on"        = "You'll get a reminder after each feeding based on the interval above.";
+"settings.reminders.footer.off"       = "Get notified when it's time for the next feeding.";
+"settings.section.data"               = "Data";
+"settings.exportCSV"                  = "Export All Data (CSV)";
+"settings.export.footer"              = "Export all records as CSV files. Share with your pediatrician or save as a backup.";
+"settings.export.failed"              = "Export Failed";
+"settings.section.about"              = "About";
+"settings.version"                    = "Version";
+"settings.privacyPolicy"              = "Privacy Policy";
+"settings.section.dangerZone"         = "Danger Zone";
+"settings.resetAllData"               = "Reset All Data";
+"settings.reset.title"                = "Reset All Data?";
+"settings.reset.confirm"              = "Reset";
+"settings.reset.message"              = "This will permanently delete all tracking records and baby profiles. This action cannot be undone.";
+"settings.notifications.disabled"     = "Notifications Disabled";
+"settings.openSettings"               = "Open Settings";
+"settings.notifications.enableMessage" = "Please enable notifications in Settings to receive feeding reminders.";
+
+/* ===== Edit Baby ===== */
+"editBaby.title"            = "Edit Baby";
+"editBaby.addPhoto"         = "Add Photo";
+"editBaby.changePhoto"      = "Change Photo";
+"editBaby.removePhoto"      = "Remove Photo";
+"editBaby.name"             = "Baby's Name";
+"editBaby.namePlaceholder"  = "Name";
+"editBaby.birthday"         = "Birthday";
+"editBaby.gender"           = "Gender";

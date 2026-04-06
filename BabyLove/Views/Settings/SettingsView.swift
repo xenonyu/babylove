@@ -51,12 +51,12 @@ struct SettingsView: View {
                             }
                         }
                     } header: {
-                        Text("Baby Profile")
+                        Text(String(localized: "settings.section.babyProfile"))
                     }
 
                     // Units
                     Section {
-                        Picker("Units", selection: Binding(
+                        Picker(String(localized: "settings.units"), selection: Binding(
                             get: { appState.measurementUnit },
                             set: { appState.setMeasurementUnit($0) }
                         )) {
@@ -65,13 +65,13 @@ struct SettingsView: View {
                             }
                         }
                     } header: {
-                        Text("Measurements")
+                        Text(String(localized: "settings.section.measurements"))
                     }
 
                     // Feeding reminders
                     Section {
                         Toggle(isOn: $feedingReminderEnabled) {
-                            Label("Feeding Reminders", systemImage: "bell.badge.fill")
+                            Label(String(localized: "settings.feedingReminders"), systemImage: "bell.badge.fill")
                         }
                         .tint(.blFeeding)
                         .onChange(of: feedingReminderEnabled) { _, enabled in
@@ -98,7 +98,7 @@ struct SettingsView: View {
                                     Text(opt.label).tag(opt.id)
                                 }
                             } label: {
-                                Label("Interval", systemImage: "clock.arrow.circlepath")
+                                Label(String(localized: "settings.interval"), systemImage: "clock.arrow.circlepath")
                             }
                             .onChange(of: feedingReminderInterval) { _, newVal in
                                 NotificationManager.shared.intervalMinutes = newVal
@@ -107,11 +107,11 @@ struct SettingsView: View {
                             }
                         }
                     } header: {
-                        Text("Reminders")
+                        Text(String(localized: "settings.section.reminders"))
                     } footer: {
                         Text(feedingReminderEnabled
-                             ? "You'll get a reminder after each feeding based on the interval above."
-                             : "Get notified when it's time for the next feeding.")
+                             ? String(localized: "settings.reminders.footer.on")
+                             : String(localized: "settings.reminders.footer.off"))
                     }
 
                     // Data export
@@ -120,7 +120,7 @@ struct SettingsView: View {
                             exportAllData()
                         } label: {
                             HStack {
-                                Label("Export All Data (CSV)", systemImage: "square.and.arrow.up")
+                                Label(String(localized: "settings.exportCSV"), systemImage: "square.and.arrow.up")
                                 Spacer()
                                 if isExporting {
                                     ProgressView()
@@ -130,26 +130,26 @@ struct SettingsView: View {
                         }
                         .disabled(isExporting)
                     } header: {
-                        Text("Data")
+                        Text(String(localized: "settings.section.data"))
                     } footer: {
-                        Text("Export all records as CSV files. Share with your pediatrician or save as a backup.")
+                        Text(String(localized: "settings.export.footer"))
                     }
 
                     // App info
                     Section {
                         HStack {
-                            Label("Version", systemImage: "info.circle")
+                            Label(String(localized: "settings.version"), systemImage: "info.circle")
                             Spacer()
                             Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0")
                                 .foregroundColor(.blTextSecondary)
                         }
                         if let privacyURL = URL(string: "https://babylove.app/privacy") {
                             Link(destination: privacyURL) {
-                                Label("Privacy Policy", systemImage: "hand.raised.fill")
+                                Label(String(localized: "settings.privacyPolicy"), systemImage: "hand.raised.fill")
                             }
                         }
                     } header: {
-                        Text("About")
+                        Text(String(localized: "settings.section.about"))
                     }
 
                     // Danger zone
@@ -157,16 +157,16 @@ struct SettingsView: View {
                         Button(role: .destructive) {
                             showResetAlert = true
                         } label: {
-                            Label("Reset All Data", systemImage: "trash.fill")
+                            Label(String(localized: "settings.resetAllData"), systemImage: "trash.fill")
                         }
                     } header: {
-                        Text("Danger Zone")
+                        Text(String(localized: "settings.section.dangerZone"))
                     }
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Settings")
+            .navigationTitle(String(localized: "settings.title"))
             .navigationBarTitleDisplayMode(.large)
             .task {
                 // Sync toggle with actual notification permission
@@ -185,27 +185,27 @@ struct SettingsView: View {
                 ShareSheet(activityItems: [url])
             }
         }
-        .alert("Reset All Data?", isPresented: $showResetAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Reset", role: .destructive) {
+        .alert(String(localized: "settings.reset.title"), isPresented: $showResetAlert) {
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+            Button(String(localized: "settings.reset.confirm"), role: .destructive) {
                 Haptic.warning()
                 resetAllData()
             }
         } message: {
-            Text("This will permanently delete all tracking records and baby profiles. This action cannot be undone.")
+            Text(String(localized: "settings.reset.message"))
         }
-        .alert("Notifications Disabled", isPresented: $notificationDenied) {
-            Button("Open Settings") {
+        .alert(String(localized: "settings.notifications.disabled"), isPresented: $notificationDenied) {
+            Button(String(localized: "settings.openSettings")) {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(String(localized: "common.cancel"), role: .cancel) {}
         } message: {
-            Text("Please enable notifications in Settings to receive feeding reminders.")
+            Text(String(localized: "settings.notifications.enableMessage"))
         }
-        .alert("Export Failed", isPresented: $showExportError) {
-            Button("OK", role: .cancel) {}
+        .alert(String(localized: "settings.export.failed"), isPresented: $showExportError) {
+            Button(String(localized: "common.ok"), role: .cancel) {}
         } message: {
             Text(exportError ?? "An unknown error occurred.")
         }
@@ -451,7 +451,7 @@ struct EditBabyView: View {
                                     HStack(spacing: 6) {
                                         Image(systemName: photoData != nil ? "arrow.triangle.2.circlepath.camera" : "camera.fill")
                                             .font(.system(size: 13, weight: .medium))
-                                        Text(photoData != nil ? "Change Photo" : "Add Photo")
+                                        Text(photoData != nil ? String(localized: "editBaby.changePhoto") : String(localized: "editBaby.addPhoto"))
                                             .font(.system(size: 14, weight: .semibold))
                                     }
                                     .foregroundColor(.blPrimary)
@@ -464,7 +464,7 @@ struct EditBabyView: View {
                                             selectedPhoto = nil
                                         }
                                     } label: {
-                                        Text("Remove Photo")
+                                        Text(String(localized: "editBaby.removePhoto"))
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.blTextTertiary)
                                     }
@@ -475,14 +475,14 @@ struct EditBabyView: View {
                         .listRowBackground(Color.clear)
                     }
 
-                    Section("Baby's Name") {
-                        TextField("Name", text: $name)
+                    Section(String(localized: "editBaby.name")) {
+                        TextField(String(localized: "editBaby.namePlaceholder"), text: $name)
                     }
-                    Section("Birthday") {
-                        DatePicker("Birthday", selection: $birthDate, in: ...Date(), displayedComponents: .date)
+                    Section(String(localized: "editBaby.birthday")) {
+                        DatePicker(String(localized: "editBaby.birthday"), selection: $birthDate, in: ...Date(), displayedComponents: .date)
                     }
-                    Section("Gender") {
-                        Picker("Gender", selection: $gender) {
+                    Section(String(localized: "editBaby.gender")) {
+                        Picker(String(localized: "editBaby.gender"), selection: $gender) {
                             ForEach(Baby.Gender.allCases, id: \.self) { g in
                                 Text("\(g.icon) \(g.displayName)").tag(g)
                             }
@@ -493,22 +493,22 @@ struct EditBabyView: View {
                 .scrollContentBackground(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("Edit Baby")
+            .navigationTitle(String(localized: "editBaby.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(String(localized: "common.done")) {
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.blPrimary)
                 }
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "common.cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(String(localized: "common.save")) {
                         var baby = appState.currentBaby ?? Baby(name: name, birthDate: birthDate, gender: gender)
                         baby.name = name
                         baby.birthDate = birthDate

@@ -40,3 +40,52 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";
+
+/* ===== Tab Bar ===== */
+"tab.today"    = "今日";
+"tab.track"    = "记录";
+"tab.growth"   = "成长";
+"tab.memories" = "回忆";
+"tab.more"     = "更多";
+
+/* ===== Common Actions ===== */
+"common.cancel" = "取消";
+"common.save"   = "保存";
+"common.done"   = "完成";
+"common.ok"     = "好";
+
+/* ===== Settings ===== */
+"settings.title"                      = "设置";
+"settings.section.babyProfile"        = "宝宝资料";
+"settings.section.measurements"       = "度量单位";
+"settings.units"                      = "单位";
+"settings.section.reminders"          = "提醒";
+"settings.feedingReminders"           = "喂食提醒";
+"settings.interval"                   = "间隔";
+"settings.reminders.footer.on"        = "每次喂食后，将根据上面设定的间隔提醒您。";
+"settings.reminders.footer.off"       = "在下次喂食时间到时提醒您。";
+"settings.section.data"               = "数据";
+"settings.exportCSV"                  = "导出所有数据 (CSV)";
+"settings.export.footer"              = "将所有记录导出为 CSV 文件，分享给儿科医生或作为备份。";
+"settings.export.failed"              = "导出失败";
+"settings.section.about"              = "关于";
+"settings.version"                    = "版本";
+"settings.privacyPolicy"              = "隐私政策";
+"settings.section.dangerZone"         = "危险操作";
+"settings.resetAllData"               = "重置所有数据";
+"settings.reset.title"                = "重置所有数据？";
+"settings.reset.confirm"              = "重置";
+"settings.reset.message"              = "这将永久删除所有追踪记录和宝宝资料，此操作不可撤销。";
+"settings.notifications.disabled"     = "通知已关闭";
+"settings.openSettings"               = "打开设置";
+"settings.notifications.enableMessage" = "请在设置中开启通知权限，以接收喂食提醒。";
+
+/* ===== Edit Baby ===== */
+"editBaby.title"            = "编辑宝宝";
+"editBaby.addPhoto"         = "添加照片";
+"editBaby.changePhoto"      = "更换照片";
+"editBaby.removePhoto"      = "移除照片";
+"editBaby.name"             = "宝宝名字";
+"editBaby.namePlaceholder"  = "名字";
+"editBaby.birthday"         = "出生日期";
+"editBaby.gender"           = "性别";

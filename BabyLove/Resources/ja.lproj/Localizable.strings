@@ -40,3 +40,52 @@
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";
+
+/* ===== Tab Bar ===== */
+"tab.today"    = "今日";
+"tab.track"    = "記録";
+"tab.growth"   = "成長";
+"tab.memories" = "思い出";
+"tab.more"     = "その他";
+
+/* ===== Common Actions ===== */
+"common.cancel" = "キャンセル";
+"common.save"   = "保存";
+"common.done"   = "完了";
+"common.ok"     = "OK";
+
+/* ===== Settings ===== */
+"settings.title"                      = "設定";
+"settings.section.babyProfile"        = "赤ちゃんのプロフィール";
+"settings.section.measurements"       = "単位";
+"settings.units"                      = "単位";
+"settings.section.reminders"          = "リマインダー";
+"settings.feedingReminders"           = "授乳リマインダー";
+"settings.interval"                   = "間隔";
+"settings.reminders.footer.on"        = "授乳後、設定した間隔でリマインダーが届きます。";
+"settings.reminders.footer.off"       = "次の授乳時間をお知らせします。";
+"settings.section.data"               = "データ";
+"settings.exportCSV"                  = "全データをエクスポート (CSV)";
+"settings.export.footer"              = "すべての記録をCSVファイルとしてエクスポートします。小児科医と共有したりバックアップとして保存できます。";
+"settings.export.failed"              = "エクスポート失敗";
+"settings.section.about"              = "アプリについて";
+"settings.version"                    = "バージョン";
+"settings.privacyPolicy"              = "プライバシーポリシー";
+"settings.section.dangerZone"         = "危険な操作";
+"settings.resetAllData"               = "全データをリセット";
+"settings.reset.title"                = "全データをリセットしますか？";
+"settings.reset.confirm"              = "リセット";
+"settings.reset.message"              = "すべての記録と赤ちゃんのプロフィールが完全に削除されます。この操作は取り消せません。";
+"settings.notifications.disabled"     = "通知が無効です";
+"settings.openSettings"               = "設定を開く";
+"settings.notifications.enableMessage" = "授乳リマインダーを受け取るには、設定で通知を有効にしてください。";
+
+/* ===== Edit Baby ===== */
+"editBaby.title"            = "赤ちゃんを編集";
+"editBaby.addPhoto"         = "写真を追加";
+"editBaby.changePhoto"      = "写真を変更";
+"editBaby.removePhoto"      = "写真を削除";
+"editBaby.name"             = "赤ちゃんの名前";
+"editBaby.namePlaceholder"  = "名前";
+"editBaby.birthday"         = "誕生日";
+"editBaby.gender"           = "性別";
