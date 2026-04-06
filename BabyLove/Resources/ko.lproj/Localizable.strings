@@ -418,6 +418,7 @@
 "growth.noData"           = "데이터 없음";
 "growth.percentile %lld"  = "백분위 %lld";
 "growth.measured %@"      = "%@에 측정";
+"growth.a11y.delta %@"    = "변화 %@";
 "growth.viewChart %@"     = "이중 탭하여 %@ 차트 보기";
 "growth.outsideRange"     = "정상 범위 밖";
 "growth.worthMonitoring"  = "관찰 필요";

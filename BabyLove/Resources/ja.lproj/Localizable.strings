@@ -418,6 +418,7 @@
 "growth.noData"           = "データなし";
 "growth.percentile %lld"  = "パーセンタイル %lld";
 "growth.measured %@"      = "%@ に測定";
+"growth.a11y.delta %@"    = "変化 %@";
 "growth.viewChart %@"     = "ダブルタップで%@グラフを表示";
 "growth.outsideRange"     = "正常範囲外";
 "growth.worthMonitoring"  = "経過観察推奨";

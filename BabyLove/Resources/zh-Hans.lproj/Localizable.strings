@@ -418,6 +418,7 @@
 "growth.noData"           = "暂无数据";
 "growth.percentile %lld"  = "百分位 %lld";
 "growth.measured %@"      = "测量于 %@";
+"growth.a11y.delta %@"    = "变化 %@";
 "growth.viewChart %@"     = "双击查看%@图表";
 "growth.outsideRange"     = "超出正常范围";
 "growth.worthMonitoring"  = "建议关注";

@@ -189,6 +189,49 @@ struct GrowthView: View {
         return nil
     }
 
+    /// Find the second-to-latest record that has a non-zero value for the given metric.
+    /// Used to calculate the growth delta (change) between the two most recent measurements.
+    private func previousRecord(for metric: GrowthMetric) -> CDGrowthRecord? {
+        var found = 0
+        for record in records.reversed() {
+            let hasValue: Bool
+            switch metric {
+            case .weight: hasValue = record.weightKG > 0
+            case .height: hasValue = record.heightCM > 0
+            case .head:   hasValue = record.headCircumferenceCM > 0
+            }
+            if hasValue {
+                found += 1
+                if found == 2 { return record }
+            }
+        }
+        return nil
+    }
+
+    /// Calculate the delta (change) between the latest and previous measurement in display units.
+    /// Returns nil if there aren't two records to compare.
+    private func metricDelta(for metric: GrowthMetric, unit: MeasurementUnit) -> Double? {
+        guard let latest = latestRecord(for: metric),
+              let previous = previousRecord(for: metric) else { return nil }
+        let latestVal: Double
+        let prevVal: Double
+        switch metric {
+        case .weight:
+            latestVal = unit.weightFromKG(latest.weightKG)
+            prevVal   = unit.weightFromKG(previous.weightKG)
+        case .height:
+            latestVal = unit.lengthFromCM(latest.heightCM)
+            prevVal   = unit.lengthFromCM(previous.heightCM)
+        case .head:
+            latestVal = unit.lengthFromCM(latest.headCircumferenceCM)
+            prevVal   = unit.lengthFromCM(previous.headCircumferenceCM)
+        }
+        let delta = latestVal - prevVal
+        // Only show meaningful deltas (avoid -0.00 / +0.00 noise)
+        guard abs(delta) >= 0.01 else { return nil }
+        return delta
+    }
+
     /// Calculate the baby's WHO percentile for a given metric using the latest record.
     /// Returns nil if baby gender is .other, no data, or age out of WHO range.
     private func whoPercentile(for metric: GrowthMetric) -> Int? {
@@ -334,6 +377,9 @@ struct GrowthView: View {
         let weightPctl = whoPercentile(for: .weight)
         let heightPctl = whoPercentile(for: .height)
         let headPctl   = whoPercentile(for: .head)
+        let weightDelta = metricDelta(for: .weight, unit: unit)
+        let heightDelta = metricDelta(for: .height, unit: unit)
+        let headDelta   = metricDelta(for: .head, unit: unit)
 
         return HStack(spacing: 0) {
             // Weight
@@ -343,6 +389,8 @@ struct GrowthView: View {
                 icon: "scalemass.fill",
                 isSelected: selectedMetric == .weight,
                 percentile: weightPctl,
+                delta: weightDelta,
+                deltaFormat: "%.2f",
                 measureDate: latestWeight?.date
             ) { selectedMetric = .weight }
 
@@ -355,6 +403,8 @@ struct GrowthView: View {
                 icon: "ruler.fill",
                 isSelected: selectedMetric == .height,
                 percentile: heightPctl,
+                delta: heightDelta,
+                deltaFormat: "%.1f",
                 measureDate: latestHeight?.date
             ) { selectedMetric = .height }
 
@@ -367,6 +417,8 @@ struct GrowthView: View {
                 icon: "circle.dashed",
                 isSelected: selectedMetric == .head,
                 percentile: headPctl,
+                delta: headDelta,
+                deltaFormat: "%.1f",
                 measureDate: latestHead?.date
             ) { selectedMetric = .head }
         }
@@ -382,7 +434,7 @@ struct GrowthView: View {
             .frame(width: 1, height: 54)
     }
 
-    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, measureDate: Date? = nil, action: @escaping () -> Void) -> some View {
+    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, delta: Double? = nil, deltaFormat: String = "%.1f", measureDate: Date? = nil, action: @escaping () -> Void) -> some View {
         Button(action: {
             Haptic.selection()
             withAnimation(.spring(response: 0.3)) { action() }
@@ -400,6 +452,19 @@ struct GrowthView: View {
                 Text(label)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(isSelected ? .blGrowth : .blTextTertiary)
+
+                // Growth delta from previous measurement (e.g. "+0.30")
+                if let delta {
+                    let sign = delta > 0 ? "+" : ""
+                    let text = "\(sign)\(String(format: deltaFormat, delta))"
+                    HStack(spacing: 2) {
+                        Image(systemName: delta > 0 ? "arrow.up.right" : "arrow.down.right")
+                            .font(.system(size: 8, weight: .bold))
+                        Text(text)
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundColor(delta > 0 ? .blTeal : .blPrimary)
+                }
 
                 // WHO percentile badge
                 if let pctl = percentile {
@@ -425,18 +490,23 @@ struct GrowthView: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(metricAccessibilityLabel(value: value, label: label, percentile: percentile, measureDate: measureDate))
+        .accessibilityLabel(metricAccessibilityLabel(value: value, label: label, percentile: percentile, delta: delta, deltaFormat: deltaFormat, measureDate: measureDate))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityHint(String(localized: "growth.viewChart \(label)"))
     }
 
     /// Build a comprehensive VoiceOver label for a metric column
-    private func metricAccessibilityLabel(value: String?, label: String, percentile: Int?, measureDate: Date?) -> String {
+    private func metricAccessibilityLabel(value: String?, label: String, percentile: Int?, delta: Double? = nil, deltaFormat: String = "%.1f", measureDate: Date?) -> String {
         var parts: [String] = [label]
         if let value {
             parts.append(value)
         } else {
             parts.append(String(localized: "growth.noData"))
+        }
+        if let delta {
+            let sign = delta > 0 ? "+" : ""
+            let formatted = "\(sign)\(String(format: deltaFormat, delta))"
+            parts.append(String(format: NSLocalizedString("growth.a11y.delta %@", comment: ""), formatted))
         }
         if let pctl = percentile {
             let range = percentileRangeDescription(pctl)

@@ -393,6 +393,7 @@
 "growth.noData"           = "no data";
 "growth.percentile %lld"  = "percentile %lld";
 "growth.measured %@"      = "measured %@";
+"growth.a11y.delta %@"    = "change %@";
 "growth.viewChart %@"     = "Double tap to view %@ chart";
 "growth.outsideRange"     = "outside normal range";
 "growth.worthMonitoring"  = "worth monitoring";
