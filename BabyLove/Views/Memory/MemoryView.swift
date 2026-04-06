@@ -62,20 +62,19 @@ struct MemoryView: View {
         filteredMilestones.filter { !$0.isCompleted }.count
     }
 
-    /// Group milestones by month (e.g. "April 2026") for timeline display
+    /// Group milestones by month (e.g. "April 2026" / "2026年4月") for timeline display.
+    /// Uses the locale-aware `BLDateFormatters.yearMonth` formatter so CJK locales
+    /// get the correct year–month ordering (e.g. "2026年4月" instead of "April 2026").
     private var groupedByMonth: [(key: String, milestones: [CDMilestone])] {
-        let cal = Calendar.current
-        let fmt = DateFormatter()
-        fmt.dateFormat = "MMMM yyyy"
         var dict: [String: [CDMilestone]] = [:]
         var order: [String] = []
         for m in filteredMilestones {
             let date = m.date ?? Date.distantPast
-            let key = fmt.string(from: date)
+            let key = BLDateFormatters.yearMonth.string(from: date)
             if dict[key] == nil { order.append(key) }
             dict[key, default: []].append(m)
         }
-        // Sort months by the actual date of their first milestone (already sorted desc from FetchRequest)
+        // Months are already in descending date order (FetchRequest sorts by date desc)
         return order.map { (key: $0, milestones: dict[$0]!) }
     }
 

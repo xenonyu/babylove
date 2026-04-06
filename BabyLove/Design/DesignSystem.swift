@@ -383,6 +383,13 @@ enum BLDateFormatters {
         return f
     }()
 
+    /// "April 2026" / "2026年4月" — locale-aware year + month for section headers
+    static let yearMonth: DateFormatter = {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("MMMMyyyy")
+        return f
+    }()
+
     /// "2026-04-06" — ISO-style for filenames
     static let isoDate: DateFormatter = {
         let f = DateFormatter()
