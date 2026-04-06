@@ -19,111 +19,107 @@ struct DiaperLogView: View {
         NavigationStack {
             ZStack {
                 Color.blBackground.ignoresSafeArea()
-                VStack(spacing: 28) {
-                    // Type selection
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Diaper Type")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.blTextSecondary)
-                            .padding(.horizontal, 24)
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Type selection
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("Diaper Type")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.blTextSecondary)
 
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
-                            ForEach(DiaperType.allCases, id: \.self) { t in
-                                Button {
-                                    Haptic.selection()
-                                    withAnimation(.spring(response: 0.3)) { diaperType = t }
-                                } label: {
-                                    VStack(spacing: 10) {
-                                        Text(t.icon)
-                                            .font(.system(size: 36))
-                                        Text(t.displayName)
-                                            .font(.system(size: 15, weight: .medium))
-                                            .foregroundColor(diaperType == t ? .white : .blTextPrimary)
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
+                                ForEach(DiaperType.allCases, id: \.self) { t in
+                                    Button {
+                                        Haptic.selection()
+                                        withAnimation(.spring(response: 0.3)) { diaperType = t }
+                                    } label: {
+                                        VStack(spacing: 10) {
+                                            Text(t.icon)
+                                                .font(.system(size: 36))
+                                            Text(t.displayName)
+                                                .font(.system(size: 15, weight: .medium))
+                                                .foregroundColor(diaperType == t ? .white : .blTextPrimary)
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 100)
+                                        .background(diaperType == t ? Color.blDiaper : Color.blSurface)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 100)
-                                    .background(diaperType == t ? Color.blDiaper : Color.blSurface)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel("\(t.displayName) diaper")
+                                    .accessibilityAddTraits(diaperType == t ? .isSelected : [])
                                 }
-                                .buttonStyle(.plain)
-                                .accessibilityLabel("\(t.displayName) diaper")
-                                .accessibilityAddTraits(diaperType == t ? .isSelected : [])
                             }
                         }
-                        .padding(.horizontal, 24)
-                    }
 
-                    // Time
-                    VStack(alignment: .leading, spacing: 10) {
-                        Button {
-                            withAnimation(.spring(response: 0.3)) { showTimePicker.toggle() }
-                        } label: {
-                            HStack {
-                                Label("Time", systemImage: "clock.fill")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundColor(.blTextSecondary)
-                                Spacer()
-                                Text(timestamp.formatted(date: .omitted, time: .shortened))
-                                    .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(.blDiaper)
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(.blTextTertiary)
-                                    .rotationEffect(.degrees(showTimePicker ? 90 : 0))
+                        // Time
+                        VStack(alignment: .leading, spacing: 10) {
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { showTimePicker.toggle() }
+                            } label: {
+                                HStack {
+                                    Label("Time", systemImage: "clock.fill")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                    Spacer()
+                                    Text(timestamp.formatted(date: .omitted, time: .shortened))
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(.blDiaper)
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(.blTextTertiary)
+                                        .rotationEffect(.degrees(showTimePicker ? 90 : 0))
+                                }
+                                .padding(14)
+                                .background(Color.blSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
-                            .padding(14)
-                            .background(Color.blSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .buttonStyle(.plain)
+
+                            if showTimePicker {
+                                DatePicker("Diaper change time", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                    .datePickerStyle(.compact)
+                                    .tint(.blDiaper)
+                                    .labelsHidden()
+                                    .accessibilityLabel("Diaper change time")
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
                         }
-                        .buttonStyle(.plain)
 
-                        if showTimePicker {
-                            DatePicker("Diaper change time", selection: $timestamp, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
-                                .datePickerStyle(.compact)
-                                .tint(.blDiaper)
-                                .labelsHidden()
-                                .accessibilityLabel("Diaper change time")
-                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        // Notes
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Notes (optional)", systemImage: "note.text")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.blTextSecondary)
+                            TextField("Color, consistency, or other notes…", text: $notes, axis: .vertical)
+                                .lineLimit(2...4)
+                                .padding(14)
+                                .background(Color.blSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
-                    }
-                    .padding(.horizontal, 24)
 
-                    // Notes
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Notes (optional)")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.blTextSecondary)
-                        TextField("Color, consistency, or other notes…", text: $notes, axis: .vertical)
-                            .lineLimit(2...4)
-                            .padding(14)
-                            .background(Color.blSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
-                    .padding(.horizontal, 24)
-
-                    Spacer()
-
-                    Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
-                        var ok = false
-                        if let record = editingRecord {
-                            ok = vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
-                            appState.showToast(ok ? "Diaper updated" : "Save failed — try again",
-                                               icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
-                                               color: ok ? .blDiaper : .red)
-                        } else {
-                            ok = vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
-                            appState.showToast(ok ? "Diaper logged" : "Save failed — try again",
-                                               icon: ok ? "oval.fill" : "exclamationmark.triangle.fill",
-                                               color: ok ? .blDiaper : .red)
+                        Button(isEditing ? "Update Diaper" : "Log Diaper Change") {
+                            var ok = false
+                            if let record = editingRecord {
+                                ok = vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
+                                appState.showToast(ok ? "Diaper updated" : "Save failed — try again",
+                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blDiaper : .red)
+                            } else {
+                                ok = vm.logDiaper(type: diaperType, notes: notes, timestamp: timestamp)
+                                appState.showToast(ok ? "Diaper logged" : "Save failed — try again",
+                                                   icon: ok ? "oval.fill" : "exclamationmark.triangle.fill",
+                                                   color: ok ? .blDiaper : .red)
+                            }
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
                         }
-                        if ok { Haptic.success(); dismiss() } else { Haptic.error() }
+                        .buttonStyle(BLPrimaryButton(color: .blDiaper))
+                        .padding(.top, 8)
                     }
-                    .buttonStyle(BLPrimaryButton(color: .blDiaper))
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 32)
+                    .padding(24)
                 }
-                .padding(.top, 24)
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isEditing ? "Edit Diaper" : "Log Diaper")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
