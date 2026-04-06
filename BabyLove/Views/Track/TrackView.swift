@@ -390,6 +390,13 @@ struct TrackView: View {
                             .foregroundColor(.blTextTertiary)
                     }
                 }
+                // Notes preview
+                if let notes = r.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                        .lineLimit(1)
+                }
             }
             Spacer()
             if let s = r.startTime, let e = r.endTime {
@@ -443,32 +450,43 @@ struct TrackView: View {
     private func growthRow(_ r: CDGrowthRecord) -> some View {
         let unit = appState.measurementUnit
         return HStack(spacing: 8) {
-            Text("Growth")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.blTextPrimary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Growth")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(.blTextPrimary)
+                // Measurement pills
+                HStack(spacing: 6) {
+                    if r.weightKG > 0 {
+                        let w = unit.weightFromKG(r.weightKG)
+                        growthMetricPill(
+                            icon: "scalemass.fill",
+                            text: String(format: "%.1f %@", w, unit.weightLabel)
+                        )
+                    }
+                    if r.heightCM > 0 {
+                        let h = unit.lengthFromCM(r.heightCM)
+                        growthMetricPill(
+                            icon: "ruler.fill",
+                            text: String(format: "%.1f %@", h, unit.heightLabel)
+                        )
+                    }
+                    if r.headCircumferenceCM > 0 {
+                        let hc = unit.lengthFromCM(r.headCircumferenceCM)
+                        growthMetricPill(
+                            icon: "circle.dashed",
+                            text: String(format: "%.1f %@", hc, unit.heightLabel)
+                        )
+                    }
+                }
+                // Notes preview
+                if let notes = r.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.system(size: 12))
+                        .foregroundColor(.blTextTertiary)
+                        .lineLimit(1)
+                }
+            }
             Spacer()
-            // Show available measurements compactly with labels to disambiguate
-            if r.weightKG > 0 {
-                let w = unit.weightFromKG(r.weightKG)
-                growthMetricPill(
-                    icon: "scalemass.fill",
-                    text: String(format: "%.1f %@", w, unit.weightLabel)
-                )
-            }
-            if r.heightCM > 0 {
-                let h = unit.lengthFromCM(r.heightCM)
-                growthMetricPill(
-                    icon: "ruler.fill",
-                    text: String(format: "%.1f %@", h, unit.heightLabel)
-                )
-            }
-            if r.headCircumferenceCM > 0 {
-                let hc = unit.lengthFromCM(r.headCircumferenceCM)
-                growthMetricPill(
-                    icon: "circle.dashed",
-                    text: String(format: "%.1f %@", hc, unit.heightLabel)
-                )
-            }
             Text(r.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "—")
                 .font(.system(size: 13))
                 .foregroundColor(.blTextTertiary)
