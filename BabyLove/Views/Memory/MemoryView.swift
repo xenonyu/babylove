@@ -331,7 +331,7 @@ struct AddMilestoneView: View {
     @State private var category: MilestoneCategory = .social
     @State private var date        = Date()
     @State private var notes       = ""
-    @State private var isCompleted = true
+    @State private var isCompleted = false
     @State private var showSuggestions = false
 
     private var isEditing: Bool { editingRecord != nil }

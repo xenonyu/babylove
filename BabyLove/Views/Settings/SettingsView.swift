@@ -140,7 +140,7 @@ struct SettingsView: View {
                         HStack {
                             Label("Version", systemImage: "info.circle")
                             Spacer()
-                            Text("1.0.0")
+                            Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0")
                                 .foregroundColor(.blTextSecondary)
                         }
                         if let privacyURL = URL(string: "https://babylove.app/privacy") {
