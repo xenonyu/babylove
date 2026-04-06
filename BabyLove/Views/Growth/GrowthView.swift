@@ -218,12 +218,51 @@ struct GrowthView: View {
         return Int(pctl.rounded())
     }
 
+    // MARK: - Percentile Availability Hint
+
+    /// Reason why WHO percentile cannot be calculated, if any
+    private var percentileUnavailableReason: String? {
+        guard !records.isEmpty else { return nil }
+        // Already showing at least one percentile? No hint needed
+        let hasAnyPercentile = GrowthMetric.allCases.contains { whoPercentile(for: $0) != nil }
+        if hasAnyPercentile { return nil }
+
+        // Check specific reasons
+        if let baby = appState.currentBaby {
+            if baby.gender == .other {
+                return String(localized: "growth.percentileHintGender")
+            }
+            let ageMonths = Date().timeIntervalSince(baby.birthDate) / (30.4375 * 86400)
+            if ageMonths > 24 {
+                return String(localized: "growth.percentileHintAge")
+            }
+        } else {
+            return String(localized: "growth.percentileHintNoBaby")
+        }
+        return nil
+    }
+
     // MARK: - Chart Area
     private var chartArea: some View {
         VStack(spacing: 16) {
             // Latest measurements overview — shows most recent non-zero value for each metric
             if !records.isEmpty {
                 latestMeasurementsCard
+
+                // Hint explaining why WHO percentile isn't available
+                if let reason = percentileUnavailableReason {
+                    HStack(spacing: 8) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 13))
+                            .foregroundColor(.blGrowth.opacity(0.7))
+                        Text(reason)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.blTextTertiary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
 
             // Growth chart with WHO percentile curves

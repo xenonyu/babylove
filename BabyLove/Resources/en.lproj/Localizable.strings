@@ -398,6 +398,9 @@
 "growth.headCircLabel"    = "head circumference";
 "growth.chartLabel %@ %lld" = "%@ chart with %lld measurements";
 "growth.chartNoData %@"   = "%@ chart, no data";
+"growth.percentileHintGender" = "Set baby's gender to Boy or Girl in Settings to see WHO percentiles";
+"growth.percentileHintAge"    = "WHO percentile data is available for ages 0–24 months";
+"growth.percentileHintNoBaby" = "Add baby profile to see WHO percentile comparisons";
 
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "Memories";

@@ -423,6 +423,9 @@
 "growth.headCircLabel"    = "머리둘레";
 "growth.chartLabel %@ %lld" = "%@ 차트, 측정 %lld건";
 "growth.chartNoData %@"   = "%@ 차트, 데이터 없음";
+"growth.percentileHintGender" = "설정에서 아기 성별을 남아 또는 여아로 지정하면 WHO 백분위를 확인할 수 있습니다";
+"growth.percentileHintAge"    = "WHO 백분위 데이터는 0~24개월에 해당합니다";
+"growth.percentileHintNoBaby" = "아기 프로필을 추가하여 WHO 백분위 비교를 확인하세요";
 
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "추억";

@@ -423,6 +423,9 @@
 "growth.headCircLabel"    = "頭囲";
 "growth.chartLabel %@ %lld" = "%@グラフ、%lld 件の測定";
 "growth.chartNoData %@"   = "%@グラフ、データなし";
+"growth.percentileHintGender" = "設定で性別を男の子または女の子に設定すると、WHOパーセンタイルが表示されます";
+"growth.percentileHintAge"    = "WHOパーセンタイルデータは0〜24か月に対応しています";
+"growth.percentileHintNoBaby" = "赤ちゃんのプロフィールを追加して、WHOパーセンタイルを確認しましょう";
 
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "思い出";
