@@ -66,6 +66,8 @@
 "settings.section.babyProfile"        = "아기 프로필";
 "settings.section.measurements"       = "측정 단위";
 "settings.units"                      = "단위";
+"units.metric"                        = "미터법 (kg, cm, ml)";
+"units.imperial"                      = "야드파운드법 (lbs, in, oz)";
 "settings.section.reminders"          = "알림";
 "settings.feedingReminders"           = "수유 알림";
 "settings.interval"                   = "간격";
@@ -75,6 +77,7 @@
 "settings.exportCSV"                  = "모든 데이터 내보내기 (CSV)";
 "settings.export.footer"              = "모든 기록을 CSV 파일로 내보냅니다. 소아과 의사와 공유하거나 백업으로 저장하세요.";
 "settings.export.failed"              = "내보내기 실패";
+"settings.export.unknownError"        = "내보내기 중 알 수 없는 오류가 발생했습니다.";
 /* CSV 내보내기 열 헤더 및 값 */
 "export.header.recordType"  = "기록 유형";
 "export.header.date"        = "날짜";

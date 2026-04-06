@@ -66,6 +66,8 @@
 "settings.section.babyProfile"        = "Baby Profile";
 "settings.section.measurements"       = "Measurements";
 "settings.units"                      = "Units";
+"units.metric"                        = "Metric (kg, cm, ml)";
+"units.imperial"                      = "Imperial (lbs, in, oz)";
 "settings.section.reminders"          = "Reminders";
 "settings.feedingReminders"           = "Feeding Reminders";
 "settings.interval"                   = "Interval";
@@ -75,6 +77,7 @@
 "settings.exportCSV"                  = "Export All Data (CSV)";
 "settings.export.footer"              = "Export all records as CSV files. Share with your pediatrician or save as a backup.";
 "settings.export.failed"              = "Export Failed";
+"settings.export.unknownError"        = "An unknown error occurred while exporting.";
 /* CSV Export Column Headers & Values */
 "export.header.recordType"  = "Record Type";
 "export.header.date"        = "Date";

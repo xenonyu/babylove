@@ -66,6 +66,8 @@
 "settings.section.babyProfile"        = "赤ちゃんのプロフィール";
 "settings.section.measurements"       = "単位";
 "settings.units"                      = "単位";
+"units.metric"                        = "メートル法 (kg, cm, ml)";
+"units.imperial"                      = "ヤード・ポンド法 (lbs, in, oz)";
 "settings.section.reminders"          = "リマインダー";
 "settings.feedingReminders"           = "授乳リマインダー";
 "settings.interval"                   = "間隔";
@@ -75,6 +77,7 @@
 "settings.exportCSV"                  = "全データをエクスポート (CSV)";
 "settings.export.footer"              = "すべての記録をCSVファイルとしてエクスポートします。小児科医と共有したりバックアップとして保存できます。";
 "settings.export.failed"              = "エクスポート失敗";
+"settings.export.unknownError"        = "エクスポート中に不明なエラーが発生しました。";
 /* CSV エクスポート列ヘッダーと値 */
 "export.header.recordType"  = "記録タイプ";
 "export.header.date"        = "日付";

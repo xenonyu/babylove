@@ -66,6 +66,8 @@
 "settings.section.babyProfile"        = "宝宝资料";
 "settings.section.measurements"       = "度量单位";
 "settings.units"                      = "单位";
+"units.metric"                        = "公制 (kg, cm, ml)";
+"units.imperial"                      = "英制 (lbs, in, oz)";
 "settings.section.reminders"          = "提醒";
 "settings.feedingReminders"           = "喂食提醒";
 "settings.interval"                   = "间隔";
@@ -75,6 +77,7 @@
 "settings.exportCSV"                  = "导出所有数据 (CSV)";
 "settings.export.footer"              = "将所有记录导出为 CSV 文件，分享给儿科医生或作为备份。";
 "settings.export.failed"              = "导出失败";
+"settings.export.unknownError"        = "导出时发生未知错误。";
 /* CSV 导出列头和值 */
 "export.header.recordType"  = "记录类型";
 "export.header.date"        = "日期";
