@@ -68,12 +68,12 @@ struct AllFeedingsView: View {
                                             .onTapGesture { recordToEdit = r }
                                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                                 Button(role: .destructive) { recordToDelete = r } label: {
-                                                    Label("Delete", systemImage: "trash")
+                                                    Label(String(localized: "track.delete"), systemImage: "trash")
                                                 }
                                             }
                                             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                                 Button { recordToEdit = r } label: {
-                                                    Label("Edit", systemImage: "pencil")
+                                                    Label(String(localized: "track.edit"), systemImage: "pencil")
                                                 }
                                                 .tint(.blFeeding)
                                             }
@@ -334,12 +334,12 @@ struct AllSleepsView: View {
                                             .onTapGesture { recordToEdit = r }
                                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                                 Button(role: .destructive) { recordToDelete = r } label: {
-                                                    Label("Delete", systemImage: "trash")
+                                                    Label(String(localized: "track.delete"), systemImage: "trash")
                                                 }
                                             }
                                             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                                 Button { recordToEdit = r } label: {
-                                                    Label("Edit", systemImage: "pencil")
+                                                    Label(String(localized: "track.edit"), systemImage: "pencil")
                                                 }
                                                 .tint(.blSleep)
                                             }
@@ -572,12 +572,12 @@ struct AllDiapersView: View {
                                             .onTapGesture { recordToEdit = r }
                                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                                 Button(role: .destructive) { recordToDelete = r } label: {
-                                                    Label("Delete", systemImage: "trash")
+                                                    Label(String(localized: "track.delete"), systemImage: "trash")
                                                 }
                                             }
                                             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                                 Button { recordToEdit = r } label: {
-                                                    Label("Edit", systemImage: "pencil")
+                                                    Label(String(localized: "track.edit"), systemImage: "pencil")
                                                 }
                                                 .tint(.blDiaper)
                                             }
@@ -743,12 +743,12 @@ struct AllGrowthView: View {
                                     .onTapGesture { recordToEdit = r }
                                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         Button(role: .destructive) { recordToDelete = r } label: {
-                                            Label("Delete", systemImage: "trash")
+                                            Label(String(localized: "track.delete"), systemImage: "trash")
                                         }
                                     }
                                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                         Button { recordToEdit = r } label: {
-                                            Label("Edit", systemImage: "pencil")
+                                            Label(String(localized: "track.edit"), systemImage: "pencil")
                                         }
                                         .tint(.blGrowth)
                                     }

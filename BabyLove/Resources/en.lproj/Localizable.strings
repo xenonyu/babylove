@@ -183,6 +183,7 @@
 "home.weekly.diapers"      = "Diapers";
 "home.weekly.perDay"       = "/day";
 "home.weekly.total %lld"   = "%lld total";
+"home.weekly.volumeTotal %lld %@" = "%lld %@ total";
 "home.weekly.naps %lld"    = "%lld naps";
 "home.weekly.upPct %lld"   = "up %lld%% from last week";
 "home.weekly.downPct %lld" = "down %lld%% from last week";

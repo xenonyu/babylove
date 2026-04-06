@@ -183,6 +183,7 @@
 "home.weekly.diapers"      = "おむつ";
 "home.weekly.perDay"       = "/日";
 "home.weekly.total %lld"   = "計 %lld 回";
+"home.weekly.volumeTotal %lld %@" = "計 %lld %@";
 "home.weekly.naps %lld"    = "計 %lld 回のお昼寝";
 "home.weekly.upPct %lld"   = "先週より %lld%% 増加";
 "home.weekly.downPct %lld" = "先週より %lld%% 減少";

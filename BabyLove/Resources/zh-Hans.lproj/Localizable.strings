@@ -183,6 +183,7 @@
 "home.weekly.diapers"      = "尿布";
 "home.weekly.perDay"       = "/天";
 "home.weekly.total %lld"   = "共 %lld 次";
+"home.weekly.volumeTotal %lld %@" = "共 %lld %@";
 "home.weekly.naps %lld"    = "共 %lld 次小睡";
 "home.weekly.upPct %lld"   = "比上周增加 %lld%%";
 "home.weekly.downPct %lld" = "比上周减少 %lld%%";

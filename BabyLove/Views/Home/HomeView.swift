@@ -550,7 +550,7 @@ struct HomeView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 .padding(.horizontal, 20)
                                 .accessibilityElement(children: .ignore)
-                                .accessibilityLabel("Daily summary: \(summary)")
+                                .accessibilityLabel(summary)
                             }
                         }
 
@@ -1476,8 +1476,8 @@ struct HomeView: View {
                         ? "\(Int(avgDisplay.rounded()))"
                         : String(format: "%.1f", avgDisplay)
                     let totalText = unit == .metric
-                        ? "\(Int(totalDisplay.rounded())) \(unit.volumeLabel) total"
-                        : String(format: "%.0f %@ total", totalDisplay, unit.volumeLabel)
+                        ? String(format: NSLocalizedString("home.weekly.volumeTotal %lld %@", comment: ""), Int(totalDisplay.rounded()), unit.volumeLabel)
+                        : String(format: NSLocalizedString("home.weekly.volumeTotal %lld %@", comment: ""), Int(totalDisplay.rounded()), unit.volumeLabel)
                     weeklyRow(
                         icon: "cross.vial.fill",
                         color: .blFeeding,
