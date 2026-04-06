@@ -35,6 +35,7 @@ struct HomeView: View {
     @State private var globalLastSleepEnd: Date?
     @State private var globalLastSleepIsOngoing: Bool = false
     @State private var globalLastDiaperTime: Date?
+    @State private var globalLastGrowthDate: Date?
 
     // Initialize with today's predicate to avoid flashing all-time data
     @FetchRequest(
@@ -333,8 +334,9 @@ struct HomeView: View {
         let feedCount = todayFeedings.count
         let sleepMins = totalSleepMinutes
         let diaperCount = todayDiapers.count
+        let growthCount = todayGrowth.count
 
-        guard feedCount > 0 || sleepMins > 0 || diaperCount > 0 else { return nil }
+        guard feedCount > 0 || sleepMins > 0 || diaperCount > 0 || growthCount > 0 else { return nil }
 
         let babyName = baby?.name ?? "Baby"
         var parts: [String] = []
@@ -369,6 +371,26 @@ struct HomeView: View {
         if diaperCount > 0 {
             let diaperKey = diaperCount == 1 ? "home.summary.diapersSingular %lld" : "home.summary.diapersPlural %lld"
             parts.append(String(format: NSLocalizedString(diaperKey, comment: ""), diaperCount))
+        }
+
+        // Growth measurements
+        if growthCount > 0 {
+            let growthKey = growthCount == 1 ? "home.summary.growthSingular" : "home.summary.growthPlural %lld"
+            var growthPart = growthCount == 1
+                ? NSLocalizedString(growthKey, comment: "")
+                : String(format: NSLocalizedString(growthKey, comment: ""), growthCount)
+            // Append latest measurement value for context
+            if let latest = todayGrowth.first {
+                let unit = appState.measurementUnit
+                if latest.weightKG > 0 {
+                    let w = unit.weightFromKG(latest.weightKG)
+                    growthPart += " (\(String(format: "%.2f", w)) \(unit.weightLabel))"
+                } else if latest.heightCM > 0 {
+                    let h = unit.lengthFromCM(latest.heightCM)
+                    growthPart += " (\(String(format: "%.1f", h)) \(unit.heightLabel))"
+                }
+            }
+            parts.append(growthPart)
         }
 
         // Assemble natural sentence
@@ -431,6 +453,14 @@ struct HomeView: View {
         _ = minuteTick
         guard let lastTime = globalLastDiaperTime else { return nil }
         return Self.timeSinceText(from: lastTime)
+    }
+
+    /// Contextual hint for the Growth quick log card.
+    /// Shows how long since the last growth measurement (e.g. "3 days ago").
+    /// Growth is measured infrequently, so this helps parents remember when to measure again.
+    private var quickLogGrowthHint: String? {
+        guard let lastDate = globalLastGrowthDate else { return nil }
+        return Self.timeSinceText(from: lastDate)
     }
 
     private var totalSleepMinutes: Int {
@@ -587,7 +617,8 @@ struct HomeView: View {
                                              hint: isSelectedDateToday ? quickLogDiaperHint : nil) { showDiaperLog = true }
                                 QuickLogCard(icon: "chart.bar.fill",
                                              label: NSLocalizedString("home.growth", comment: ""),
-                                             color: .blGrowth) { showGrowthLog = true }
+                                             color: .blGrowth,
+                                             hint: isSelectedDateToday ? quickLogGrowthHint : nil) { showGrowthLog = true }
                             }
                             .padding(.horizontal, 20)
                         }
@@ -660,7 +691,7 @@ struct HomeView: View {
             .onChange(of: todayFeedings.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
             .onChange(of: todaySleeps.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
             .onChange(of: todayDiapers.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
-            .onChange(of: todayGrowth.count) { _, _ in refreshActiveDays() }
+            .onChange(of: todayGrowth.count) { _, _ in refreshGlobalLastTimes(); refreshActiveDays() }
             .onChange(of: ongoingSleeps.count) { _, count in
                 refreshGlobalLastTimes()
                 if count > 0 {
@@ -821,6 +852,12 @@ struct HomeView: View {
         diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         diaperReq.fetchLimit = 1
         globalLastDiaperTime = (try? ctx.fetch(diaperReq))?.first?.timestamp
+
+        // Last growth measurement (any day)
+        let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+        growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        growthReq.fetchLimit = 1
+        globalLastGrowthDate = (try? ctx.fetch(growthReq))?.first?.date
     }
 
     // MARK: - Active Days Indicators

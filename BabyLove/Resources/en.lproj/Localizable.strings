@@ -213,6 +213,8 @@
 "home.summary.sleepOf %@"   = "%@ of sleep";
 "home.summary.diapersSingular %lld" = "%lld diaper change";
 "home.summary.diapersPlural %lld"   = "%lld diaper changes";
+"home.summary.growthSingular"       = "a growth measurement";
+"home.summary.growthPlural %lld"    = "%lld growth measurements";
 "home.summary.todayFormat %@ %@"    = "%@ has had %@ so far today.";
 "home.summary.pastFormat %@ %@"     = "%@ had %@.";
 "home.summary.feedingEvery %@"      = " Feeding about every %@.";

@@ -213,6 +213,8 @@
 "home.summary.sleepOf %@"   = "수면 %@";
 "home.summary.diapersSingular %lld" = "기저귀 교체 %lld회";
 "home.summary.diapersPlural %lld"   = "기저귀 교체 %lld회";
+"home.summary.growthSingular"       = "성장 측정 1회";
+"home.summary.growthPlural %lld"    = "성장 측정 %lld회";
 "home.summary.todayFormat %@ %@"    = "%1$@은(는) 오늘 %2$@입니다.";
 "home.summary.pastFormat %@ %@"     = "%1$@은(는) %2$@이었습니다.";
 "home.summary.feedingEvery %@"      = " 약 %@ 간격으로 수유.";

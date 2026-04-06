@@ -213,6 +213,8 @@
 "home.summary.sleepOf %@"   = "%@ 睡眠";
 "home.summary.diapersSingular %lld" = "%lld 次换尿布";
 "home.summary.diapersPlural %lld"   = "%lld 次换尿布";
+"home.summary.growthSingular"       = "1 次体检测量";
+"home.summary.growthPlural %lld"    = "%lld 次体检测量";
 "home.summary.todayFormat %@ %@"    = "%1$@ 今天已有 %2$@。";
 "home.summary.pastFormat %@ %@"     = "%1$@ 有 %2$@。";
 "home.summary.feedingEvery %@"      = " 平均每 %@ 喂一次。";

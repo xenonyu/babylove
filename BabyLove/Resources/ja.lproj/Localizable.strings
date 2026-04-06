@@ -213,6 +213,8 @@
 "home.summary.sleepOf %@"   = "睡眠 %@";
 "home.summary.diapersSingular %lld" = "おむつ交換 %lld 回";
 "home.summary.diapersPlural %lld"   = "おむつ交換 %lld 回";
+"home.summary.growthSingular"       = "身体計測 1 回";
+"home.summary.growthPlural %lld"    = "身体計測 %lld 回";
 "home.summary.todayFormat %@ %@"    = "%1$@ は今日 %2$@ です。";
 "home.summary.pastFormat %@ %@"     = "%1$@ は %2$@ でした。";
 "home.summary.feedingEvery %@"      = " 約 %@ ごとに授乳。";
