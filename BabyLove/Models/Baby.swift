@@ -77,4 +77,28 @@ struct Baby: Codable, Identifiable {
         let c = Calendar.current.dateComponents([.month], from: birthDate, to: Date())
         return c.month ?? 0
     }
+
+    /// Human-readable age text at a specific date (e.g. "3m 12d", "1y 2m").
+    /// Useful for growth records where the measurement date may differ from today.
+    func ageText(at date: Date) -> String {
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: birthDate, to: date)
+        let yr = c.year ?? 0
+        let mo = c.month ?? 0
+        let dy = c.day ?? 0
+
+        // Guard against future or same-day dates
+        guard yr >= 0 && mo >= 0 && dy >= 0 else { return "0 days" }
+
+        if yr > 0 {
+            return mo > 0 ? "\(yr)y \(mo)m" : "\(yr)y"
+        } else if mo > 0 {
+            return dy > 0 ? "\(mo)m \(dy)d" : "\(mo)m"
+        } else if dy >= 7 {
+            let wk = dy / 7
+            let remDays = dy % 7
+            return remDays > 0 ? "\(wk)w \(remDays)d" : "\(wk)w"
+        } else {
+            return "\(dy)d"
+        }
+    }
 }

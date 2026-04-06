@@ -449,11 +449,24 @@ struct TrackView: View {
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {
         let unit = appState.measurementUnit
+        let baby = appState.currentBaby
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Growth")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.blTextPrimary)
+                HStack(spacing: 6) {
+                    Text("Growth")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                    // Baby's age at this measurement
+                    if let baby, let date = r.date {
+                        Text(baby.ageText(at: date))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundColor(.blGrowth)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.blGrowth.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                }
                 // Measurement pills
                 HStack(spacing: 6) {
                     if r.weightKG > 0 {

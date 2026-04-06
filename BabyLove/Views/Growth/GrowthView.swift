@@ -313,6 +313,7 @@ struct GrowthView: View {
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {
         let unit = appState.measurementUnit
+        let baby = appState.currentBaby
         return HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -323,9 +324,21 @@ struct GrowthView: View {
                     .foregroundColor(.blGrowth)
             }
             VStack(alignment: .leading, spacing: 3) {
-                Text(r.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.blTextPrimary)
+                HStack(spacing: 6) {
+                    Text(r.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.blTextPrimary)
+                    // Baby's age at this measurement
+                    if let baby, let date = r.date {
+                        Text(baby.ageText(at: date))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundColor(.blGrowth)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.blGrowth.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                }
                 HStack(spacing: 10) {
                     if r.weightKG > 0 {
                         Text("\(String(format: "%.2f", unit.weightFromKG(r.weightKG))) \(unit.weightLabel)")
