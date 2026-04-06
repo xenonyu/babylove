@@ -43,8 +43,7 @@ struct SleepLogView: View {
         Int(endTime.timeIntervalSince(startTime) / 60)
     }
     private var durationText: String {
-        let h = duration / 60, m = duration % 60
-        return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+        DurationFormat.fromMinutes(duration)
     }
     /// Elapsed minutes for the ongoing sleep, updated by `elapsedTimer`.
     @State private var ongoingElapsedMinutes: Int = 0
@@ -52,8 +51,7 @@ struct SleepLogView: View {
     private var ongoingDurationText: String {
         // Reference the state var so SwiftUI triggers re-render when it changes
         let mins = ongoingElapsedMinutes
-        let h = mins / 60, m = mins % 60
-        return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+        return DurationFormat.fromMinutes(mins)
     }
 
     var body: some View {

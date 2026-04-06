@@ -284,8 +284,7 @@ struct SettingsView: View {
                         }
                         if let s = r.startTime, let e = r.endTime {
                             let mins = Int(e.timeIntervalSince(s) / 60)
-                            let h = mins / 60, m = mins % 60
-                            details.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
+                            details.append(DurationFormat.fromMinutes(mins))
                             details.append(String(format: NSLocalizedString("export.sleep.end %@", comment: ""), timeFormatter.string(from: e)))
                         } else {
                             details.append(sleepOngoing)

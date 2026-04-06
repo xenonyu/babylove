@@ -206,6 +206,7 @@
 "home.weekly.volume"       = "奶量";
 "home.weekly.sleep"        = "睡眠";
 "home.weekly.diapers"      = "尿布";
+"home.weekly.hoursValue %@" = "%@小时";
 "home.weekly.perDay"       = "/天";
 "home.weekly.total %lld"   = "共 %lld 次";
 "home.weekly.volumeTotal %lld %@" = "共 %lld %@";

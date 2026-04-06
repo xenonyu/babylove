@@ -206,6 +206,7 @@
 "home.weekly.volume"       = "수유량";
 "home.weekly.sleep"        = "수면";
 "home.weekly.diapers"      = "기저귀";
+"home.weekly.hoursValue %@" = "%@시간";
 "home.weekly.perDay"       = "/일";
 "home.weekly.total %lld"   = "총 %lld회";
 "home.weekly.volumeTotal %lld %@" = "총 %lld %@";

@@ -234,23 +234,39 @@ enum SleepLocation: String, CaseIterable, Codable {
 
 // MARK: - Duration Formatting
 
-/// Human-readable duration from raw minutes.
-/// Returns "Xh Ym" for ≥60 min, "X min" otherwise.
-/// Compact variant (for tight layouts): "Xh Ym" / "Xm".
+/// Localized human-readable duration using `DateComponentsFormatter`.
+/// Automatically adapts to the user's locale (e.g. "2h 15m" in English,
+/// "2時間15分" in Japanese, "2小时15分钟" in Chinese, "2시간 15분" in Korean).
 enum DurationFormat {
-    /// Standard: "45 min", "1h 30m", "2h"
+    // Shared formatters (thread-safe, reused for performance)
+    private static let abbreviatedFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.unitsStyle = .abbreviated        // "2h 15m" / "2時間15分" etc.
+        f.allowedUnits = [.hour, .minute]
+        f.zeroFormattingBehavior = .dropAll
+        return f
+    }()
+
+    /// Standard: locale-aware "45 min", "1h 30m", "2h"
+    /// Uses `.abbreviated` style — produces short localized strings.
     static func standard(_ minutes: Int16) -> String {
-        let m = Int(minutes)
-        guard m >= 60 else { return "\(m) min" }
-        let h = m / 60, rem = m % 60
-        return rem > 0 ? "\(h)h \(rem)m" : "\(h)h"
+        let seconds = TimeInterval(minutes) * 60
+        return abbreviatedFormatter.string(from: seconds) ?? "\(minutes)m"
     }
 
-    /// Compact: "45m", "1h 30m", "2h"
+    /// Compact: same as standard (both use abbreviated locale-aware format)
     static func compact(_ minutes: Int16) -> String {
-        let m = Int(minutes)
-        guard m >= 60 else { return "\(m)m" }
-        let h = m / 60, rem = m % 60
-        return rem > 0 ? "\(h)h \(rem)m" : "\(h)h"
+        standard(minutes)
+    }
+
+    /// Format raw minutes (Int) into a localized duration string.
+    static func fromMinutes(_ minutes: Int) -> String {
+        let seconds = TimeInterval(minutes) * 60
+        return abbreviatedFormatter.string(from: seconds) ?? "\(minutes)m"
+    }
+
+    /// Format a TimeInterval (seconds) into a localized duration string.
+    static func fromSeconds(_ interval: TimeInterval) -> String {
+        return abbreviatedFormatter.string(from: interval) ?? "0m"
     }
 }

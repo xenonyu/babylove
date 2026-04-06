@@ -206,6 +206,7 @@
 "home.weekly.volume"       = "ミルク量";
 "home.weekly.sleep"        = "睡眠";
 "home.weekly.diapers"      = "おむつ";
+"home.weekly.hoursValue %@" = "%@時間";
 "home.weekly.perDay"       = "/日";
 "home.weekly.total %lld"   = "計 %lld 回";
 "home.weekly.volumeTotal %lld %@" = "計 %lld %@";

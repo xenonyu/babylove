@@ -209,9 +209,7 @@ struct HomeView: View {
             return sum + Int(r.durationMinutes)
         }
         if totalBreastMinutes > 0 {
-            let h = totalBreastMinutes / 60
-            let m = totalBreastMinutes % 60
-            parts.append(h > 0 ? "\(h)h \(m)m" : "\(m) min")
+            parts.append(DurationFormat.fromMinutes(totalBreastMinutes))
         }
         // Last breast side (helps moms remember which side to use next)
         if let lastSide = lastBreastSide {
@@ -244,13 +242,10 @@ struct HomeView: View {
         return avgMinutes > 0 ? avgMinutes : nil
     }
 
-    /// Human-readable average feeding interval (e.g. "2h 15m", "45m")
+    /// Human-readable average feeding interval, localized (e.g. "2h 15m", "2時間15分")
     private var avgFeedingIntervalText: String? {
         guard let mins = avgFeedingIntervalMinutes else { return nil }
-        let h = mins / 60, m = mins % 60
-        if h > 0 && m > 0 { return "\(h)h \(m)m" }
-        if h > 0 { return "\(h)h" }
-        return "\(m)m"
+        return DurationFormat.fromMinutes(mins)
     }
 
     /// The side used in the most recent breast/pump feeding today
@@ -359,11 +354,7 @@ struct HomeView: View {
 
         // Sleep
         if sleepMins > 0 {
-            let h = sleepMins / 60
-            let m = sleepMins % 60
-            let sleepStr = h > 0
-                ? (m > 0 ? "\(h)h \(m)m" : "\(h)h")
-                : "\(m)m"
+            let sleepStr = DurationFormat.fromMinutes(sleepMins)
             parts.append(String(format: NSLocalizedString("home.summary.sleepOf %@", comment: ""), sleepStr))
         }
 
@@ -482,10 +473,7 @@ struct HomeView: View {
     }
 
     private var sleepText: String {
-        let h = totalSleepMinutes / 60
-        let m = totalSleepMinutes % 60
-        if h > 0 { return "\(h)h \(m)m" }
-        return "\(m)m"
+        DurationFormat.fromMinutes(totalSleepMinutes)
     }
 
     /// Subtitle for the sleep stat badge: nap count + longest nap info
@@ -510,9 +498,7 @@ struct HomeView: View {
                 return max(best, mins)
             }
             if longestMinutes > 0 {
-                let h = longestMinutes / 60
-                let m = longestMinutes % 60
-                let longestText = h > 0 ? "\(h)h \(m)m" : "\(m)m"
+                let longestText = DurationFormat.fromMinutes(longestMinutes)
                 parts.append(String(format: NSLocalizedString("home.naps.longest %@", comment: ""), longestText))
             }
         }
@@ -1074,14 +1060,9 @@ struct HomeView: View {
         }
     }
 
-    /// Format a duration into a human-readable string like "5h 23m"
+    /// Format a duration into a localized human-readable string like "5h 23m" / "5時間23分"
     private static func humanReadableDuration(_ interval: TimeInterval) -> String {
-        let total = Int(interval)
-        let h = total / 3600
-        let m = (total % 3600) / 60
-        if h > 0 && m > 0 { return "\(h)h \(m)m" }
-        if h > 0 { return "\(h)h" }
-        return "\(m)m"
+        DurationFormat.fromSeconds(interval)
     }
 
     // MARK: - Minute Refresh Timer (keeps "time since" labels accurate)
@@ -1569,7 +1550,7 @@ struct HomeView: View {
                         icon: "moon.zzz.fill",
                         color: .blSleep,
                         title: NSLocalizedString("home.weekly.sleep", comment: ""),
-                        value: String(format: "%.1fh", weekAvgSleepHours),
+                        value: String(format: NSLocalizedString("home.weekly.hoursValue %@", comment: ""), String(format: "%.1f", weekAvgSleepHours)),
                         unit: NSLocalizedString("home.weekly.perDay", comment: ""),
                         total: String(format: NSLocalizedString("home.weekly.naps %lld", comment: ""), weekSleeps.count),
                         current: weekAvgSleepHours,
@@ -1900,8 +1881,7 @@ struct HomeView: View {
                     parts.append(NSLocalizedString("home.ongoing", comment: ""))
                 } else if let e = r.endTime {
                     let mins = Int(e.timeIntervalSince(st) / 60)
-                    let h = mins / 60, m = mins % 60
-                    parts.append(h > 0 ? "\(h)h \(m)m" : "\(m)m")
+                    parts.append(DurationFormat.fromMinutes(mins))
                 }
                 return parts.joined(separator: " · ")
             }()

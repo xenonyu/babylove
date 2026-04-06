@@ -481,8 +481,7 @@ struct AllSleepsView: View {
 
                     if let s = r.startTime, let e = r.endTime {
                         let mins = Int(e.timeIntervalSince(s) / 60)
-                        let h = mins / 60, m = mins % 60
-                        Text(h > 0 ? "\(h)h \(m)m" : "\(m)m")
+                        Text(DurationFormat.fromMinutes(mins))
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.blSleep)
                     } else {

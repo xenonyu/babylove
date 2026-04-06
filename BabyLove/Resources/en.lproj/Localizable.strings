@@ -206,6 +206,7 @@
 "home.weekly.volume"       = "Volume";
 "home.weekly.sleep"        = "Sleep";
 "home.weekly.diapers"      = "Diapers";
+"home.weekly.hoursValue %@" = "%@h";
 "home.weekly.perDay"       = "/day";
 "home.weekly.total %lld"   = "%lld total";
 "home.weekly.volumeTotal %lld %@" = "%lld %@ total";

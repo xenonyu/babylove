@@ -40,14 +40,9 @@ struct FeedingLogView: View {
     private var maxAmount: Double { unit == .metric ? 300 : 10 }
     private var amountStep: Double { unit == .metric ? 5 : 0.5 }
 
-    /// Human-readable duration: shows "Xh Ym" for ≥60 min, "X min" otherwise
+    /// Localized human-readable duration (e.g. "15 min", "1h 30m", "1時間30分")
     private var durationDisplayText: String {
-        let mins = Int(duration)
-        if mins >= 60 {
-            let h = mins / 60, m = mins % 60
-            return m > 0 ? "\(h)h \(m)m" : "\(h)h"
-        }
-        return "\(mins) min"
+        DurationFormat.standard(Int16(duration))
     }
 
     /// Accessibility-friendly duration text
