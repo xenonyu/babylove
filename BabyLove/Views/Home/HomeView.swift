@@ -1027,11 +1027,14 @@ struct HomeView: View {
     }
 
     /// Average sleep hours per day this week
+    /// Note: Ongoing sessions (endTime == nil) are skipped so the running
+    /// timer doesn't inflate the weekly average — consistent with prevWeek.
     private var weekAvgSleepHours: Double {
         guard !weekSleeps.isEmpty else { return 0 }
-        let totalMinutes = weekSleeps.reduce(0) { sum, r in
-            guard let s = r.startTime else { return sum }
-            let e = r.endTime ?? Date()
+        let completedSleeps = weekSleeps.filter { $0.endTime != nil }
+        guard !completedSleeps.isEmpty else { return 0 }
+        let totalMinutes = completedSleeps.reduce(0) { sum, r in
+            guard let s = r.startTime, let e = r.endTime else { return sum }
             return sum + Int(e.timeIntervalSince(s) / 60)
         }
         return Double(totalMinutes) / 60.0 / currentWeekActiveDays
