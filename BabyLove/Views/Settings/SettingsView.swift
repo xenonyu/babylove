@@ -5,6 +5,7 @@ import PhotosUI
 
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.managedObjectContext) private var ctx
     @State private var showEditBaby = false
     @State private var showResetAlert = false
     @State private var showExportShare = false
@@ -80,8 +81,8 @@ struct SettingsView: View {
                                     let granted = await NotificationManager.shared.requestPermission()
                                     if granted {
                                         NotificationManager.shared.isEnabled = true
-                                        // Schedule from now if turning on
-                                        NotificationManager.shared.scheduleFeedingReminder()
+                                        // Schedule relative to last actual feeding time
+                                        NotificationManager.shared.scheduleFeedingReminder(afterFeedingAt: lastFeedingTime())
                                     } else {
                                         feedingReminderEnabled = false
                                         notificationDenied = true
@@ -102,8 +103,8 @@ struct SettingsView: View {
                             }
                             .onChange(of: feedingReminderInterval) { _, newVal in
                                 NotificationManager.shared.intervalMinutes = newVal
-                                // Re-schedule with new interval
-                                NotificationManager.shared.scheduleFeedingReminder()
+                                // Re-schedule with new interval relative to last feeding
+                                NotificationManager.shared.scheduleFeedingReminder(afterFeedingAt: lastFeedingTime())
                             }
                         }
                     } header: {
@@ -367,6 +368,19 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    /// Fetch the most recent feeding timestamp from CoreData so that
+    /// reminders scheduled from Settings fire relative to the last actual
+    /// feeding, not from "right now".
+    private func lastFeedingTime() -> Date {
+        let req: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        req.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        req.fetchLimit = 1
+        if let last = (try? ctx.fetch(req))?.first, let ts = last.timestamp {
+            return ts
+        }
+        return Date() // no feedings yet — fall back to now
     }
 
     private static func csvEscape(_ value: String?) -> String {
