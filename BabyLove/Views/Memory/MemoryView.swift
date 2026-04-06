@@ -112,6 +112,8 @@ struct MemoryView: View {
                                                 vm.toggleMilestoneCompleted(m, in: ctx)
                                             }
                                         }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { milestoneToEdit = m }
                                             .padding(.horizontal, 20)
                                             .contextMenu {
                                                 Button {
