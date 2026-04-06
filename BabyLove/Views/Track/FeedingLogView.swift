@@ -537,8 +537,10 @@ struct FeedingLogView: View {
     private func startElapsedTimerIfNeeded() {
         guard isEditingOngoingFeeding else { return }
         elapsedTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { _ in
-            let elapsed = Date().timeIntervalSince(timestamp) / 60.0
-            duration = max(1, min(180, elapsed.rounded()))
+            Task { @MainActor in
+                let elapsed = Date().timeIntervalSince(timestamp) / 60.0
+                duration = max(1, min(180, elapsed.rounded()))
+            }
         }
     }
 }
