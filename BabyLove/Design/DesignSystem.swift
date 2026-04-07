@@ -380,6 +380,25 @@ struct BLToastOverlay: ViewModifier {
                     Text(message)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
+
+                    // Optional action button (e.g. "Undo")
+                    if let action = appState.toastAction,
+                       let label = appState.toastActionLabel {
+                        Button {
+                            Haptic.success()
+                            action()
+                            appState.dismissToast()
+                        } label: {
+                            Text(label)
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(accentColor)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(accentColor.opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 14)

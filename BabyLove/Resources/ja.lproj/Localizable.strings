@@ -62,6 +62,7 @@
 "common.save"   = "保存";
 "common.done"   = "完了";
 "common.ok"     = "OK";
+"common.undo"   = "元に戻す";
 
 /* ===== Settings ===== */
 "settings.title"                      = "設定";

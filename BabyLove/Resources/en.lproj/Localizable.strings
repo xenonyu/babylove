@@ -62,6 +62,7 @@
 "common.save"   = "Save";
 "common.done"   = "Done";
 "common.ok"     = "OK";
+"common.undo"   = "Undo";
 
 /* ===== Settings ===== */
 "settings.title"                      = "Settings";

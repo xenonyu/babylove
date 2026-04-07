@@ -1182,10 +1182,11 @@ struct HomeView: View {
                         }
                         return (NSLocalizedString("home.recordDeleted", comment: ""), "trash.fill", Color.blPrimary)
                     }()
-                    let success = vm.deleteObject(record, in: ctx)
+                    let (success, undoAction) = vm.deleteObjectWithUndo(record, in: ctx)
                     if success {
                         withAnimation { /* row removed */ }
-                        appState.showToast(msg, icon: icon, color: color)
+                        let undoLabel = NSLocalizedString("common.undo", comment: "")
+                        appState.showToast(msg, icon: icon, color: color, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
                     } else {
                         Haptic.error()
                         appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)

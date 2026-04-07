@@ -33,6 +33,8 @@ struct PersistenceController: Sendable {
         }
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        // Enable undo support so record deletions can be reverted
+        container.viewContext.undoManager = UndoManager()
     }
 
     func save() {

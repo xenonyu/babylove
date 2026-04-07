@@ -138,10 +138,11 @@ struct AllFeedingsView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    let success = vm.deleteObject(obj, in: ctx)
+                    let (success, undoAction) = vm.deleteObjectWithUndo(obj, in: ctx)
                     if success {
                         withAnimation { /* row removed */ }
-                        appState.showToast(String(localized: "allRecords.feedingDeleted"), icon: "trash.fill", color: .blFeeding)
+                        let undoLabel = String(localized: "common.undo")
+                        appState.showToast(String(localized: "allRecords.feedingDeleted"), icon: "trash.fill", color: .blFeeding, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
                     } else {
                         Haptic.error()
                         appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
@@ -478,10 +479,11 @@ struct AllSleepsView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    let success = vm.deleteObject(obj, in: ctx)
+                    let (success, undoAction) = vm.deleteObjectWithUndo(obj, in: ctx)
                     if success {
                         withAnimation { /* row removed */ }
-                        appState.showToast(String(localized: "allRecords.sleepDeleted"), icon: "trash.fill", color: .blSleep)
+                        let undoLabel = String(localized: "common.undo")
+                        appState.showToast(String(localized: "allRecords.sleepDeleted"), icon: "trash.fill", color: .blSleep, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
                     } else {
                         Haptic.error()
                         appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
@@ -795,10 +797,11 @@ struct AllDiapersView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    let success = vm.deleteObject(obj, in: ctx)
+                    let (success, undoAction) = vm.deleteObjectWithUndo(obj, in: ctx)
                     if success {
                         withAnimation { /* row removed */ }
-                        appState.showToast(String(localized: "allRecords.diaperDeleted"), icon: "trash.fill", color: .blDiaper)
+                        let undoLabel = String(localized: "common.undo")
+                        appState.showToast(String(localized: "allRecords.diaperDeleted"), icon: "trash.fill", color: .blDiaper, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
                     } else {
                         Haptic.error()
                         appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)
@@ -1089,10 +1092,11 @@ struct AllGrowthView: View {
             Button(String(localized: "allRecords.delete"), role: .destructive) {
                 Haptic.warning()
                 if let obj = recordToDelete {
-                    let success = vm.deleteObject(obj, in: ctx)
+                    let (success, undoAction) = vm.deleteObjectWithUndo(obj, in: ctx)
                     if success {
                         withAnimation { /* row removed */ }
-                        appState.showToast(String(localized: "allRecords.growthDeleted"), icon: "trash.fill", color: .blGrowth)
+                        let undoLabel = String(localized: "common.undo")
+                        appState.showToast(String(localized: "allRecords.growthDeleted"), icon: "trash.fill", color: .blGrowth, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
                     } else {
                         Haptic.error()
                         appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)

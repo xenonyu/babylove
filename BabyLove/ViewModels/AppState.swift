@@ -10,6 +10,9 @@ class AppState: ObservableObject {
     @Published var toastMessage: String?
     @Published var toastIcon: String?
     @Published var toastColor: Color?
+    /// Optional undo/action callback shown as a button in the toast
+    @Published var toastAction: (() -> Void)?
+    @Published var toastActionLabel: String?
 
     /// Tracks the current toast so stale dismiss tasks don't cancel a newer toast
     private var currentToastID: UUID?
@@ -55,22 +58,46 @@ class AppState: ObservableObject {
     /// cause an earlier dismiss-task to prematurely clear a newer toast.
     @MainActor
     func showToast(_ message: String, icon: String = "checkmark.circle.fill", color: Color = .blPrimary) {
+        showToast(message, icon: icon, color: color, action: nil, actionLabel: nil)
+    }
+
+    /// Show a toast with an optional action button (e.g. "Undo").
+    /// The toast auto-dismisses after the given duration.
+    @MainActor
+    func showToast(_ message: String, icon: String = "checkmark.circle.fill", color: Color = .blPrimary,
+                   action: (() -> Void)?, actionLabel: String?, duration: UInt64 = 3_500_000_000) {
         let id = UUID()
         currentToastID = id
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
             toastMessage = message
             toastIcon = icon
             toastColor = color
+            toastAction = action
+            toastActionLabel = actionLabel
         }
         Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
-            // Only dismiss if no newer toast has replaced this one
+            try? await Task.sleep(nanoseconds: duration)
             guard self?.currentToastID == id else { return }
             withAnimation(.easeOut(duration: 0.25)) {
                 self?.toastMessage = nil
                 self?.toastIcon = nil
                 self?.toastColor = nil
+                self?.toastAction = nil
+                self?.toastActionLabel = nil
             }
+        }
+    }
+
+    /// Dismiss the current toast immediately
+    @MainActor
+    func dismissToast() {
+        currentToastID = nil
+        withAnimation(.easeOut(duration: 0.25)) {
+            toastMessage = nil
+            toastIcon = nil
+            toastColor = nil
+            toastAction = nil
+            toastActionLabel = nil
         }
     }
 }

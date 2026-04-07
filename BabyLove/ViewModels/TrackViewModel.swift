@@ -366,6 +366,30 @@ class TrackViewModel: ObservableObject {
         return Self.save(context)
     }
 
+    /// Delete an object and return an undo closure that re-inserts it.
+    /// Uses CoreData's undoManager to group the delete into an undoable operation.
+    /// Returns (success, undoClosure?) — undoClosure is nil if undoManager is unavailable.
+    func deleteObjectWithUndo(_ object: NSManagedObject, in context: NSManagedObjectContext) -> (success: Bool, undo: (() -> Void)?) {
+        guard let undoManager = context.undoManager else {
+            // Fallback: no undo support
+            let ok = deleteObject(object, in: context)
+            return (ok, nil)
+        }
+
+        undoManager.beginUndoGrouping()
+        context.delete(object)
+        let ok = Self.save(context)
+        undoManager.endUndoGrouping()
+
+        guard ok else { return (false, nil) }
+
+        let undoClosure: () -> Void = { [weak undoManager] in
+            undoManager?.undo()
+            try? context.save()
+        }
+        return (true, undoClosure)
+    }
+
     // MARK: - Private Save
 
     @discardableResult

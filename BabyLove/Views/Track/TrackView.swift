@@ -396,10 +396,11 @@ struct TrackView: View {
                         }
                         return (String(localized: "track.recordDeleted"), "trash.fill", Color.blPrimary)
                     }()
-                    let success = vm.deleteObject(obj, in: ctx)
+                    let (success, undoAction) = vm.deleteObjectWithUndo(obj, in: ctx)
                     if success {
                         withAnimation { /* row removed */ }
-                        appState.showToast(msg, icon: icon, color: color)
+                        let undoLabel = String(localized: "common.undo")
+                        appState.showToast(msg, icon: icon, color: color, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
                     } else {
                         Haptic.error()
                         appState.showToast(String(localized: "common.deleteFailed"), icon: "exclamationmark.triangle.fill", color: .red)

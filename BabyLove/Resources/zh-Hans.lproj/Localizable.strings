@@ -62,6 +62,7 @@
 "common.save"   = "保存";
 "common.done"   = "完成";
 "common.ok"     = "好";
+"common.undo"   = "撤销";
 
 /* ===== Settings ===== */
 "settings.title"                      = "设置";
