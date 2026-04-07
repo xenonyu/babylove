@@ -154,6 +154,8 @@
 "home.showAllEvents %lld"  = "Show all %lld events";
 "home.showLess"            = "Show less";
 "home.backToToday"         = "Back to Today";
+"home.streakDays %lld"     = "%lldd";
+"home.streak %lld"         = "%lld-day logging streak";
 
 /* Quick Log Cards */
 "home.feeding"             = "Feeding";

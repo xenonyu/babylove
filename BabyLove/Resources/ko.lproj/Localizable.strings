@@ -154,6 +154,8 @@
 "home.showAllEvents %lld"  = "전체 %lld건 보기";
 "home.showLess"            = "접기";
 "home.backToToday"         = "오늘로 돌아가기";
+"home.streakDays %lld"     = "%lld일";
+"home.streak %lld"         = "%lld일 연속 기록";
 
 /* Quick Log Cards */
 "home.feeding"             = "수유";

@@ -154,6 +154,8 @@
 "home.showAllEvents %lld"  = "查看全部 %lld 条记录";
 "home.showLess"            = "收起";
 "home.backToToday"         = "返回今天";
+"home.streakDays %lld"     = "%lld天";
+"home.streak %lld"         = "连续记录%lld天";
 
 /* Quick Log Cards */
 "home.feeding"             = "喂食";

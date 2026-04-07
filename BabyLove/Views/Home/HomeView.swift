@@ -1823,7 +1823,8 @@ struct HomeView: View {
     // MARK: - Baby Hero Card
 
     private var babyHeroCard: some View {
-        HStack(spacing: 16) {
+        let streak = currentStreak
+        return HStack(spacing: 16) {
             // Avatar
             if let baby {
                 BabyAvatarView(baby: baby, size: 64)
@@ -1838,9 +1839,34 @@ struct HomeView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(baby?.name ?? "Baby")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.blTextPrimary)
+                HStack(spacing: 8) {
+                    Text(baby?.name ?? "Baby")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.blTextPrimary)
+
+                    // Streak badge — shown when 2+ consecutive days have records
+                    if streak >= 2 {
+                        HStack(spacing: 3) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 10, weight: .bold))
+                            Text(String(format: NSLocalizedString("home.streakDays %lld", comment: ""), streak))
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule().fill(
+                                LinearGradient(
+                                    colors: [Color.orange, Color.blPrimary],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                        )
+                        .transition(.scale.combined(with: .opacity))
+                    }
+                }
                 // Show baby's age at the selected date, not always today
                 Text(heroAgeText)
                     .font(.system(size: 15))
@@ -1871,6 +1897,24 @@ struct HomeView: View {
         }
     }
 
+    /// Number of consecutive days (ending today) that have at least one record.
+    /// Uses the pre-computed `activeDays` set (covers last 14 days).
+    /// Returns 0 if today has no records yet (streak not started for today).
+    private var currentStreak: Int {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        var streak = 0
+        for offset in 0..<14 {
+            guard let day = cal.date(byAdding: .day, value: -offset, to: today) else { break }
+            if activeDays.contains(day) {
+                streak += 1
+            } else {
+                break
+            }
+        }
+        return streak
+    }
+
     private var babyHeroAccessibilityLabel: String {
         var parts: [String] = []
         parts.append(baby?.name ?? "Baby")
@@ -1879,6 +1923,10 @@ struct HomeView: View {
             if !ageStr.isEmpty { parts.append(ageStr) }
         }
         parts.append(selectedDate.formatted(date: .complete, time: .omitted))
+        let streak = currentStreak
+        if streak >= 2 {
+            parts.append(String(format: NSLocalizedString("home.streak %lld", comment: ""), streak))
+        }
         return parts.joined(separator: ", ")
     }
 
