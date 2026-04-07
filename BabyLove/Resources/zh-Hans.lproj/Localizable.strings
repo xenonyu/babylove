@@ -141,6 +141,13 @@
 "onboarding.allSet"          = "准备就绪！";
 "onboarding.readyToTrack %@" = "准备开始记录\n%@的成长之旅 💛";
 "onboarding.yourBaby"        = "宝宝";
+"onboarding.feature1"        = "闪电般快速记录";
+"onboarding.feature2"        = "WHO 生长曲线与洞察";
+"onboarding.feature3"        = "100% 隐私，数据仅存本地";
+"onboarding.track.feeding"   = "喂食记录";
+"onboarding.track.sleep"     = "睡眠模式";
+"onboarding.track.diaper"    = "换尿布";
+"onboarding.track.growth"    = "成长里程碑";
 
 /* ===== Home View ===== */
 "home.todaysSummary"       = "今日概览";

@@ -9,6 +9,12 @@ struct OnboardingView: View {
     @State private var showDatePicker = false
     @FocusState private var isNameFieldFocused: Bool
 
+    // Staggered entry animation states
+    @State private var showEmoji = false
+    @State private var showTitle = false
+    @State private var showSubtitle = false
+    @State private var showFeatures = false
+
     var body: some View {
         ZStack {
             Color.blBackground.ignoresSafeArea()
@@ -54,9 +60,11 @@ struct OnboardingView: View {
                            ? String(localized: "onboarding.getStarted")
                            : String(localized: "onboarding.continue")) {
                         isNameFieldFocused = false
+                        resetAnimationStates()
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                             page += 1
                         }
+                        triggerEntryAnimations()
                     }
                     .buttonStyle(BLPrimaryButton())
                     .padding(.horizontal, 32)
@@ -76,6 +84,31 @@ struct OnboardingView: View {
                 }
             }
         }
+        .onAppear { triggerEntryAnimations() }
+    }
+
+    // MARK: - Animation Helpers
+
+    private func resetAnimationStates() {
+        showEmoji = false
+        showTitle = false
+        showSubtitle = false
+        showFeatures = false
+    }
+
+    private func triggerEntryAnimations() {
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.6).delay(0.15)) {
+            showEmoji = true
+        }
+        withAnimation(.easeOut(duration: 0.5).delay(0.35)) {
+            showTitle = true
+        }
+        withAnimation(.easeOut(duration: 0.5).delay(0.55)) {
+            showSubtitle = true
+        }
+        withAnimation(.easeOut(duration: 0.5).delay(0.75)) {
+            showFeatures = true
+        }
     }
 
     // MARK: - Pages
@@ -84,15 +117,53 @@ struct OnboardingView: View {
         VStack(spacing: 24) {
             Text("🍼")
                 .font(.system(size: 80))
+                .scaleEffect(showEmoji ? 1.0 : 0.3)
+                .opacity(showEmoji ? 1 : 0)
+
             Text("onboarding.welcomeTitle")
                 .font(.system(size: 34, weight: .bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextPrimary)
+                .opacity(showTitle ? 1 : 0)
+                .offset(y: showTitle ? 0 : 12)
+
             Text("onboarding.welcomeSubtitle")
                 .font(.system(size: 17))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextSecondary)
                 .padding(.horizontal, 32)
+                .opacity(showSubtitle ? 1 : 0)
+                .offset(y: showSubtitle ? 0 : 12)
+
+            // Feature highlights
+            VStack(spacing: 14) {
+                featureRow(icon: "bolt.fill", text: String(localized: "onboarding.feature1"), color: .blFeeding)
+                featureRow(icon: "chart.line.uptrend.xyaxis", text: String(localized: "onboarding.feature2"), color: .blGrowth)
+                featureRow(icon: "lock.shield.fill", text: String(localized: "onboarding.feature3"), color: .blDiaper)
+            }
+            .padding(.horizontal, 40)
+            .padding(.top, 8)
+            .opacity(showFeatures ? 1 : 0)
+            .offset(y: showFeatures ? 0 : 16)
+        }
+    }
+
+    /// Compact feature highlight row for welcome page
+    @ViewBuilder
+    private func featureRow(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(color.opacity(0.12))
+                    .frame(width: 34, height: 34)
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(color)
+            }
+            Text(text)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.blTextSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -195,14 +266,51 @@ struct OnboardingView: View {
         VStack(spacing: 20) {
             Text("🎉")
                 .font(.system(size: 80))
+                .scaleEffect(showEmoji ? 1.0 : 0.3)
+                .opacity(showEmoji ? 1 : 0)
+
             Text("onboarding.allSet")
                 .font(.system(size: 34, weight: .bold))
                 .foregroundColor(.blTextPrimary)
+                .opacity(showTitle ? 1 : 0)
+                .offset(y: showTitle ? 0 : 12)
+
             Text(String(localized: "onboarding.readyToTrack \(babyName.isEmpty ? String(localized: "onboarding.yourBaby") : babyName)"))
                 .font(.system(size: 17))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.blTextSecondary)
                 .padding(.horizontal, 32)
+                .opacity(showSubtitle ? 1 : 0)
+                .offset(y: showSubtitle ? 0 : 12)
+
+            // Summary of what they'll be able to do
+            VStack(spacing: 10) {
+                allSetFeature(icon: "drop.fill", text: String(localized: "onboarding.track.feeding"), color: .blFeeding)
+                allSetFeature(icon: "moon.zzz.fill", text: String(localized: "onboarding.track.sleep"), color: .blSleep)
+                allSetFeature(icon: "oval.fill", text: String(localized: "onboarding.track.diaper"), color: .blDiaper)
+                allSetFeature(icon: "chart.bar.fill", text: String(localized: "onboarding.track.growth"), color: .blGrowth)
+            }
+            .padding(.horizontal, 40)
+            .padding(.top, 8)
+            .opacity(showFeatures ? 1 : 0)
+            .offset(y: showFeatures ? 0 : 16)
+        }
+    }
+
+    /// Compact feature item for the "All Set" page
+    @ViewBuilder
+    private func allSetFeature(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(.blDiaper)
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundColor(color)
+            Text(text)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.blTextSecondary)
+            Spacer()
         }
     }
 }

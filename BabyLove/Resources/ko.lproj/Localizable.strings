@@ -141,6 +141,13 @@
 "onboarding.allSet"          = "준비 완료!";
 "onboarding.readyToTrack %@" = "%@의 성장 기록을\n시작할 준비가 되었어요 💛";
 "onboarding.yourBaby"        = "아기";
+"onboarding.feature1"        = "번개처럼 빠른 기록";
+"onboarding.feature2"        = "WHO 성장 곡선 및 인사이트";
+"onboarding.feature3"        = "100% 프라이버시, 기기 내 저장";
+"onboarding.track.feeding"   = "수유 기록";
+"onboarding.track.sleep"     = "수면 패턴";
+"onboarding.track.diaper"    = "기저귀 교체";
+"onboarding.track.growth"    = "성장 마일스톤";
 
 /* ===== Home View ===== */
 "home.todaysSummary"       = "오늘 요약";

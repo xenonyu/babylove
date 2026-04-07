@@ -141,6 +141,13 @@
 "onboarding.allSet"          = "準備完了！";
 "onboarding.readyToTrack %@" = "%@の成長記録を\n始めましょう 💛";
 "onboarding.yourBaby"        = "赤ちゃん";
+"onboarding.feature1"        = "素早くかんたん記録";
+"onboarding.feature2"        = "WHO成長曲線とインサイト";
+"onboarding.feature3"        = "100%プライベート、端末内保存";
+"onboarding.track.feeding"   = "授乳の記録";
+"onboarding.track.sleep"     = "睡眠パターン";
+"onboarding.track.diaper"    = "おむつ交換";
+"onboarding.track.growth"    = "成長マイルストーン";
 
 /* ===== Home View ===== */
 "home.todaysSummary"       = "今日のまとめ";

@@ -141,6 +141,13 @@
 "onboarding.allSet"          = "All set!";
 "onboarding.readyToTrack %@" = "Ready to start tracking\n%@'s journey 💛";
 "onboarding.yourBaby"        = "your baby";
+"onboarding.feature1"        = "Lightning-fast logging";
+"onboarding.feature2"        = "WHO growth charts & insights";
+"onboarding.feature3"        = "100% private, on-device";
+"onboarding.track.feeding"   = "Feeding tracking";
+"onboarding.track.sleep"     = "Sleep patterns";
+"onboarding.track.diaper"    = "Diaper changes";
+"onboarding.track.growth"    = "Growth milestones";
 
 /* ===== Home View ===== */
 "home.todaysSummary"       = "Today's Summary";
