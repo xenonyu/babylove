@@ -188,6 +188,17 @@
 "home.greeting.evening"    = "晚上好";
 "home.greeting.night"      = "晚安";
 
+/* 年龄里程碑庆祝 */
+"home.milestone.oneWeek"     = "满1周啦！";
+"home.milestone.twoWeeks"    = "满2周啦！";
+"home.milestone.months %lld" = "%lld个月生日快乐！";
+"home.milestone.oneYear"     = "1岁生日快乐！";
+"home.milestone.twoYears"    = "2岁生日快乐！";
+"home.milestone.100days"     = "满100天啦！";
+"home.milestone.200days"     = "满200天啦！";
+"home.milestone.365days"     = "满365天啦！";
+"home.milestone.congrats %@" = "%@的特别日子 🎈";
+
 /* Quick Log Cards */
 "home.feeding"             = "喂食";
 "home.sleep"               = "睡眠";

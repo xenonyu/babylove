@@ -188,6 +188,17 @@
 "home.greeting.evening"    = "こんばんは";
 "home.greeting.night"      = "おやすみなさい";
 
+/* 年齢マイルストーンのお祝い */
+"home.milestone.oneWeek"     = "生後1週間おめでとう！";
+"home.milestone.twoWeeks"    = "生後2週間おめでとう！";
+"home.milestone.months %lld" = "%lldヶ月おめでとう！";
+"home.milestone.oneYear"     = "1歳のお誕生日おめでとう！";
+"home.milestone.twoYears"    = "2歳のお誕生日おめでとう！";
+"home.milestone.100days"     = "生後100日おめでとう！";
+"home.milestone.200days"     = "生後200日おめでとう！";
+"home.milestone.365days"     = "生後365日おめでとう！";
+"home.milestone.congrats %@" = "%@の特別な日 🎈";
+
 /* Quick Log Cards */
 "home.feeding"             = "授乳";
 "home.sleep"               = "睡眠";

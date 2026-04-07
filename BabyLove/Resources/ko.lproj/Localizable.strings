@@ -188,6 +188,17 @@
 "home.greeting.evening"    = "좋은 저녁이에요";
 "home.greeting.night"      = "좋은 밤이에요";
 
+/* 나이 마일스톤 축하 */
+"home.milestone.oneWeek"     = "태어난 지 1주일 축하해요!";
+"home.milestone.twoWeeks"    = "태어난 지 2주일 축하해요!";
+"home.milestone.months %lld" = "%lld개월 생일 축하해요!";
+"home.milestone.oneYear"     = "첫 번째 생일 축하해요!";
+"home.milestone.twoYears"    = "두 번째 생일 축하해요!";
+"home.milestone.100days"     = "태어난 지 100일 축하해요!";
+"home.milestone.200days"     = "태어난 지 200일 축하해요!";
+"home.milestone.365days"     = "태어난 지 365일이에요!";
+"home.milestone.congrats %@" = "%@의 특별한 날이에요 🎈";
+
 /* Quick Log Cards */
 "home.feeding"             = "수유";
 "home.sleep"               = "수면";

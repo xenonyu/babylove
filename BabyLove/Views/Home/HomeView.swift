@@ -902,6 +902,13 @@ struct HomeView: View {
                         // Baby hero card
                         babyHeroCard
 
+                        // Age milestone celebration (e.g. "🎉 Happy 100 days!")
+                        if isSelectedDateToday, let milestone = todayAgeMilestone {
+                            ageMilestoneBanner(milestone)
+                                .padding(.horizontal, 20)
+                                .transition(.move(edge: .top).combined(with: .opacity))
+                        }
+
                         // Date navigation bar
                         dateNavigationBar
                             .padding(.horizontal, 20)
@@ -2396,6 +2403,144 @@ struct HomeView: View {
         .padding(.horizontal, 20)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(babyHeroAccessibilityLabel)
+    }
+
+    // MARK: - Age Milestone Celebration
+
+    /// Represents a special age milestone worth celebrating
+    private struct AgeMilestone {
+        let emoji: String
+        let message: String  // e.g. "Happy 100 days!"
+        let ageLabel: String // e.g. "100 days"
+    }
+
+    /// Checks if today is a special age milestone for the baby.
+    /// Milestones: 7d, 14d, 21d, 1mo-12mo, 100d, 200d, 365d (1yr), 18mo, 2yr
+    private var todayAgeMilestone: AgeMilestone? {
+        guard let baby else { return nil }
+        let cal = Calendar.current
+        let days = cal.dateComponents([.day], from: cal.startOfDay(for: baby.birthDate), to: cal.startOfDay(for: Date())).day ?? 0
+        guard days > 0 else { return nil }
+
+        // Check exact month boundaries (1-12 months, 18 months, 2 years)
+        let monthComps = cal.dateComponents([.year, .month, .day], from: baby.birthDate, to: Date())
+        let yr = monthComps.year ?? 0
+        let mo = monthComps.month ?? 0
+        let dy = monthComps.day ?? 0
+
+        // Exact month/year anniversaries (day component must be 0)
+        if dy == 0 {
+            let totalMonths = yr * 12 + mo
+            switch totalMonths {
+            case 1:
+                return AgeMilestone(
+                    emoji: "🎂",
+                    message: String(format: NSLocalizedString("home.milestone.months %lld", comment: ""), 1),
+                    ageLabel: String(format: NSLocalizedString("age.m", comment: ""), 1)
+                )
+            case 2...12:
+                return AgeMilestone(
+                    emoji: totalMonths == 6 ? "🎊" : (totalMonths == 12 ? "🎉" : "🎂"),
+                    message: totalMonths == 12
+                        ? NSLocalizedString("home.milestone.oneYear", comment: "")
+                        : String(format: NSLocalizedString("home.milestone.months %lld", comment: ""), totalMonths),
+                    ageLabel: totalMonths == 12
+                        ? String(format: NSLocalizedString("age.y", comment: ""), 1)
+                        : String(format: NSLocalizedString("age.m", comment: ""), totalMonths)
+                )
+            case 18:
+                return AgeMilestone(
+                    emoji: "🎊",
+                    message: String(format: NSLocalizedString("home.milestone.months %lld", comment: ""), 18),
+                    ageLabel: String(format: NSLocalizedString("age.ym", comment: ""), 1, 6)
+                )
+            case 24:
+                return AgeMilestone(
+                    emoji: "🎉",
+                    message: NSLocalizedString("home.milestone.twoYears", comment: ""),
+                    ageLabel: String(format: NSLocalizedString("age.y", comment: ""), 2)
+                )
+            default: break
+            }
+        }
+
+        // Special day milestones
+        switch days {
+        case 7:
+            return AgeMilestone(
+                emoji: "🌟",
+                message: NSLocalizedString("home.milestone.oneWeek", comment: ""),
+                ageLabel: String(format: NSLocalizedString("age.w", comment: ""), 1)
+            )
+        case 14:
+            return AgeMilestone(
+                emoji: "🌟",
+                message: NSLocalizedString("home.milestone.twoWeeks", comment: ""),
+                ageLabel: String(format: NSLocalizedString("age.w", comment: ""), 2)
+            )
+        case 100:
+            return AgeMilestone(
+                emoji: "💯",
+                message: NSLocalizedString("home.milestone.100days", comment: ""),
+                ageLabel: String(format: NSLocalizedString("age.d", comment: ""), 100)
+            )
+        case 200:
+            return AgeMilestone(
+                emoji: "🎊",
+                message: NSLocalizedString("home.milestone.200days", comment: ""),
+                ageLabel: String(format: NSLocalizedString("age.d", comment: ""), 200)
+            )
+        case 365:
+            // Only show if the month-based check didn't already fire (leap year edge case)
+            if yr == 0 || mo > 0 || dy > 0 {
+                return AgeMilestone(
+                    emoji: "🎉",
+                    message: NSLocalizedString("home.milestone.365days", comment: ""),
+                    ageLabel: String(format: NSLocalizedString("age.d", comment: ""), 365)
+                )
+            }
+        default: break
+        }
+
+        return nil
+    }
+
+    @ViewBuilder
+    private func ageMilestoneBanner(_ milestone: AgeMilestone) -> some View {
+        HStack(spacing: 12) {
+            Text(milestone.emoji)
+                .font(.system(size: 28))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(milestone.message)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.blPrimary)
+                if let babyName = baby?.name {
+                    Text(String(format: NSLocalizedString("home.milestone.congrats %@", comment: ""), babyName))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.blTextSecondary)
+                }
+            }
+
+            Spacer()
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.blPrimary.opacity(0.08), Color.blGrowth.opacity(0.08)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(Color.blPrimary.opacity(0.15), lineWidth: 1)
+                )
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(milestone.message), \(baby?.name ?? "")")
     }
 
     // MARK: - Time-of-Day Greeting

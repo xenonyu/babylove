@@ -188,6 +188,17 @@
 "home.greeting.evening"    = "Good evening";
 "home.greeting.night"      = "Good night";
 
+/* Age Milestone Celebrations */
+"home.milestone.oneWeek"     = "Happy 1 week!";
+"home.milestone.twoWeeks"    = "Happy 2 weeks!";
+"home.milestone.months %lld" = "Happy %lld month birthday!";
+"home.milestone.oneYear"     = "Happy 1st birthday!";
+"home.milestone.twoYears"    = "Happy 2nd birthday!";
+"home.milestone.100days"     = "Happy 100 days!";
+"home.milestone.200days"     = "Happy 200 days!";
+"home.milestone.365days"     = "Happy 365 days!";
+"home.milestone.congrats %@" = "A special day for %@ 🎈";
+
 /* Quick Log Cards */
 "home.feeding"             = "Feeding";
 "home.sleep"               = "Sleep";
