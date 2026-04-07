@@ -406,6 +406,12 @@
 "growthLog.jumpConfirmTitle"  = "비정상적인 값 감지";
 "growthLog.jumpConfirmSave"   = "그래도 저장";
 "growthLog.jumpConfirmCancel" = "돌아가서 수정";
+"growthLog.weightPlaceholder.metric"   = "예: 5.5";
+"growthLog.weightPlaceholder.imperial" = "예: 12.1";
+"growthLog.heightPlaceholder.metric"   = "예: 60.5";
+"growthLog.heightPlaceholder.imperial" = "예: 23.8";
+"growthLog.headPlaceholder.metric"     = "예: 40.2";
+"growthLog.headPlaceholder.imperial"   = "예: 15.8";
 
 /* ===== Growth View ===== */
 "growth.title"            = "성장 곡선";

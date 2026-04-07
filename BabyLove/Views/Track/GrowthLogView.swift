@@ -122,7 +122,9 @@ struct GrowthLogView: View {
                             icon: "scalemass.fill",
                             color: .blGrowth,
                             value: $weightKG,
-                            placeholder: unit == .metric ? "e.g. 5.5" : "e.g. 12.1"
+                            placeholder: unit == .metric
+                                ? NSLocalizedString("growthLog.weightPlaceholder.metric", comment: "")
+                                : NSLocalizedString("growthLog.weightPlaceholder.imperial", comment: "")
                         )
                         measurementField(
                             label: NSLocalizedString("growthLog.height", comment: ""),
@@ -130,7 +132,9 @@ struct GrowthLogView: View {
                             icon: "ruler.fill",
                             color: .blGrowth,
                             value: $heightCM,
-                            placeholder: unit == .metric ? "e.g. 60.5" : "e.g. 23.8"
+                            placeholder: unit == .metric
+                                ? NSLocalizedString("growthLog.heightPlaceholder.metric", comment: "")
+                                : NSLocalizedString("growthLog.heightPlaceholder.imperial", comment: "")
                         )
                         measurementField(
                             label: NSLocalizedString("growthLog.headCirc", comment: ""),
@@ -138,7 +142,9 @@ struct GrowthLogView: View {
                             icon: "circle.dotted",
                             color: .blGrowth,
                             value: $headCM,
-                            placeholder: unit == .metric ? "e.g. 40.2" : "e.g. 15.8"
+                            placeholder: unit == .metric
+                                ? NSLocalizedString("growthLog.headPlaceholder.metric", comment: "")
+                                : NSLocalizedString("growthLog.headPlaceholder.imperial", comment: "")
                         )
 
                         // Date

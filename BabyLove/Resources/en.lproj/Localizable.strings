@@ -406,6 +406,12 @@
 "growthLog.jumpConfirmTitle"  = "Unusual Value Detected";
 "growthLog.jumpConfirmSave"   = "Save Anyway";
 "growthLog.jumpConfirmCancel" = "Go Back";
+"growthLog.weightPlaceholder.metric"   = "e.g. 5.5";
+"growthLog.weightPlaceholder.imperial" = "e.g. 12.1";
+"growthLog.heightPlaceholder.metric"   = "e.g. 60.5";
+"growthLog.heightPlaceholder.imperial" = "e.g. 23.8";
+"growthLog.headPlaceholder.metric"     = "e.g. 40.2";
+"growthLog.headPlaceholder.imperial"   = "e.g. 15.8";
 
 /* ===== Growth View ===== */
 "growth.title"            = "Growth";

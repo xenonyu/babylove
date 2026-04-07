@@ -406,6 +406,12 @@
 "growthLog.jumpConfirmTitle"  = "检测到异常数值";
 "growthLog.jumpConfirmSave"   = "仍然保存";
 "growthLog.jumpConfirmCancel" = "返回修改";
+"growthLog.weightPlaceholder.metric"   = "如 5.5";
+"growthLog.weightPlaceholder.imperial" = "如 12.1";
+"growthLog.heightPlaceholder.metric"   = "如 60.5";
+"growthLog.heightPlaceholder.imperial" = "如 23.8";
+"growthLog.headPlaceholder.metric"     = "如 40.2";
+"growthLog.headPlaceholder.imperial"   = "如 15.8";
 
 /* ===== Growth View ===== */
 "growth.title"            = "生长曲线";

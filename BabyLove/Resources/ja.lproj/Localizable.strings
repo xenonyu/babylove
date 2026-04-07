@@ -406,6 +406,12 @@
 "growthLog.jumpConfirmTitle"  = "異常な数値を検出";
 "growthLog.jumpConfirmSave"   = "このまま保存";
 "growthLog.jumpConfirmCancel" = "戻って修正";
+"growthLog.weightPlaceholder.metric"   = "例: 5.5";
+"growthLog.weightPlaceholder.imperial" = "例: 12.1";
+"growthLog.heightPlaceholder.metric"   = "例: 60.5";
+"growthLog.heightPlaceholder.imperial" = "例: 23.8";
+"growthLog.headPlaceholder.metric"     = "例: 40.2";
+"growthLog.headPlaceholder.imperial"   = "例: 15.8";
 
 /* ===== Growth View ===== */
 "growth.title"            = "成長曲線";
