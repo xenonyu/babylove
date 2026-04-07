@@ -99,7 +99,7 @@ struct AllFeedingsView: View {
                                             }
                                     }
                                 } header: {
-                                    dateSectionHeader(section.key, count: section.records.count)
+                                    feedingSectionHeader(section.key, records: section.records)
                                 }
                             }
                         }
@@ -291,6 +291,57 @@ struct AllFeedingsView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
         .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
+    }
+
+    /// Enhanced section header for feeding records: shows date, count, and daily volume/duration summary.
+    @ViewBuilder
+    private func feedingSectionHeader(_ title: String, records: [CDFeedingRecord]) -> some View {
+        let unit = appState.measurementUnit
+        // Compute daily totals
+        let totalML = records.reduce(0.0) { $0 + $1.amountML }
+        let totalBreastMinutes = records.reduce(0) { sum, r in
+            let ft = FeedType(rawValue: r.feedType ?? "")
+            guard ft == .breast || ft == .pump, r.durationMinutes > 0 else { return sum }
+            return sum + Int(r.durationMinutes)
+        }
+
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.blTextSecondary)
+                    .textCase(nil)
+
+                // Daily summary pills
+                let hasSummary = totalML > 0 || totalBreastMinutes > 0
+                if hasSummary {
+                    HStack(spacing: 6) {
+                        if totalML > 0 {
+                            let displayVol = unit.volumeFromML(totalML)
+                            let volText = unit == .metric
+                                ? "\(Int(displayVol)) \(unit.volumeLabel)"
+                                : String(format: "%.1f %@", displayVol, unit.volumeLabel)
+                            Text(volText)
+                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                                .foregroundColor(.blFeeding)
+                        }
+                        if totalBreastMinutes > 0 {
+                            Text(DurationFormat.fromMinutes(totalBreastMinutes))
+                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                                .foregroundColor(.blFeeding)
+                        }
+                    }
+                }
+            }
+            Spacer()
+            Text("\(records.count)")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(.blTextTertiary)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Color.blTextTertiary.opacity(0.1))
+                .clipShape(Capsule())
+        }
     }
 }
 
