@@ -115,6 +115,15 @@ struct OnboardingView: View {
                     .padding(16)
                     .background(Color.blSurface)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button(String(localized: "common.done")) {
+                                isNameFieldFocused = false
+                            }
+                            .font(.system(size: 16, weight: .semibold))
+                        }
+                    }
             }
             .padding(.horizontal, 32)
 
