@@ -342,7 +342,6 @@ struct SleepLogView: View {
                         }
                         .buttonStyle(BLPrimaryButton(color: .blSleep))
                         .disabled(!canSave || isSaving)
-                        .opacity(canSave && !isSaving ? 1 : 0.5)
                         .padding(.top, 8)
 
                         if !canSave && isOngoing && hasExistingOngoingSleep && !isEditing {

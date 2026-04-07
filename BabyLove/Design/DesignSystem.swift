@@ -112,6 +112,8 @@ extension View {
 // MARK: - Primary Button
 struct BLPrimaryButton: ButtonStyle {
     var color: Color = .blPrimary
+    @Environment(\.isEnabled) private var isEnabled
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 17, weight: .semibold))
@@ -119,7 +121,32 @@ struct BLPrimaryButton: ButtonStyle {
             .frame(maxWidth: .infinity)
             .frame(height: 54)
             .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(color))
-            .opacity(configuration.isPressed ? 0.85 : 1)
+            .opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.45)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+/// Secondary outlined button for supporting actions (cancel, alternative flows).
+struct BLSecondaryButton: ButtonStyle {
+    var color: Color = .blPrimary
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundColor(color)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(color.opacity(0.08))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(color.opacity(0.25), lineWidth: 1.5)
+            )
+            .opacity(isEnabled ? (configuration.isPressed ? 0.7 : 1) : 0.4)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
     }

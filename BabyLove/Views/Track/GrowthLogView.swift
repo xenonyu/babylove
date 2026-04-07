@@ -347,7 +347,6 @@ struct GrowthLogView: View {
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
                         .disabled(!canSave || isSaving)
-                        .opacity(canSave && !isSaving ? 1 : 0.5)
                         .padding(.top, 8)
 
                         if let warning = validationWarning {

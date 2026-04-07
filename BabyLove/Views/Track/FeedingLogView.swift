@@ -558,7 +558,6 @@ struct FeedingLogView: View {
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
                         .disabled(!canSave || isSaving)
-                        .opacity(canSave && !isSaving ? 1 : 0.5)
                         .padding(.top, 8)
 
                         if isTimerMode && supportsTimer && !isEditing && hasExistingOngoingFeeding {

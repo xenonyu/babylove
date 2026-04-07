@@ -70,7 +70,6 @@ struct OnboardingView: View {
                     .padding(.horizontal, 32)
                     .padding(.bottom, 48)
                     .disabled(page == 1 && babyName.trimmingCharacters(in: .whitespaces).isEmpty)
-                    .opacity(page == 1 && babyName.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
                 } else {
                     Button(String(localized: "onboarding.startLogging")) {
                         let baby = Baby(name: babyName.trimmingCharacters(in: .whitespaces),
