@@ -931,6 +931,7 @@ struct AllGrowthView: View {
     @State private var recordToEdit: CDGrowthRecord?
     @State private var showAddSheet = false
     @State private var selectedFilter: GrowthMetricFilter? = nil
+    @State private var searchText = ""
 
     /// Filter options for growth records by metric type.
     private enum GrowthMetricFilter: String, CaseIterable {
@@ -959,8 +960,24 @@ struct AllGrowthView: View {
     ) private var records: FetchedResults<CDGrowthRecord>
 
     private var filteredRecords: [CDGrowthRecord] {
-        guard let filter = selectedFilter else { return Array(records) }
-        return records.filter { filter.matches($0) }
+        var result: [CDGrowthRecord]
+        if let filter = selectedFilter {
+            result = records.filter { filter.matches($0) }
+        } else {
+            result = Array(records)
+        }
+        // Apply text search across notes
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return result }
+        return result.filter { record in
+            if let notes = record.notes, notes.lowercased().contains(query) { return true }
+            // Also search by date string for convenience
+            if let date = record.date {
+                let dateStr = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none).lowercased()
+                if dateStr.contains(query) { return true }
+            }
+            return false
+        }
     }
 
     private func countFor(_ metric: GrowthMetricFilter) -> Int {
@@ -981,14 +998,20 @@ struct AllGrowthView: View {
                     if filteredRecords.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
-                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            Image(systemName: !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "magnifyingglass" : "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blGrowth.opacity(0.4))
-                            Text(String(localized: "allRecords.noFilteredGrowth \(selectedFilter?.displayName ?? "")"))
+                            Text(!searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                 ? String(format: NSLocalizedString("allRecords.noSearchResults %@", comment: ""), searchText)
+                                 : String(localized: "allRecords.noFilteredGrowth \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
+                                .multilineTextAlignment(.center)
                             Button {
-                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedFilter = nil
+                                    searchText = ""
+                                }
                             } label: {
                                 Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
@@ -1032,6 +1055,7 @@ struct AllGrowthView: View {
         }
         .navigationTitle(String(localized: "allRecords.allGrowth"))
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: String(localized: "allRecords.searchGrowth"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showAddSheet = true } label: {

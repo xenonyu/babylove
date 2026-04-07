@@ -310,6 +310,7 @@
 "allRecords.searchFeedings"        = "메모, 유형 검색…";
 "allRecords.searchSleep"           = "메모, 장소 검색…";
 "allRecords.searchDiapers"         = "메모, 유형 검색…";
+"allRecords.searchGrowth"          = "메모, 날짜 검색…";
 "allRecords.noSearchResults %@"    = "\"%@\" 결과 없음";
 "allRecords.filterAll"             = "전체";
 "allRecords.inProgress"            = "진행 중";

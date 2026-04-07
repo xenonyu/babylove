@@ -310,6 +310,7 @@
 "allRecords.searchFeedings"        = "搜索备注、类型…";
 "allRecords.searchSleep"           = "搜索备注、地点…";
 "allRecords.searchDiapers"         = "搜索备注、类型…";
+"allRecords.searchGrowth"          = "搜索备注、日期…";
 "allRecords.noSearchResults %@"    = "未找到\"%@\"的结果";
 "allRecords.filterAll"             = "全部";
 "allRecords.inProgress"            = "进行中";
