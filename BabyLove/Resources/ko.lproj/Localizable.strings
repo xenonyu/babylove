@@ -155,6 +155,8 @@
 "home.showLess"            = "접기";
 "home.timeline.all"        = "전체";
 "home.backToToday"         = "오늘로 돌아가기";
+"home.jumpToDate"          = "날짜로 이동";
+"home.jumpGoToDate"        = "이 날짜로 이동";
 "home.streakDays %lld"     = "%lld일";
 "home.streak %lld"         = "%lld일 연속 기록";
 
@@ -582,6 +584,8 @@
 "a11y.earliestDate"        = "가장 이른 날짜입니다";
 "a11y.nextDay"             = "다음 날";
 "a11y.nextDayHint"         = "다음 날 기록 보기";
+"a11y.jumpToDate %@"       = "%@, 탭하여 다른 날짜로 이동";
+"a11y.jumpToDateHint"      = "달력을 열어 날짜를 선택합니다";
 "a11y.longPressEditDelete" = "길게 눌러 편집 또는 삭제";
 "a11y.tapEditSwipeDelete"  = "탭하여 편집, 스와이프하여 삭제";
 "a11y.at %@"               = "%@";

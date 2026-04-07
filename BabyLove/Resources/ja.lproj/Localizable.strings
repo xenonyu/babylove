@@ -155,6 +155,8 @@
 "home.showLess"            = "折りたたむ";
 "home.timeline.all"        = "すべて";
 "home.backToToday"         = "今日に戻る";
+"home.jumpToDate"          = "日付を選択";
+"home.jumpGoToDate"        = "この日付に移動";
 "home.streakDays %lld"     = "%lld日";
 "home.streak %lld"         = "%lld日連続記録中";
 
@@ -582,6 +584,8 @@
 "a11y.earliestDate"        = "最も古い日付です";
 "a11y.nextDay"             = "翌日";
 "a11y.nextDayHint"         = "翌日の記録を見る";
+"a11y.jumpToDate %@"       = "%@、タップして別の日付に移動";
+"a11y.jumpToDateHint"      = "カレンダーを開いて日付を選択";
 "a11y.longPressEditDelete" = "長押しで編集または削除";
 "a11y.tapEditSwipeDelete"  = "タップで編集、スワイプで削除";
 "a11y.at %@"               = "%@";

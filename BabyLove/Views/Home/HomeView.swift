@@ -44,6 +44,8 @@ struct HomeView: View {
     @State private var isTimelineExpanded = false
     /// Filter for the daily timeline (nil = show all record types)
     @State private var timelineFilter: TimelineRecordType? = nil
+    /// Whether the "Jump to Date" calendar picker is shown
+    @State private var showDateJumpPicker = false
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingRecord: CDFeedingRecord?
@@ -812,6 +814,12 @@ struct HomeView: View {
                 }
             }
         }
+        .sheet(isPresented: $showDateJumpPicker) {
+            DateJumpPickerView(
+                selectedDate: $selectedDate,
+                earliestDate: earliestJumpDate
+            )
+        }
         .sheet(isPresented: $showFeedingLog) {
             FeedingLogView(vm: vm, initialDate: retroactiveDate)
         }
@@ -1327,29 +1335,27 @@ struct HomeView: View {
         return (0..<14).compactMap { cal.date(byAdding: .day, value: -$0, to: today) }
     }
 
-    /// The earliest date the user can navigate to: the later of 13 days ago
-    /// or the baby's birth date (no point showing dates before birth).
-    private var earliestNavigableDate: Date {
+    /// The earliest date the user can navigate to via the date picker:
+    /// baby's birth date, or 1 year ago if no baby profile.
+    private var earliestJumpDate: Date {
         let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let rangeStart = cal.date(byAdding: .day, value: -13, to: today) ?? today
         if let birth = baby?.birthDate {
-            let birthStart = cal.startOfDay(for: birth)
-            return max(rangeStart, birthStart)
+            return cal.startOfDay(for: birth)
         }
-        return rangeStart
+        return cal.date(byAdding: .year, value: -1, to: cal.startOfDay(for: Date())) ?? Date()
     }
 
-    /// Whether the left chevron should be disabled (already at earliest date)
+    /// Whether the left chevron should be disabled (already at earliest navigable date).
+    /// Chevron nav now goes all the way back to baby's birth date.
     private var canNavigateBack: Bool {
-        Calendar.current.startOfDay(for: selectedDate) > earliestNavigableDate
+        Calendar.current.startOfDay(for: selectedDate) > earliestJumpDate
     }
 
-    /// Navigate to the previous day (if within range)
+    /// Navigate to the previous day (if within range — all the way to birth date)
     private func navigateToPreviousDay() {
         let cal = Calendar.current
         guard let prev = cal.date(byAdding: .day, value: -1, to: selectedDate),
-              cal.startOfDay(for: prev) >= earliestNavigableDate else { return }
+              cal.startOfDay(for: prev) >= earliestJumpDate else { return }
         Haptic.selection()
         withAnimation(.easeInOut(duration: 0.2)) { selectedDate = prev }
     }
@@ -1381,10 +1387,23 @@ struct HomeView: View {
 
                 Spacer()
 
-                Text(dateHeaderText)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.blTextPrimary)
-                    .contentTransition(.numericText())
+                Button {
+                    Haptic.light()
+                    showDateJumpPicker = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(dateHeaderText)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.blTextPrimary)
+                            .contentTransition(.numericText())
+                        Image(systemName: "calendar")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.blPrimary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(format: NSLocalizedString("a11y.jumpToDate %@", comment: ""), dateHeaderText))
+                .accessibilityHint(NSLocalizedString("a11y.jumpToDateHint", comment: ""))
 
                 Spacer()
 
@@ -2412,6 +2431,59 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .padding(.horizontal, 20)
             }
+        }
+    }
+}
+
+// MARK: - Date Jump Picker
+/// Compact sheet letting the user jump to any date from birth to today.
+struct DateJumpPickerView: View {
+    @Binding var selectedDate: Date
+    let earliestDate: Date
+    @Environment(\.dismiss) private var dismiss
+    @State private var pickerDate = Date()
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.blBackground.ignoresSafeArea()
+                VStack(spacing: 16) {
+                    DatePicker(
+                        NSLocalizedString("home.jumpToDate", comment: ""),
+                        selection: $pickerDate,
+                        in: earliestDate...Date(),
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .tint(.blPrimary)
+                    .padding(.horizontal)
+
+                    Button {
+                        Haptic.medium()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedDate = pickerDate
+                        }
+                        dismiss()
+                    } label: {
+                        Text(NSLocalizedString("home.jumpGoToDate", comment: ""))
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.blPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+                    .padding(.horizontal, 24)
+                }
+            }
+            .navigationTitle(NSLocalizedString("home.jumpToDate", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(NSLocalizedString("common.cancel", comment: "")) { dismiss() }
+                }
+            }
+            .onAppear { pickerDate = selectedDate }
         }
     }
 }

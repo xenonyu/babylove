@@ -155,6 +155,8 @@
 "home.showLess"            = "收起";
 "home.timeline.all"        = "全部";
 "home.backToToday"         = "返回今天";
+"home.jumpToDate"          = "跳转到日期";
+"home.jumpGoToDate"        = "前往该日期";
 "home.streakDays %lld"     = "%lld天";
 "home.streak %lld"         = "连续记录%lld天";
 
@@ -582,6 +584,8 @@
 "a11y.earliestDate"        = "已到最早日期";
 "a11y.nextDay"             = "后一天";
 "a11y.nextDayHint"         = "查看后一天的记录";
+"a11y.jumpToDate %@"       = "%@，点击跳转到其他日期";
+"a11y.jumpToDateHint"      = "打开日历选择任意日期";
 "a11y.longPressEditDelete" = "长按可编辑或删除";
 "a11y.tapEditSwipeDelete"  = "点按编辑，滑动删除";
 "a11y.at %@"               = "%@";

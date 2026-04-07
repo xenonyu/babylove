@@ -155,6 +155,8 @@
 "home.showLess"            = "Show less";
 "home.timeline.all"        = "All";
 "home.backToToday"         = "Back to Today";
+"home.jumpToDate"          = "Jump to Date";
+"home.jumpGoToDate"        = "Go to This Date";
 "home.streakDays %lld"     = "%lldd";
 "home.streak %lld"         = "%lld-day logging streak";
 
@@ -582,6 +584,8 @@
 "a11y.earliestDate"        = "Already at earliest date";
 "a11y.nextDay"             = "Next day";
 "a11y.nextDayHint"         = "Go to the next day";
+"a11y.jumpToDate %@"       = "%@, tap to jump to a different date";
+"a11y.jumpToDateHint"      = "Opens a calendar to pick any date";
 "a11y.longPressEditDelete" = "Long press to edit or delete";
 "a11y.tapEditSwipeDelete"  = "Tap to edit, swipe to delete";
 "a11y.at %@"               = "at %@";
