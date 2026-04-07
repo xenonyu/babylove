@@ -309,6 +309,7 @@
 "allRecords.showAll"               = "すべて表示";
 "allRecords.searchFeedings"        = "メモ、種類で検索…";
 "allRecords.searchSleep"           = "メモ、場所で検索…";
+"allRecords.searchDiapers"         = "メモ、種類で検索…";
 "allRecords.noSearchResults %@"    = "「%@」の結果なし";
 "allRecords.filterAll"             = "すべて";
 "allRecords.inProgress"            = "進行中";

@@ -309,6 +309,7 @@
 "allRecords.showAll"               = "Show All";
 "allRecords.searchFeedings"        = "Search notes, type…";
 "allRecords.searchSleep"           = "Search notes, location…";
+"allRecords.searchDiapers"         = "Search notes, type…";
 "allRecords.noSearchResults %@"    = "No results for \"%@\"";
 "allRecords.filterAll"             = "All";
 "allRecords.inProgress"            = "In Progress";

@@ -579,6 +579,7 @@ struct AllDiapersView: View {
     @State private var recordToEdit: CDDiaperRecord?
     @State private var showAddSheet = false
     @State private var selectedFilter: DiaperType? = nil
+    @State private var searchText = ""
 
     @FetchRequest(
         entity: CDDiaperRecord.entity(),
@@ -586,8 +587,20 @@ struct AllDiapersView: View {
     ) private var records: FetchedResults<CDDiaperRecord>
 
     private var filteredRecords: [CDDiaperRecord] {
-        guard let filter = selectedFilter else { return Array(records) }
-        return records.filter { DiaperType(rawValue: $0.diaperType ?? "") == filter }
+        var result: [CDDiaperRecord]
+        if let filter = selectedFilter {
+            result = records.filter { DiaperType(rawValue: $0.diaperType ?? "") == filter }
+        } else {
+            result = Array(records)
+        }
+        // Apply text search across notes and diaper type name
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return result }
+        return result.filter { record in
+            if let notes = record.notes, notes.lowercased().contains(query) { return true }
+            if let dt = DiaperType(rawValue: record.diaperType ?? ""), dt.displayName.lowercased().contains(query) { return true }
+            return false
+        }
     }
 
     private func countFor(_ type: DiaperType) -> Int {
@@ -608,14 +621,20 @@ struct AllDiapersView: View {
                     if filteredRecords.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
-                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            Image(systemName: !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "magnifyingglass" : "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blDiaper.opacity(0.4))
-                            Text(String(localized: "allRecords.noFilteredDiapers \(selectedFilter?.displayName ?? "")"))
+                            Text(!searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                 ? String(format: NSLocalizedString("allRecords.noSearchResults %@", comment: ""), searchText)
+                                 : String(localized: "allRecords.noFilteredDiapers \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
+                                .multilineTextAlignment(.center)
                             Button {
-                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedFilter = nil
+                                    searchText = ""
+                                }
                             } label: {
                                 Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
@@ -659,6 +678,7 @@ struct AllDiapersView: View {
         }
         .navigationTitle(String(localized: "allRecords.allDiapers"))
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: String(localized: "allRecords.searchDiapers"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showAddSheet = true } label: {
