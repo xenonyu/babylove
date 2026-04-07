@@ -47,14 +47,44 @@ struct FeedingLogView: View {
         DurationFormat.standard(Int16(duration))
     }
 
-    /// Accessibility-friendly duration text
+    /// Accessibility-friendly duration text (locale-aware for VoiceOver)
+    private static let a11yDurationFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.unitsStyle = .full  // "2 hours 15 minutes" / "2時間15分" / "2시간 15분"
+        f.allowedUnits = [.hour, .minute]
+        f.zeroFormattingBehavior = .dropAll
+        return f
+    }()
+
     private var durationAccessibilityText: String {
-        let mins = Int(duration)
-        if mins >= 60 {
-            let h = mins / 60, m = mins % 60
-            return m > 0 ? "\(h) hours \(m) minutes" : "\(h) hours"
+        let seconds = TimeInterval(duration) * 60
+        return Self.a11yDurationFormatter.string(from: seconds) ?? "\(Int(duration))m"
+    }
+
+    /// Locale-aware volume text for VoiceOver (e.g. "120 milliliters" / "120 ミリリットル")
+    private static let a11yMLFormatter: MeasurementFormatter = {
+        let f = MeasurementFormatter()
+        f.unitStyle = .long
+        f.unitOptions = .providedUnit
+        f.numberFormatter.maximumFractionDigits = 0
+        return f
+    }()
+    private static let a11yOzFormatter: MeasurementFormatter = {
+        let f = MeasurementFormatter()
+        f.unitStyle = .long
+        f.unitOptions = .providedUnit
+        f.numberFormatter.maximumFractionDigits = 1
+        return f
+    }()
+
+    private static func accessibilityVolumeText(amount: Double, unit: MeasurementUnit) -> String {
+        if unit == .metric {
+            let m = Measurement(value: amount, unit: UnitVolume.milliliters)
+            return a11yMLFormatter.string(from: m)
+        } else {
+            let m = Measurement(value: amount, unit: UnitVolume.fluidOunces)
+            return a11yOzFormatter.string(from: m)
         }
-        return "\(mins) minutes"
     }
 
     /// Whether the current feed type supports timer mode
@@ -299,7 +329,7 @@ struct FeedingLogView: View {
                                 Slider(value: $amount, in: 0...maxAmount, step: amountStep)
                                     .tint(.blFeeding)
                                     .accessibilityLabel(NSLocalizedString("feedLog.amount", comment: ""))
-                                    .accessibilityValue(unit == .metric ? "\(Int(amount)) milliliters" : String(format: "%.1f ounces", amount))
+                                    .accessibilityValue(Self.accessibilityVolumeText(amount: amount, unit: unit))
                             }
                         }
 
