@@ -429,8 +429,16 @@ struct AddMilestoneView: View {
     @State private var notes       = ""
     @State private var isCompleted = false
     @State private var showSuggestions = false
+    @State private var isSaving = false
 
     private var isEditing: Bool { editingRecord != nil }
+
+    private var hasUnsavedChanges: Bool {
+        if isEditing { return true }
+        if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        if !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        return false
+    }
 
     /// Baby's current age in months (nil if no baby profile)
     private var babyAgeMonths: Int? {
@@ -555,6 +563,8 @@ struct AddMilestoneView: View {
                         }
 
                         Button(isEditing ? String(localized: "memory.update") : String(localized: "memory.save")) {
+                            guard !isSaving else { return }
+                            isSaving = true
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
@@ -567,11 +577,11 @@ struct AddMilestoneView: View {
                                                    icon: ok ? "star.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blPrimary : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton())
-                        .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
-                        .opacity(title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
+                        .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
+                        .opacity(title.trimmingCharacters(in: .whitespaces).isEmpty || isSaving ? 0.5 : 1)
                         .padding(.top, 8)
                     }
                     .padding(24)
@@ -594,6 +604,7 @@ struct AddMilestoneView: View {
                 }
             }
             .onAppear { populateFromRecord() }
+            .interactiveDismissDisabled(hasUnsavedChanges)
         }
     }
 
