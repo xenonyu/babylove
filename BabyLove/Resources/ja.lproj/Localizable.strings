@@ -655,6 +655,8 @@
 "a11y.weight %@"             = "体重 %@";
 "a11y.height %@"             = "身長 %@";
 "a11y.headCircumference %@"  = "頭囲 %@";
+"a11y.timeSince.warning"     = "そろそろ時間です";
+"a11y.timeSince.overdue"     = "時間超過";
 "a11y.milestone.alreadyRecorded %@" = "%@、記録済み";
 "a11y.onboarding.step %lld %lld" = "ステップ %lld / %lld";
 "a11y.onboarding.birthday %@"    = "誕生日：%@";

@@ -206,6 +206,22 @@ struct BLSectionHeader: View {
 }
 
 // MARK: - Stat Badge
+/// Visual urgency level for "time since" labels on stat badges.
+/// Provides a gentle colour shift when a tracked event is overdue.
+enum TimeSinceUrgency {
+    case normal   // default grey
+    case warning  // orange — approaching overdue
+    case overdue  // red — significantly overdue
+
+    var color: Color {
+        switch self {
+        case .normal:  return .blTextTertiary
+        case .warning: return .orange
+        case .overdue: return .red.opacity(0.8)
+        }
+    }
+}
+
 struct StatBadge: View {
     let value: String
     let label: String
@@ -213,11 +229,20 @@ struct StatBadge: View {
     var subtitle: String? = nil
     /// Shows how long since the last event (e.g. "1h 23m ago")
     var timeSince: String? = nil
+    /// Visual urgency for the timeSince label (default: normal grey)
+    var timeSinceUrgency: TimeSinceUrgency = .normal
 
     private var accessibilityText: String {
         var parts = ["\(value) \(label)"]
         if let subtitle, !subtitle.isEmpty { parts.append(subtitle) }
-        if let timeSince, !timeSince.isEmpty { parts.append(timeSince) }
+        if let timeSince, !timeSince.isEmpty {
+            parts.append(timeSince)
+            switch timeSinceUrgency {
+            case .warning: parts.append(NSLocalizedString("a11y.timeSince.warning", comment: ""))
+            case .overdue: parts.append(NSLocalizedString("a11y.timeSince.overdue", comment: ""))
+            case .normal: break
+            }
+        }
         return parts.joined(separator: ", ")
     }
 
@@ -239,8 +264,8 @@ struct StatBadge: View {
             }
             if let timeSince, !timeSince.isEmpty {
                 Text(timeSince)
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundColor(.blTextTertiary)
+                    .font(.system(size: 9, weight: timeSinceUrgency == .normal ? .medium : .semibold))
+                    .foregroundColor(timeSinceUrgency.color)
                     .lineLimit(1)
             }
         }

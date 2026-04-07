@@ -319,6 +319,44 @@ struct HomeView: View {
         return Self.timeSinceText(from: globalLastDiaperRecord?.timestamp)
     }
 
+    // MARK: - Time-Since Urgency
+    /// Computes visual urgency for feeding: >3h = warning, >5h = overdue.
+    /// Ongoing feedings always show normal (baby is being fed right now).
+    private var feedingUrgency: TimeSinceUrgency {
+        _ = minuteTick
+        if globalLastFeedingIsOngoing { return .normal }
+        return Self.urgency(from: globalLastFeedingRecord?.timestamp,
+                            warningMinutes: 180, overdueMinutes: 300)
+    }
+
+    /// Computes visual urgency for sleep: >5h awake = warning, >7h = overdue.
+    /// Ongoing sleep always shows normal.
+    private var sleepUrgency: TimeSinceUrgency {
+        _ = minuteTick
+        if globalLastSleepIsOngoing { return .normal }
+        let ref = globalLastSleepRecord?.endTime
+        return Self.urgency(from: ref, warningMinutes: 300, overdueMinutes: 420)
+    }
+
+    /// Computes visual urgency for diaper: >3h = warning, >5h = overdue.
+    private var diaperUrgency: TimeSinceUrgency {
+        _ = minuteTick
+        return Self.urgency(from: globalLastDiaperRecord?.timestamp,
+                            warningMinutes: 180, overdueMinutes: 300)
+    }
+
+    /// Generic urgency mapper: returns `.normal` / `.warning` / `.overdue`
+    /// based on minutes since the given date.
+    private static func urgency(from date: Date?,
+                                warningMinutes: Int,
+                                overdueMinutes: Int) -> TimeSinceUrgency {
+        guard let date else { return .normal }
+        let elapsed = Int(Date().timeIntervalSince(date)) / 60
+        if elapsed >= overdueMinutes { return .overdue }
+        if elapsed >= warningMinutes { return .warning }
+        return .normal
+    }
+
     /// Diaper breakdown subtitle (e.g. "3💧 2💩")
     private var diaperBreakdownSubtitle: String {
         guard !todayDiapers.isEmpty else { return "" }
@@ -596,17 +634,20 @@ struct HomeView: View {
                                           label: NSLocalizedString("home.feedings", comment: ""),
                                           color: .blFeeding,
                                           subtitle: feedingVolumeSubtitle,
-                                          timeSince: isSelectedDateToday ? feedingTimeSince : nil)
+                                          timeSince: isSelectedDateToday ? feedingTimeSince : nil,
+                                          timeSinceUrgency: isSelectedDateToday ? feedingUrgency : .normal)
                                 StatBadge(value: sleepText,
                                           label: NSLocalizedString("home.sleep", comment: ""),
                                           color: .blSleep,
                                           subtitle: sleepSubtitle,
-                                          timeSince: isSelectedDateToday ? sleepTimeSince : nil)
+                                          timeSince: isSelectedDateToday ? sleepTimeSince : nil,
+                                          timeSinceUrgency: isSelectedDateToday ? sleepUrgency : .normal)
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: NSLocalizedString("home.diapers", comment: ""),
                                           color: .blDiaper,
                                           subtitle: diaperBreakdownSubtitle,
-                                          timeSince: isSelectedDateToday ? diaperTimeSince : nil)
+                                          timeSince: isSelectedDateToday ? diaperTimeSince : nil,
+                                          timeSinceUrgency: isSelectedDateToday ? diaperUrgency : .normal)
                             }
                             .padding(.horizontal, 20)
 
