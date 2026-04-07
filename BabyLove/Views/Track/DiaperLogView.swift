@@ -125,11 +125,15 @@ struct DiaperLogView: View {
                             }
                         }
 
-                        // Notes
+                        // Notes with quick-suggestion chips
                         VStack(alignment: .leading, spacing: 10) {
                             Label(NSLocalizedString("log.notesOptional", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
+
+                            // Quick-note suggestion chips — tap to append to notes
+                            quickNoteChips
+
                             TextField(NSLocalizedString("diaperLog.notesPlaceholder", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(2...4)
                                 .padding(14)
@@ -188,6 +192,100 @@ struct DiaperLogView: View {
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
         }
+    }
+
+    // MARK: - Quick Note Suggestions
+
+    /// Common diaper observations that parents frequently note.
+    /// Contextual: some chips only appear for specific diaper types.
+    private var quickNoteSuggestions: [String] {
+        var suggestions: [String] = []
+        switch diaperType {
+        case .wet:
+            suggestions = [
+                NSLocalizedString("diaperLog.chip.lightWet", comment: ""),
+                NSLocalizedString("diaperLog.chip.heavyWet", comment: ""),
+                NSLocalizedString("diaperLog.chip.rash", comment: ""),
+                NSLocalizedString("diaperLog.chip.leakage", comment: ""),
+            ]
+        case .dirty:
+            suggestions = [
+                NSLocalizedString("diaperLog.chip.soft", comment: ""),
+                NSLocalizedString("diaperLog.chip.loose", comment: ""),
+                NSLocalizedString("diaperLog.chip.firm", comment: ""),
+                NSLocalizedString("diaperLog.chip.greenish", comment: ""),
+                NSLocalizedString("diaperLog.chip.rash", comment: ""),
+            ]
+        case .both:
+            suggestions = [
+                NSLocalizedString("diaperLog.chip.loose", comment: ""),
+                NSLocalizedString("diaperLog.chip.rash", comment: ""),
+                NSLocalizedString("diaperLog.chip.heavyWet", comment: ""),
+                NSLocalizedString("diaperLog.chip.greenish", comment: ""),
+            ]
+        case .dry:
+            suggestions = [
+                NSLocalizedString("diaperLog.chip.rash", comment: ""),
+                NSLocalizedString("diaperLog.chip.creamApplied", comment: ""),
+            ]
+        }
+        return suggestions
+    }
+
+    /// Whether a suggestion chip's text is already contained in the notes field
+    private func chipAlreadyAdded(_ chip: String) -> Bool {
+        notes.localizedCaseInsensitiveContains(chip)
+    }
+
+    private var quickNoteChips: some View {
+        // Use a flowing layout via HStack + wrapping
+        FlowLayout(spacing: 8) {
+            ForEach(quickNoteSuggestions, id: \.self) { chip in
+                let isAdded = chipAlreadyAdded(chip)
+                Button {
+                    Haptic.selection()
+                    if isAdded {
+                        // Remove chip text from notes
+                        removeChipFromNotes(chip)
+                    } else {
+                        // Append chip text to notes
+                        if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            notes = chip
+                        } else {
+                            notes += ", \(chip)"
+                        }
+                    }
+                } label: {
+                    Text(chip)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(isAdded ? .white : .blDiaper)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(isAdded ? Color.blDiaper : Color.blDiaper.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(chip)
+                .accessibilityAddTraits(isAdded ? .isSelected : [])
+            }
+        }
+    }
+
+    /// Remove a chip's text from the notes field, cleaning up surrounding separators
+    private func removeChipFromNotes(_ chip: String) {
+        // Try to remove ", chip" or "chip, " or just "chip"
+        if let range = notes.range(of: ", \(chip)", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: "\(chip), ", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: chip, options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Clean up trailing/leading separators
+        if notes.hasPrefix(", ") { notes = String(notes.dropFirst(2)) }
+        if notes.hasSuffix(",") { notes = String(notes.dropLast()) }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func populateFromRecord() {

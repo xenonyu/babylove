@@ -377,6 +377,15 @@
 "diaperLog.updated"       = "Diaper updated";
 "diaperLog.logged"        = "Diaper logged";
 "diaperLog.saveFailed"    = "Save failed — try again";
+"diaperLog.chip.lightWet" = "Light wet";
+"diaperLog.chip.heavyWet" = "Heavy wet";
+"diaperLog.chip.rash"     = "Rash";
+"diaperLog.chip.leakage"  = "Leakage";
+"diaperLog.chip.soft"     = "Soft";
+"diaperLog.chip.loose"    = "Loose";
+"diaperLog.chip.firm"     = "Firm";
+"diaperLog.chip.greenish" = "Greenish";
+"diaperLog.chip.creamApplied" = "Cream applied";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "Log Growth";

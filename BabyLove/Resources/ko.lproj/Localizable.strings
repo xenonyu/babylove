@@ -377,6 +377,15 @@
 "diaperLog.updated"       = "기저귀 기록이 업데이트되었습니다";
 "diaperLog.logged"        = "기저귀가 기록되었습니다";
 "diaperLog.saveFailed"    = "저장 실패 — 다시 시도하세요";
+"diaperLog.chip.lightWet" = "살짝 젖음";
+"diaperLog.chip.heavyWet" = "많이 젖음";
+"diaperLog.chip.rash"     = "기저귀 발진";
+"diaperLog.chip.leakage"  = "새어나옴";
+"diaperLog.chip.soft"     = "무른 변";
+"diaperLog.chip.loose"    = "묽은 변";
+"diaperLog.chip.firm"     = "딱딱한 변";
+"diaperLog.chip.greenish" = "녹색빛";
+"diaperLog.chip.creamApplied" = "크림 발랐음";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "성장 기록";

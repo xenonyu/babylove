@@ -377,6 +377,15 @@
 "diaperLog.updated"       = "尿布记录已更新";
 "diaperLog.logged"        = "尿布已记录";
 "diaperLog.saveFailed"    = "保存失败，请重试";
+"diaperLog.chip.lightWet" = "微湿";
+"diaperLog.chip.heavyWet" = "很湿";
+"diaperLog.chip.rash"     = "红屁屁";
+"diaperLog.chip.leakage"  = "漏尿";
+"diaperLog.chip.soft"     = "软便";
+"diaperLog.chip.loose"    = "稀便";
+"diaperLog.chip.firm"     = "硬便";
+"diaperLog.chip.greenish" = "偏绿色";
+"diaperLog.chip.creamApplied" = "涂了护臀霜";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "记录生长";

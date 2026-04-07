@@ -377,6 +377,15 @@
 "diaperLog.updated"       = "おむつ記録を更新しました";
 "diaperLog.logged"        = "おむつを記録しました";
 "diaperLog.saveFailed"    = "保存に失敗しました。もう一度お試しください";
+"diaperLog.chip.lightWet" = "少し濡れ";
+"diaperLog.chip.heavyWet" = "たっぷり濡れ";
+"diaperLog.chip.rash"     = "おむつかぶれ";
+"diaperLog.chip.leakage"  = "漏れ";
+"diaperLog.chip.soft"     = "やわらかめ";
+"diaperLog.chip.loose"    = "ゆるめ";
+"diaperLog.chip.firm"     = "かため";
+"diaperLog.chip.greenish" = "緑がかり";
+"diaperLog.chip.creamApplied" = "クリーム塗布";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "成長を記録";
