@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
@@ -17,6 +18,24 @@ struct MainTabView: View {
     @EnvironmentObject var appState: AppState
     @State private var selectedTab = 0
 
+    // Track ongoing timers across all tabs so the Home badge stays visible
+    @FetchRequest(
+        sortDescriptors: [],
+        predicate: NSPredicate(format: "endTime == nil")
+    )
+    private var ongoingSleeps: FetchedResults<CDSleepRecord>
+
+    @FetchRequest(
+        sortDescriptors: [],
+        predicate: NSPredicate(format: "durationMinutes == 0 AND (feedType == %@ OR feedType == %@)", "breast", "pump")
+    )
+    private var ongoingFeedings: FetchedResults<CDFeedingRecord>
+
+    /// Number of active timers (sleep + feeding) — shown as a badge on the Home tab
+    private var activeTimerCount: Int {
+        ongoingSleeps.count + ongoingFeedings.count
+    }
+
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
@@ -24,6 +43,7 @@ struct MainTabView: View {
                     Label(String(localized: "tab.today"), systemImage: selectedTab == 0 ? "house.fill" : "house")
                 }
                 .tag(0)
+                .badge(activeTimerCount)
 
             TrackView()
                 .tabItem {
