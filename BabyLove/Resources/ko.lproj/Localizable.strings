@@ -343,6 +343,19 @@
 "feedLog.timerStarted"    = "수유 타이머가 시작되었습니다";
 "feedLog.logged"          = "수유가 기록되었습니다";
 "feedLog.saveFailed"      = "저장 실패 — 다시 시도하세요";
+"feedLog.chip.goodLatch"  = "젖물림 좋음";
+"feedLog.chip.fussy"      = "보챔";
+"feedLog.chip.fellAsleep" = "먹다 잠듦";
+"feedLog.chip.spitUp"     = "토함";
+"feedLog.chip.finishedAll"= "다 마심";
+"feedLog.chip.refused"    = "거부";
+"feedLog.chip.gassy"      = "배에 가스";
+"feedLog.chip.lovedIt"    = "잘 먹음";
+"feedLog.chip.newFood"    = "새 음식";
+"feedLog.chip.messy"      = "지저분";
+"feedLog.chip.goodOutput" = "양 많음";
+"feedLog.chip.lowOutput"  = "양 적음";
+"feedLog.chip.painful"    = "통증";
 
 /* ===== Sleep Log ===== */
 "sleepLog.title"          = "수면 기록";

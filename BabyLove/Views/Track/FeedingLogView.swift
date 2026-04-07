@@ -376,11 +376,15 @@ struct FeedingLogView: View {
                             }
                         }
 
-                        // Notes
+                        // Notes with quick-suggestion chips
                         VStack(alignment: .leading, spacing: 10) {
                             Label(NSLocalizedString("log.notesOptional", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
+
+                            // Quick-note suggestion chips — contextual to feed type
+                            feedingNoteChips
+
                             TextField(NSLocalizedString("log.addNote", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(3...5)
                                 .padding(14)
@@ -511,6 +515,90 @@ struct FeedingLogView: View {
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
         }
+    }
+
+    // MARK: - Quick Note Suggestions
+
+    /// Common feeding observations, contextual to the selected feed type.
+    private var feedingNoteSuggestions: [String] {
+        switch feedType {
+        case .breast:
+            return [
+                NSLocalizedString("feedLog.chip.goodLatch", comment: ""),
+                NSLocalizedString("feedLog.chip.fussy", comment: ""),
+                NSLocalizedString("feedLog.chip.fellAsleep", comment: ""),
+                NSLocalizedString("feedLog.chip.spitUp", comment: ""),
+            ]
+        case .formula:
+            return [
+                NSLocalizedString("feedLog.chip.finishedAll", comment: ""),
+                NSLocalizedString("feedLog.chip.refused", comment: ""),
+                NSLocalizedString("feedLog.chip.spitUp", comment: ""),
+                NSLocalizedString("feedLog.chip.gassy", comment: ""),
+            ]
+        case .solid:
+            return [
+                NSLocalizedString("feedLog.chip.lovedIt", comment: ""),
+                NSLocalizedString("feedLog.chip.refused", comment: ""),
+                NSLocalizedString("feedLog.chip.newFood", comment: ""),
+                NSLocalizedString("feedLog.chip.messy", comment: ""),
+            ]
+        case .pump:
+            return [
+                NSLocalizedString("feedLog.chip.goodOutput", comment: ""),
+                NSLocalizedString("feedLog.chip.lowOutput", comment: ""),
+                NSLocalizedString("feedLog.chip.painful", comment: ""),
+            ]
+        }
+    }
+
+    private func chipAlreadyAdded(_ chip: String) -> Bool {
+        notes.localizedCaseInsensitiveContains(chip)
+    }
+
+    private var feedingNoteChips: some View {
+        FlowLayout(spacing: 8) {
+            ForEach(feedingNoteSuggestions, id: \.self) { chip in
+                let isAdded = chipAlreadyAdded(chip)
+                Button {
+                    Haptic.selection()
+                    if isAdded {
+                        removeChipFromNotes(chip)
+                    } else {
+                        if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            notes = chip
+                        } else {
+                            notes += ", \(chip)"
+                        }
+                    }
+                } label: {
+                    Text(chip)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(isAdded ? .white : .blFeeding)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(isAdded ? Color.blFeeding : Color.blFeeding.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(chip)
+                .accessibilityAddTraits(isAdded ? .isSelected : [])
+            }
+        }
+    }
+
+    private func removeChipFromNotes(_ chip: String) {
+        if let range = notes.range(of: ", \(chip)", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: "\(chip), ", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: chip, options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        if notes.hasPrefix(", ") { notes = String(notes.dropFirst(2)) }
+        if notes.hasSuffix(",") { notes = String(notes.dropLast()) }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func populateFromRecord() {

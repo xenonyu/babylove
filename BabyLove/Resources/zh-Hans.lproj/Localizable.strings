@@ -343,6 +343,19 @@
 "feedLog.timerStarted"    = "喂食计时已开始";
 "feedLog.logged"          = "喂食已记录";
 "feedLog.saveFailed"      = "保存失败，请重试";
+"feedLog.chip.goodLatch"  = "衔乳好";
+"feedLog.chip.fussy"      = "哭闹";
+"feedLog.chip.fellAsleep" = "吃着睡着了";
+"feedLog.chip.spitUp"     = "吐奶";
+"feedLog.chip.finishedAll"= "全部喝完";
+"feedLog.chip.refused"    = "拒绝";
+"feedLog.chip.gassy"      = "胀气";
+"feedLog.chip.lovedIt"    = "很爱吃";
+"feedLog.chip.newFood"    = "新食物";
+"feedLog.chip.messy"      = "吃得很脏";
+"feedLog.chip.goodOutput" = "产量好";
+"feedLog.chip.lowOutput"  = "产量少";
+"feedLog.chip.painful"    = "疼痛";
 
 /* ===== Sleep Log ===== */
 "sleepLog.title"          = "记录睡眠";

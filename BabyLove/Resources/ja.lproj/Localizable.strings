@@ -343,6 +343,19 @@
 "feedLog.timerStarted"    = "授乳タイマーを開始しました";
 "feedLog.logged"          = "授乳を記録しました";
 "feedLog.saveFailed"      = "保存に失敗しました。もう一度お試しください";
+"feedLog.chip.goodLatch"  = "吸い付き良好";
+"feedLog.chip.fussy"      = "ぐずり";
+"feedLog.chip.fellAsleep" = "飲みながら寝た";
+"feedLog.chip.spitUp"     = "吐き戻し";
+"feedLog.chip.finishedAll"= "全部飲んだ";
+"feedLog.chip.refused"    = "拒否";
+"feedLog.chip.gassy"      = "お腹が張った";
+"feedLog.chip.lovedIt"    = "よく食べた";
+"feedLog.chip.newFood"    = "新しい食材";
+"feedLog.chip.messy"      = "散らかした";
+"feedLog.chip.goodOutput" = "量が出た";
+"feedLog.chip.lowOutput"  = "量が少ない";
+"feedLog.chip.painful"    = "痛み";
 
 /* ===== Sleep Log ===== */
 "sleepLog.title"          = "睡眠を記録";

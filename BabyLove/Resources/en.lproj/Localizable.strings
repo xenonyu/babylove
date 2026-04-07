@@ -343,6 +343,19 @@
 "feedLog.timerStarted"    = "Feeding timer started";
 "feedLog.logged"          = "Feeding logged";
 "feedLog.saveFailed"      = "Save failed — try again";
+"feedLog.chip.goodLatch"  = "Good latch";
+"feedLog.chip.fussy"      = "Fussy";
+"feedLog.chip.fellAsleep" = "Fell asleep";
+"feedLog.chip.spitUp"     = "Spit up";
+"feedLog.chip.finishedAll"= "Finished all";
+"feedLog.chip.refused"    = "Refused";
+"feedLog.chip.gassy"      = "Gassy";
+"feedLog.chip.lovedIt"    = "Loved it";
+"feedLog.chip.newFood"    = "New food";
+"feedLog.chip.messy"      = "Messy";
+"feedLog.chip.goodOutput" = "Good output";
+"feedLog.chip.lowOutput"  = "Low output";
+"feedLog.chip.painful"    = "Painful";
 
 /* ===== Sleep Log ===== */
 "sleepLog.title"          = "Log Sleep";
