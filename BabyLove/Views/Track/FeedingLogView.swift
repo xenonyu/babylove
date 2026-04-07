@@ -330,6 +330,10 @@ struct FeedingLogView: View {
                                         .font(.system(size: 17, weight: .bold))
                                         .foregroundColor(.blFeeding)
                                 }
+
+                                // Quick amount presets — tap to instantly set a common volume
+                                quickAmountPresets
+
                                 Slider(value: $amount, in: 0...maxAmount, step: amountStep)
                                     .tint(.blFeeding)
                                     .accessibilityLabel(NSLocalizedString("feedLog.amount", comment: ""))
@@ -524,6 +528,56 @@ struct FeedingLogView: View {
                 elapsedTimer = nil
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
+        }
+    }
+
+    // MARK: - Quick Amount Presets
+
+    /// Common bottle/formula volumes for one-tap selection.
+    /// Values are in display units (ml for metric, oz for imperial).
+    private var quickAmountValues: [Double] {
+        if feedType == .solid {
+            return unit == .metric ? [30, 60, 90, 120] : [1, 2, 3, 4]
+        }
+        // Formula / pump — typical bottle volumes
+        return unit == .metric ? [60, 90, 120, 150, 180, 240] : [2, 3, 4, 5, 6, 8]
+    }
+
+    /// Formatted label for a quick-amount preset (e.g. "90 ml" or "3 oz").
+    private func quickAmountLabel(_ value: Double) -> String {
+        if unit == .metric {
+            return "\(Int(value)) \(unit.volumeLabel)"
+        } else {
+            // Drop trailing .0 for whole numbers
+            let formatted = value.truncatingRemainder(dividingBy: 1) == 0
+                ? "\(Int(value))"
+                : String(format: "%.1f", value)
+            return "\(formatted) \(unit.volumeLabel)"
+        }
+    }
+
+    private var quickAmountPresets: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(quickAmountValues, id: \.self) { preset in
+                    let isSelected = abs(amount - preset) < 0.01
+                    Button {
+                        Haptic.selection()
+                        withAnimation(.spring(response: 0.25)) { amount = preset }
+                    } label: {
+                        Text(quickAmountLabel(preset))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(isSelected ? .white : .blFeeding)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(isSelected ? Color.blFeeding : Color.blFeeding.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(quickAmountLabel(preset))
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
         }
     }
 
