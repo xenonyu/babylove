@@ -414,6 +414,8 @@
 "growthLog.heightPlaceholder.imperial" = "如 23.8";
 "growthLog.headPlaceholder.metric"     = "如 40.2";
 "growthLog.headPlaceholder.imperial"   = "如 15.8";
+"growthLog.previous %@"               = "上次: %@";
+"growthLog.previousWithDate %@ %@"    = "上次: %@ · %@";
 
 /* ===== Growth View ===== */
 "growth.title"            = "生长曲线";

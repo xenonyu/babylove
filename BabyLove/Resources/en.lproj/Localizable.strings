@@ -414,6 +414,8 @@
 "growthLog.heightPlaceholder.imperial" = "e.g. 23.8";
 "growthLog.headPlaceholder.metric"     = "e.g. 40.2";
 "growthLog.headPlaceholder.imperial"   = "e.g. 15.8";
+"growthLog.previous %@"               = "Last: %@";
+"growthLog.previousWithDate %@ %@"    = "Last: %@ · %@";
 
 /* ===== Growth View ===== */
 "growth.title"            = "Growth";

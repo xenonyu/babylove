@@ -92,6 +92,41 @@ struct GrowthLogView: View {
         hasValidMeasurement && validationWarning == nil
     }
 
+    // MARK: - Previous Measurement Reference
+
+    /// Formatted string showing the previous weight for quick reference, e.g. "Last: 5.43 kg · Apr 1"
+    private var previousWeightText: String? {
+        guard let prev = previousRecord, prev.weightKG > 0 else { return nil }
+        let w = unit.weightFromKG(prev.weightKG)
+        let valStr = String(format: "%.2f %@", w, unit.weightLabel)
+        return formatPreviousText(valStr, date: prev.date)
+    }
+
+    /// Formatted string showing the previous height for quick reference
+    private var previousHeightText: String? {
+        guard let prev = previousRecord, prev.heightCM > 0 else { return nil }
+        let h = unit.lengthFromCM(prev.heightCM)
+        let valStr = String(format: "%.1f %@", h, unit.heightLabel)
+        return formatPreviousText(valStr, date: prev.date)
+    }
+
+    /// Formatted string showing the previous head circumference for quick reference
+    private var previousHeadText: String? {
+        guard let prev = previousRecord, prev.headCircumferenceCM > 0 else { return nil }
+        let hc = unit.lengthFromCM(prev.headCircumferenceCM)
+        let valStr = String(format: "%.1f %@", hc, unit.heightLabel)
+        return formatPreviousText(valStr, date: prev.date)
+    }
+
+    /// Combine a value string with an optional date into "Last: {value} · {date}"
+    private func formatPreviousText(_ valueStr: String, date: Date?) -> String {
+        if let date {
+            let dateStr = BLDateFormatters.monthDay.string(from: date)
+            return String(format: NSLocalizedString("growthLog.previousWithDate %@ %@", comment: ""), valueStr, dateStr)
+        }
+        return String(format: NSLocalizedString("growthLog.previous %@", comment: ""), valueStr)
+    }
+
     /// Whether the form has meaningful user input that would be lost on dismiss.
     private var hasUnsavedChanges: Bool {
         if isEditing { return true }
@@ -134,7 +169,8 @@ struct GrowthLogView: View {
                             value: $weightKG,
                             placeholder: unit == .metric
                                 ? NSLocalizedString("growthLog.weightPlaceholder.metric", comment: "")
-                                : NSLocalizedString("growthLog.weightPlaceholder.imperial", comment: "")
+                                : NSLocalizedString("growthLog.weightPlaceholder.imperial", comment: ""),
+                            previousText: previousWeightText
                         )
                         measurementField(
                             label: NSLocalizedString("growthLog.height", comment: ""),
@@ -144,7 +180,8 @@ struct GrowthLogView: View {
                             value: $heightCM,
                             placeholder: unit == .metric
                                 ? NSLocalizedString("growthLog.heightPlaceholder.metric", comment: "")
-                                : NSLocalizedString("growthLog.heightPlaceholder.imperial", comment: "")
+                                : NSLocalizedString("growthLog.heightPlaceholder.imperial", comment: ""),
+                            previousText: previousHeightText
                         )
                         measurementField(
                             label: NSLocalizedString("growthLog.headCirc", comment: ""),
@@ -154,7 +191,8 @@ struct GrowthLogView: View {
                             value: $headCM,
                             placeholder: unit == .metric
                                 ? NSLocalizedString("growthLog.headPlaceholder.metric", comment: "")
-                                : NSLocalizedString("growthLog.headPlaceholder.imperial", comment: "")
+                                : NSLocalizedString("growthLog.headPlaceholder.imperial", comment: ""),
+                            previousText: previousHeadText
                         )
 
                         // Date
@@ -352,12 +390,21 @@ struct GrowthLogView: View {
         icon: String,
         color: Color,
         value: Binding<String>,
-        placeholder: String
+        placeholder: String,
+        previousText: String? = nil
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label(label, systemImage: icon)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.blTextSecondary)
+            HStack {
+                Label(label, systemImage: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.blTextSecondary)
+                Spacer()
+                if let previousText {
+                    Text(previousText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.blTextTertiary)
+                }
+            }
             HStack {
                 TextField(placeholder, text: value)
                     .keyboardType(.decimalPad)

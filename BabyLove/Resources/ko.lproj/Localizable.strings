@@ -414,6 +414,8 @@
 "growthLog.heightPlaceholder.imperial" = "예: 23.8";
 "growthLog.headPlaceholder.metric"     = "예: 40.2";
 "growthLog.headPlaceholder.imperial"   = "예: 15.8";
+"growthLog.previous %@"               = "이전: %@";
+"growthLog.previousWithDate %@ %@"    = "이전: %@ · %@";
 
 /* ===== Growth View ===== */
 "growth.title"            = "성장 곡선";
