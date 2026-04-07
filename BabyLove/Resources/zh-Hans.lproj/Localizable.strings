@@ -538,6 +538,12 @@
 "growth.percentileHintGender" = "在设置中将宝宝性别设为男孩或女孩，即可查看WHO百分位";
 "growth.percentileHintAge"    = "WHO百分位数据适用于0–24个月龄";
 "growth.percentileHintNoBaby" = "添加宝宝资料以查看WHO百分位对比";
+"growth.chartTapHint"         = "点击数据点查看详情";
+"growth.tooltip.age %@"       = "月龄：%@";
+"growth.tooltip.weeks %lld"   = "%lld 周";
+"growth.tooltip.months %lld"  = "%lld 个月";
+"growth.tooltip.years %lld"   = "%lld 岁";
+"growth.tooltip.yearsMonths %lld %lld" = "%lld 岁 %lld 个月";
 
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "回忆";

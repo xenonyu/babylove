@@ -342,8 +342,9 @@ struct GrowthView: View {
                 )
                 .frame(height: 260)
                 .blCard()
-                .accessibilityElement(children: .ignore)
+                .accessibilityElement(children: .combine)
                 .accessibilityLabel(chartAccessibilityLabel)
+                .accessibilityHint(String(localized: "growth.chartTapHint"))
             }
         }
     }
@@ -694,6 +695,9 @@ struct SimpleLineChart: View {
     var unit: MeasurementUnit = .metric
     var baby: Baby? = nil
 
+    /// Index of the data point currently selected for inspection
+    @State private var selectedPointIndex: Int?
+
     /// Left margin reserved for Y-axis labels
     private let yAxisWidth: CGFloat = 40
     /// Bottom margin reserved for X-axis labels
@@ -895,6 +899,16 @@ struct SimpleLineChart: View {
                         let h = geo.size.height
 
                         ZStack {
+                            // Background tap to dismiss tooltip
+                            Color.clear.contentShape(Rectangle())
+                                .onTapGesture {
+                                    if selectedPointIndex != nil {
+                                        withAnimation(.spring(response: 0.25)) {
+                                            selectedPointIndex = nil
+                                        }
+                                    }
+                                }
+
                             // Grid lines
                             ForEach(Array(yTicks.enumerated()), id: \.offset) { _, tick in
                                 let y = h - h * CGFloat((tick - chartMin) / chartRange)
@@ -971,22 +985,48 @@ struct SimpleLineChart: View {
                                     .stroke(Color.blGrowth, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
                                 }
 
-                                // Dots + value labels
+                                // Dots + value labels (tap to inspect)
                                 ForEach(0..<points.count, id: \.self) { i in
                                     let pt = points[i]
-                                    Text(formatValue(displayValue(data[i].value)))
-                                        .font(.system(size: 8, weight: .semibold))
-                                        .foregroundColor(.blGrowth)
-                                        .position(x: pt.x, y: pt.y - 12)
+                                    let isSelected = selectedPointIndex == i
 
+                                    // Value label above point (dimmed when another point is inspected)
+                                    if selectedPointIndex == nil || isSelected {
+                                        Text(formatValue(displayValue(data[i].value)))
+                                            .font(.system(size: 8, weight: .semibold))
+                                            .foregroundColor(.blGrowth)
+                                            .position(x: pt.x, y: pt.y - 12)
+                                    }
+
+                                    // Data point dot (enlarged when selected)
                                     Circle()
                                         .fill(Color.white)
-                                        .frame(width: 9, height: 9)
+                                        .frame(width: isSelected ? 13 : 9, height: isSelected ? 13 : 9)
                                         .position(pt)
                                     Circle()
                                         .fill(Color.blGrowth)
-                                        .frame(width: 6, height: 6)
+                                        .frame(width: isSelected ? 9 : 6, height: isSelected ? 9 : 6)
                                         .position(pt)
+
+                                    // Invisible larger tap target
+                                    Circle()
+                                        .fill(Color.clear)
+                                        .frame(width: 36, height: 36)
+                                        .contentShape(Circle())
+                                        .position(pt)
+                                        .onTapGesture {
+                                            Haptic.selection()
+                                            withAnimation(.spring(response: 0.25)) {
+                                                selectedPointIndex = isSelected ? nil : i
+                                            }
+                                        }
+                                }
+
+                                // Tooltip for selected data point
+                                if let idx = selectedPointIndex, idx < data.count, idx < points.count {
+                                    let dp = data[idx]
+                                    let pt = points[idx]
+                                    inspectionTooltip(age: dp.age, rawValue: dp.value, date: dp.date, chartWidth: w, chartHeight: h, anchorPoint: pt)
                                 }
                             }
                         }
@@ -1015,6 +1055,81 @@ struct SimpleLineChart: View {
             .padding(.horizontal, 8)
             .padding(.bottom, 4)
         )
+    }
+
+    // MARK: - Inspection Tooltip
+
+    /// Rich tooltip shown when a data point is tapped
+    private func inspectionTooltip(age: Double, rawValue: Double, date: Date, chartWidth: CGFloat, chartHeight: CGFloat, anchorPoint: CGPoint) -> some View {
+        let dispValue = displayValue(rawValue)
+        let valueText = "\(formatValue(dispValue)) \(unitLabel)"
+        let dateText = BLDateFormatters.monthDay.string(from: date)
+        let ageText = String(format: NSLocalizedString("growth.tooltip.age %@", comment: ""), Self.formatAgeMonths(age))
+
+        // Calculate WHO percentile for this specific data point
+        var pctlText: String? = nil
+        if let table = whoTable {
+            if let pctl = table.percentile(atMonth: age, value: rawValue) {
+                pctlText = String(localized: "growth.percentile \(Int(pctl.rounded()))")
+            }
+        }
+
+        // Position tooltip above the point, flipping if too close to top
+        let tooltipWidth: CGFloat = 140
+        let showBelow = anchorPoint.y < 60
+        let tooltipY = showBelow ? anchorPoint.y + 40 : anchorPoint.y - 48
+        // Clamp X so tooltip doesn't overflow chart edges
+        let clampedX = min(max(tooltipWidth / 2 + 4, anchorPoint.x), chartWidth - tooltipWidth / 2 - 4)
+
+        return VStack(spacing: 3) {
+            Text(valueText)
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .foregroundColor(.blGrowth)
+
+            Text(dateText)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.blTextSecondary)
+
+            Text(ageText)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.blTextTertiary)
+
+            if let pctlText {
+                Text(pctlText)
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundColor(.blTeal)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
+        )
+        .frame(width: tooltipWidth)
+        .position(x: clampedX, y: tooltipY)
+        .transition(.opacity.combined(with: .scale(scale: 0.85)))
+        .allowsHitTesting(false)
+    }
+
+    /// Format age in months to a human-readable string (e.g. "3.5m" or "1y 2m")
+    private static func formatAgeMonths(_ months: Double) -> String {
+        let totalMonths = Int(months.rounded())
+        if totalMonths < 12 {
+            if months < 1 {
+                let weeks = Int((months * 4.345).rounded())
+                return String(format: NSLocalizedString("growth.tooltip.weeks %lld", comment: ""), max(1, weeks))
+            }
+            return String(format: NSLocalizedString("growth.tooltip.months %lld", comment: ""), totalMonths)
+        } else {
+            let years = totalMonths / 12
+            let remaining = totalMonths % 12
+            if remaining == 0 {
+                return String(format: NSLocalizedString("growth.tooltip.years %lld", comment: ""), years)
+            }
+            return String(format: NSLocalizedString("growth.tooltip.yearsMonths %lld %lld", comment: ""), years, remaining)
+        }
     }
 
     // MARK: - WHO Curve Helpers

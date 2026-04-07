@@ -538,6 +538,12 @@
 "growth.percentileHintGender" = "設定で性別を男の子または女の子に設定すると、WHOパーセンタイルが表示されます";
 "growth.percentileHintAge"    = "WHOパーセンタイルデータは0〜24か月に対応しています";
 "growth.percentileHintNoBaby" = "赤ちゃんのプロフィールを追加して、WHOパーセンタイルを確認しましょう";
+"growth.chartTapHint"         = "データポイントをタップして詳細を表示";
+"growth.tooltip.age %@"       = "月齢：%@";
+"growth.tooltip.weeks %lld"   = "%lld 週間";
+"growth.tooltip.months %lld"  = "%lld か月";
+"growth.tooltip.years %lld"   = "%lld 歳";
+"growth.tooltip.yearsMonths %lld %lld" = "%lld 歳 %lld か月";
 
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "思い出";

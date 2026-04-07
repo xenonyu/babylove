@@ -538,6 +538,12 @@
 "growth.percentileHintGender" = "Set baby's gender to Boy or Girl in Settings to see WHO percentiles";
 "growth.percentileHintAge"    = "WHO percentile data is available for ages 0–24 months";
 "growth.percentileHintNoBaby" = "Add baby profile to see WHO percentile comparisons";
+"growth.chartTapHint"         = "Tap data points to see details";
+"growth.tooltip.age %@"       = "Age: %@";
+"growth.tooltip.weeks %lld"   = "%lld weeks";
+"growth.tooltip.months %lld"  = "%lld months";
+"growth.tooltip.years %lld"   = "%lld years";
+"growth.tooltip.yearsMonths %lld %lld" = "%lld yr %lld mo";
 
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "Memories";
