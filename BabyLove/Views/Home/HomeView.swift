@@ -1837,9 +1837,9 @@ struct HomeView: View {
         if r.amountML > 0 {
             let display = unit.volumeFromML(r.amountML)
             if unit == .metric {
-                parts.append("\(Int(display)) ml")
+                parts.append("\(Int(display)) \(unit.volumeLabel)")
             } else {
-                parts.append(String(format: "%.1f oz", display))
+                parts.append(String(format: "%.1f %@", display, unit.volumeLabel))
             }
         }
         if let side = r.breastSide, !side.isEmpty {

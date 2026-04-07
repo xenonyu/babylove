@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -76,7 +76,7 @@
 		6634790B09DF900EBFD38662 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		673B4B9F6094D50AD5A2AA08 /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
 		709C21D5EB7D4BCDACEA7C19 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		709CBB9F52E43EEE1D85CDCB /* BabyLove.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyLove.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		709CBB9F52E43EEE1D85CDCB /* BabyLove.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BabyLove.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		76E83015CBD149D49CDA6EE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7FCECAE45648C1C42C3C9F7D /* FeedingLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingLogView.swift; sourceTree = "<group>"; };
 		7FCEFB476E123D3291E45FA9 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -369,6 +369,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					18DE939E927CBA7AC19B689B = {
+						DevelopmentTeam = MS49M8LMJ8;
+					};
 					4E2B131C1810F30FAF7FE5DF = {
 						DevelopmentTeam = MS49M8LMJ8;
 						TestTargetID = 18DE939E927CBA7AC19B689B;
@@ -391,6 +394,7 @@
 			);
 			mainGroup = 10AE8A8494C9DF4D64B497A2;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -498,14 +502,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BabyLove/BabyLove.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = EMXU4GKM3N;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = BabyLove/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.babylove.app;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
@@ -597,14 +597,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BabyLove/BabyLove.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = EMXU4GKM3N;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = BabyLove/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.babylove.app;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
