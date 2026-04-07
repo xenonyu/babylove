@@ -569,6 +569,16 @@
 "growth.tooltip.years %lld"   = "%lld 岁";
 "growth.tooltip.yearsMonths %lld %lld" = "%lld 岁 %lld 个月";
 
+// Measurement Reminder
+"growth.reminder.title"        = "该量一量了";
+"growth.reminder.newborn"      = "新生儿";
+"growth.reminder.infant"       = "婴儿";
+"growth.reminder.toddler"      = "幼儿";
+"growth.reminder.due %lld %@"  = "距上次测量已 %lld 天 — 建议%@每周测量";
+"growth.reminder.overdue %lld" = "距上次测量已 %lld 天";
+"growth.reminder.a11y.label"   = "测量提醒 — 点击记录新测量";
+"growth.reminder.a11y.hint %lld" = "距上次测量已 %lld 天";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "回忆";
 "memory.achieved %lld"      = "%lld 已达成";

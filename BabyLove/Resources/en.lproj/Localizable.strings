@@ -569,6 +569,16 @@
 "growth.tooltip.years %lld"   = "%lld years";
 "growth.tooltip.yearsMonths %lld %lld" = "%lld yr %lld mo";
 
+// Measurement Reminder
+"growth.reminder.title"        = "Time for a Measurement";
+"growth.reminder.newborn"      = "newborns";
+"growth.reminder.infant"       = "infants";
+"growth.reminder.toddler"      = "toddlers";
+"growth.reminder.due %lld %@"  = "Last measured %lld days ago — weekly checks recommended for %@";
+"growth.reminder.overdue %lld" = "It's been %lld days since the last measurement";
+"growth.reminder.a11y.label"   = "Measurement reminder — tap to record new measurement";
+"growth.reminder.a11y.hint %lld" = "Last measurement was %lld days ago";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "Memories";
 "memory.achieved %lld"      = "%lld Achieved";

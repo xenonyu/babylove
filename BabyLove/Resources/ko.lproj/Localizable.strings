@@ -569,6 +569,16 @@
 "growth.tooltip.years %lld"   = "%lld세";
 "growth.tooltip.yearsMonths %lld %lld" = "%lld세 %lld개월";
 
+// Measurement Reminder
+"growth.reminder.title"        = "측정할 시간이에요";
+"growth.reminder.newborn"      = "신생아";
+"growth.reminder.infant"       = "영아";
+"growth.reminder.toddler"      = "유아";
+"growth.reminder.due %lld %@"  = "마지막 측정 후 %lld일 — %@는 매주 측정을 권장합니다";
+"growth.reminder.overdue %lld" = "마지막 측정 후 %lld일이 지났습니다";
+"growth.reminder.a11y.label"   = "측정 알림 — 탭하여 새 측정 기록";
+"growth.reminder.a11y.hint %lld" = "마지막 측정 후 %lld일";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "추억";
 "memory.achieved %lld"      = "%lld 달성";

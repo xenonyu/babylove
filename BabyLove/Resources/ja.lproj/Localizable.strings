@@ -569,6 +569,16 @@
 "growth.tooltip.years %lld"   = "%lld 歳";
 "growth.tooltip.yearsMonths %lld %lld" = "%lld 歳 %lld か月";
 
+// Measurement Reminder
+"growth.reminder.title"        = "測定の時間です";
+"growth.reminder.newborn"      = "新生児";
+"growth.reminder.infant"       = "乳児";
+"growth.reminder.toddler"      = "幼児";
+"growth.reminder.due %lld %@"  = "前回の測定から %lld 日 — %@は毎週の測定をおすすめします";
+"growth.reminder.overdue %lld" = "前回の測定から %lld 日経っています";
+"growth.reminder.a11y.label"   = "測定リマインダー — タップして新しい測定を記録";
+"growth.reminder.a11y.hint %lld" = "前回の測定から %lld 日";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "思い出";
 "memory.achieved %lld"      = "%lld 達成済み";

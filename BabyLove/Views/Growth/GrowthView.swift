@@ -54,6 +54,13 @@ struct GrowthView: View {
                         .pickerStyle(.segmented)
                         .padding(.horizontal, 20)
 
+                        // Measurement reminder nudge
+                        if let reminder = measurementReminder {
+                            measurementReminderCard(reminder)
+                                .padding(.horizontal, 20)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+
                         // Chart area
                         chartArea
                             .padding(.horizontal, 20)
@@ -307,6 +314,107 @@ struct GrowthView: View {
             return String(localized: "growth.percentileHintNoBaby")
         }
         return nil
+    }
+
+    // MARK: - Measurement Reminder
+
+    /// Reminder info: days since last measurement and recommended interval
+    private struct MeasurementReminderInfo {
+        let daysSince: Int
+        let recommendedInterval: Int
+        let message: String
+        let icon: String
+    }
+
+    /// Returns a reminder if it's been too long since the last measurement, based on baby's age.
+    /// Newborns (0-3mo): every 7 days, Infants (3-12mo): every 14 days, Toddlers (12mo+): every 30 days.
+    private var measurementReminder: MeasurementReminderInfo? {
+        // Only show when there are records and a baby profile
+        guard !records.isEmpty, let baby = appState.currentBaby else { return nil }
+
+        // Find the latest record date
+        guard let latestDate = records.last?.date else { return nil }
+        let daysSince = Calendar.current.dateComponents([.day], from: latestDate, to: Date()).day ?? 0
+
+        // Determine recommended interval based on baby's age
+        let ageMonths = baby.ageInMonths
+        let interval: Int
+        let ageGroup: String
+        if ageMonths < 3 {
+            interval = 7
+            ageGroup = String(localized: "growth.reminder.newborn")
+        } else if ageMonths < 12 {
+            interval = 14
+            ageGroup = String(localized: "growth.reminder.infant")
+        } else {
+            interval = 30
+            ageGroup = String(localized: "growth.reminder.toddler")
+        }
+
+        guard daysSince >= interval else { return nil }
+
+        let message: String
+        let icon: String
+        if daysSince >= interval * 2 {
+            // Very overdue
+            message = String(format: NSLocalizedString("growth.reminder.overdue %lld", comment: ""), daysSince)
+            icon = "exclamationmark.circle.fill"
+        } else {
+            // Gentle reminder
+            message = String(format: NSLocalizedString("growth.reminder.due %lld %@", comment: ""), daysSince, ageGroup)
+            icon = "clock.badge.exclamationmark"
+        }
+
+        return MeasurementReminderInfo(daysSince: daysSince, recommendedInterval: interval, message: message, icon: icon)
+    }
+
+    @ViewBuilder
+    private func measurementReminderCard(_ info: MeasurementReminderInfo) -> some View {
+        Button {
+            Haptic.selection()
+            showLog = true
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(Color.blGrowth.opacity(0.15))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: info.icon)
+                        .font(.system(size: 18))
+                        .foregroundColor(.blGrowth)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(localized: "growth.reminder.title"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    Text(info.message)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.blTextSecondary)
+                        .lineLimit(2)
+                }
+
+                Spacer()
+
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(.blGrowth)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.blGrowth.opacity(0.08))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(Color.blGrowth.opacity(0.2), lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "growth.reminder.a11y.label"))
+        .accessibilityHint(String(format: NSLocalizedString("growth.reminder.a11y.hint %lld", comment: ""), info.daysSince))
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Chart Area
