@@ -442,7 +442,7 @@ struct AllSleepsView: View {
                                             }
                                     }
                                 } header: {
-                                    dateSectionHeader(section.key, count: section.records.count)
+                                    sleepSectionHeader(section.key, records: section.records)
                                 }
                             }
                         }
@@ -618,6 +618,38 @@ struct AllSleepsView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
         .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
+    }
+
+    /// Enhanced section header for sleep records: shows date, count, and total sleep duration.
+    @ViewBuilder
+    private func sleepSectionHeader(_ title: String, records: [CDSleepRecord]) -> some View {
+        let totalMinutes = records.reduce(0) { sum, r in
+            guard let start = r.startTime, let end = r.endTime else { return sum }
+            return sum + Int(end.timeIntervalSince(start) / 60)
+        }
+
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.blTextSecondary)
+                    .textCase(nil)
+
+                if totalMinutes > 0 {
+                    Text(DurationFormat.fromMinutes(totalMinutes))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.blSleep)
+                }
+            }
+            Spacer()
+            Text("\(records.count)")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(.blTextTertiary)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Color.blTextTertiary.opacity(0.1))
+                .clipShape(Capsule())
+        }
     }
 }
 
