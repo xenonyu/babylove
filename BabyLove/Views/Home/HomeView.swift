@@ -42,7 +42,7 @@ struct HomeView: View {
     @State private var activeDays: Set<Date> = []
 
     // Global "last event" times — not filtered by selected day
-    @State private var globalLastFeedingTime: Date?
+    @State private var globalLastFeedingRecord: CDFeedingRecord?
     @State private var globalLastFeedingIsOngoing: Bool = false
     @State private var globalLastSleepRecord: CDSleepRecord?
     @State private var globalLastSleepIsOngoing: Bool = false
@@ -300,7 +300,7 @@ struct HomeView: View {
     private var feedingTimeSince: String {
         _ = minuteTick
         if globalLastFeedingIsOngoing { return NSLocalizedString("home.feedingNow", comment: "") }
-        return Self.timeSinceText(from: globalLastFeedingTime)
+        return Self.timeSinceText(from: globalLastFeedingRecord?.timestamp)
     }
 
     /// Time since last sleep ended (global), or "sleeping now" if ongoing.
@@ -440,9 +440,13 @@ struct HomeView: View {
             let nextSide = lastSide == .left ? BreastSide.right.displayName : BreastSide.left.displayName
             return String(format: NSLocalizedString("home.next %@", comment: ""), nextSide)
         }
-        // Otherwise show time since last feeding
-        guard let lastTime = globalLastFeedingTime else { return nil }
-        return Self.timeSinceText(from: lastTime)
+        // Show feed type with time since for context (e.g. "Bottle · 2h ago")
+        guard let record = globalLastFeedingRecord, let lastTime = record.timestamp else { return nil }
+        let timeSince = Self.timeSinceText(from: lastTime)
+        if let ft = FeedType(rawValue: record.feedType ?? "") {
+            return "\(ft.displayName) · \(timeSince)"
+        }
+        return timeSince
     }
 
     /// Contextual hint for the Sleep quick log card.
@@ -855,13 +859,13 @@ struct HomeView: View {
         feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         feedReq.fetchLimit = 1
         if let lastFeeding = (try? ctx.fetch(feedReq))?.first {
-            globalLastFeedingTime = lastFeeding.timestamp
+            globalLastFeedingRecord = lastFeeding
             // An ongoing breast/pump feeding has durationMinutes == 0
             let ft = FeedType(rawValue: lastFeeding.feedType ?? "")
             let isTimerType = ft == .breast || ft == .pump
             globalLastFeedingIsOngoing = isTimerType && lastFeeding.durationMinutes == 0
         } else {
-            globalLastFeedingTime = nil
+            globalLastFeedingRecord = nil
             globalLastFeedingIsOngoing = false
         }
 
