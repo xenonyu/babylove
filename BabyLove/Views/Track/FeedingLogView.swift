@@ -322,8 +322,8 @@ struct FeedingLogView: View {
                                         .foregroundColor(.blTextSecondary)
                                     Spacer()
                                     Text(unit == .metric
-                                         ? "\(Int(amount)) ml"
-                                         : String(format: "%.1f oz", amount))
+                                         ? "\(Int(amount)) \(unit.volumeLabel)"
+                                         : String(format: "%.1f %@", amount, unit.volumeLabel))
                                         .font(.system(size: 17, weight: .bold))
                                         .foregroundColor(.blFeeding)
                                 }
