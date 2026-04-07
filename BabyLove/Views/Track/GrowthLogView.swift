@@ -18,6 +18,8 @@ struct GrowthLogView: View {
     @State private var showDatePicker = false
     @State private var previousRecord: CDGrowthRecord?
     @State private var showJumpConfirmation = false
+    /// Guards against double-tap creating duplicate records
+    @State private var isSaving = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -195,6 +197,7 @@ struct GrowthLogView: View {
                         Button(isEditing
                                ? NSLocalizedString("growthLog.updateMeasurements", comment: "")
                                : NSLocalizedString("growthLog.saveMeasurements", comment: "")) {
+                            guard !isSaving else { return }
                             // If there are jump warnings, ask the user to confirm before saving
                             if !jumpWarnings.isEmpty {
                                 showJumpConfirmation = true
@@ -203,8 +206,8 @@ struct GrowthLogView: View {
                             }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blGrowth))
-                        .disabled(!canSave)
-                        .opacity(canSave ? 1 : 0.5)
+                        .disabled(!canSave || isSaving)
+                        .opacity(canSave && !isSaving ? 1 : 0.5)
                         .padding(.top, 8)
 
                         if let warning = validationWarning {
@@ -279,6 +282,8 @@ struct GrowthLogView: View {
 
     /// Performs the actual save/update after any confirmations are resolved.
     private func performSave() {
+        guard !isSaving else { return }
+        isSaving = true
         let wKG: Double? = Self.parseMetric(weightKG, convert: unit.weightToKG, isEditing: isEditing)
         let hCM: Double? = Self.parseMetric(heightCM, convert: unit.lengthToCM, isEditing: isEditing)
         let hd: Double? = Self.parseMetric(headCM, convert: unit.lengthToCM, isEditing: isEditing)
@@ -294,7 +299,7 @@ struct GrowthLogView: View {
                                icon: ok ? "chart.bar.fill" : "exclamationmark.triangle.fill",
                                color: ok ? .blGrowth : .red)
         }
-        if ok { Haptic.success(); dismiss() } else { Haptic.error() }
+        if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
     }
 
     private func populateFromRecord() {

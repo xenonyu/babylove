@@ -33,6 +33,8 @@ struct FeedingLogView: View {
     @State private var isEditingOngoingFeeding = false
     /// Timer to keep the displayed elapsed duration up to date while editing an ongoing feeding
     @State private var elapsedTimer: Timer?
+    /// Guards against double-tap creating duplicate records
+    @State private var isSaving = false
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -347,6 +349,8 @@ struct FeedingLogView: View {
                         }
 
                         Button(buttonLabel) {
+                            guard !isSaving else { return }
+                            isSaving = true
                             let hasDuration = feedType == .breast || feedType == .pump
                             let hasAmount = feedType == .formula || feedType == .pump || feedType == .solid
                             // Zero out irrelevant fields to avoid stale data across type switches
@@ -398,11 +402,11 @@ struct FeedingLogView: View {
                                                    icon: ok ? "drop.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blFeeding : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
-                        .disabled(!canSave)
-                        .opacity(canSave ? 1 : 0.5)
+                        .disabled(!canSave || isSaving)
+                        .opacity(canSave && !isSaving ? 1 : 0.5)
                         .padding(.top, 8)
 
                         if isTimerMode && supportsTimer && !isEditing && hasExistingOngoingFeeding {

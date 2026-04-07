@@ -14,6 +14,8 @@ struct DiaperLogView: View {
     @State private var notes = ""
     @State private var timestamp = Date()
     @State private var showTimePicker = false
+    /// Guards against double-tap creating duplicate records
+    @State private var isSaving = false
     /// Whether the current timestamp falls on a different calendar day than today
     private var isTimestampPastDay: Bool {
         !Calendar.current.isDateInToday(timestamp)
@@ -130,6 +132,8 @@ struct DiaperLogView: View {
                         Button(isEditing
                                ? NSLocalizedString("diaperLog.updateDiaper", comment: "")
                                : NSLocalizedString("diaperLog.logDiaper", comment: "")) {
+                            guard !isSaving else { return }
+                            isSaving = true
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateDiaper(record, type: diaperType, notes: notes, timestamp: timestamp)
@@ -142,9 +146,10 @@ struct DiaperLogView: View {
                                                    icon: ok ? "oval.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blDiaper : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blDiaper))
+                        .disabled(isSaving)
                         .padding(.top, 8)
                     }
                     .padding(24)

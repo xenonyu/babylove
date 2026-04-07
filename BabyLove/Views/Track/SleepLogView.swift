@@ -20,6 +20,8 @@ struct SleepLogView: View {
     @State private var hasExistingOngoingSleep = false
     /// Timer that keeps the displayed ongoing duration up to date
     @State private var elapsedTimer: Timer?
+    /// Guards against double-tap creating duplicate records
+    @State private var isSaving = false
     /// Whether the start time falls on a different calendar day than today
     private var isStartTimePastDay: Bool {
         !Calendar.current.isDateInToday(startTime)
@@ -235,6 +237,8 @@ struct SleepLogView: View {
                                : (isOngoing
                                   ? NSLocalizedString("sleepLog.startTimer", comment: "")
                                   : NSLocalizedString("sleepLog.logSleep", comment: ""))) {
+                            guard !isSaving else { return }
+                            isSaving = true
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
@@ -252,11 +256,11 @@ struct SleepLogView: View {
                                                    icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blSleep : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error() }
+                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blSleep))
-                        .disabled(!canSave)
-                        .opacity(canSave ? 1 : 0.5)
+                        .disabled(!canSave || isSaving)
+                        .opacity(canSave && !isSaving ? 1 : 0.5)
                         .padding(.top, 8)
 
                         if !canSave && isOngoing && hasExistingOngoingSleep && !isEditing {
