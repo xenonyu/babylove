@@ -1487,6 +1487,25 @@ struct HomeView: View {
         return Double(weekDiapers.count) / currentWeekActiveDays
     }
 
+    /// Wet/dirty diaper breakdown for weekly summary (e.g. "Total 42 · 28💧 18💩")
+    private var weekDiaperBreakdownText: String {
+        guard !weekDiapers.isEmpty else { return "" }
+        var wet = 0, dirty = 0
+        for r in weekDiapers {
+            switch DiaperType(rawValue: r.diaperType ?? "") {
+            case .wet:   wet += 1
+            case .dirty: dirty += 1
+            case .both:  wet += 1; dirty += 1
+            case .dry, .none: break
+            }
+        }
+        var parts: [String] = []
+        parts.append(String(format: NSLocalizedString("home.weekly.total %lld", comment: ""), weekDiapers.count))
+        if wet > 0   { parts.append("\(wet)💧") }
+        if dirty > 0 { parts.append("\(dirty)💩") }
+        return parts.joined(separator: " · ")
+    }
+
     /// Average feedings per day previous week
     private var prevWeekAvgFeedings: Double {
         guard !prevWeekFeedings.isEmpty else { return 0 }
@@ -1607,7 +1626,7 @@ struct HomeView: View {
                     Divider().padding(.leading, 60)
                 }
 
-                // Row 3: Diapers
+                // Row 3: Diapers (with wet/dirty breakdown)
                 if !weekDiapers.isEmpty {
                     weeklyRow(
                         icon: "oval.fill",
@@ -1615,7 +1634,7 @@ struct HomeView: View {
                         title: NSLocalizedString("home.weekly.diapers", comment: ""),
                         value: String(format: "%.1f", weekAvgDiapers),
                         unit: NSLocalizedString("home.weekly.perDay", comment: ""),
-                        total: String(format: NSLocalizedString("home.weekly.total %lld", comment: ""), weekDiapers.count),
+                        total: weekDiaperBreakdownText,
                         current: weekAvgDiapers,
                         previous: prevWeekAvgDiapers
                     )
