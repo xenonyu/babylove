@@ -637,19 +637,22 @@ struct HomeView: View {
                                           color: .blFeeding,
                                           subtitle: feedingVolumeSubtitle,
                                           timeSince: isSelectedDateToday ? feedingTimeSince : nil,
-                                          timeSinceUrgency: isSelectedDateToday ? feedingUrgency : .normal)
+                                          timeSinceUrgency: isSelectedDateToday ? feedingUrgency : .normal,
+                                          onTap: { showFeedingLog = true })
                                 StatBadge(value: sleepText,
                                           label: NSLocalizedString("home.sleep", comment: ""),
                                           color: .blSleep,
                                           subtitle: sleepSubtitle,
                                           timeSince: isSelectedDateToday ? sleepTimeSince : nil,
-                                          timeSinceUrgency: isSelectedDateToday ? sleepUrgency : .normal)
+                                          timeSinceUrgency: isSelectedDateToday ? sleepUrgency : .normal,
+                                          onTap: { showSleepLog = true })
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: NSLocalizedString("home.diapers", comment: ""),
                                           color: .blDiaper,
                                           subtitle: diaperBreakdownSubtitle,
                                           timeSince: isSelectedDateToday ? diaperTimeSince : nil,
-                                          timeSinceUrgency: isSelectedDateToday ? diaperUrgency : .normal)
+                                          timeSinceUrgency: isSelectedDateToday ? diaperUrgency : .normal,
+                                          onTap: { showDiaperLog = true })
                             }
                             .padding(.horizontal, 20)
 

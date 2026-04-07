@@ -231,6 +231,8 @@ struct StatBadge: View {
     var timeSince: String? = nil
     /// Visual urgency for the timeSince label (default: normal grey)
     var timeSinceUrgency: TimeSinceUrgency = .normal
+    /// Optional tap action — when provided, the badge becomes tappable
+    var onTap: (() -> Void)? = nil
 
     private var accessibilityText: String {
         var parts = ["\(value) \(label)"]
@@ -247,7 +249,7 @@ struct StatBadge: View {
     }
 
     var body: some View {
-        VStack(spacing: 4) {
+        let content = VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(color)
@@ -274,6 +276,19 @@ struct StatBadge: View {
         .blCard()
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
+
+        if let onTap {
+            content
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    Haptic.light()
+                    onTap()
+                }
+                .accessibilityAddTraits(.isButton)
+                .accessibilityHint(String(format: NSLocalizedString("a11y.tapToLog %@", comment: ""), label.lowercased()))
+        } else {
+            content
+        }
     }
 }
 

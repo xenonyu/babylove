@@ -654,6 +654,7 @@
 "a11y.trackView.headCirc %@" = "頭囲 %@";
 "a11y.logAction %@"          = "%@を記録";
 "a11y.logHint %@"            = "ダブルタップで新しい%@を記録";
+"a11y.tapToLog %@"           = "タップして%@を記録";
 "a11y.babyPhoto %@"          = "%@の写真";
 "a11y.feedTypeOption %@"     = "%@の授乳";
 "a11y.breastSideOption %@"   = "%@側";

@@ -654,6 +654,7 @@
 "a11y.trackView.headCirc %@" = "头围 %@";
 "a11y.logAction %@"          = "记录%@";
 "a11y.logHint %@"            = "双击记录新的%@";
+"a11y.tapToLog %@"           = "点击记录%@";
 "a11y.babyPhoto %@"          = "%@的照片";
 "a11y.feedTypeOption %@"     = "%@喂养";
 "a11y.breastSideOption %@"   = "%@侧";

@@ -654,6 +654,7 @@
 "a11y.trackView.headCirc %@" = "head circumference %@";
 "a11y.logAction %@"          = "Log %@";
 "a11y.logHint %@"            = "Double tap to record a new %@ entry";
+"a11y.tapToLog %@"           = "Tap to log %@";
 "a11y.babyPhoto %@"          = "%@'s photo";
 "a11y.feedTypeOption %@"     = "%@ feeding";
 "a11y.breastSideOption %@"   = "%@ side";
