@@ -303,6 +303,7 @@ struct AllSleepsView: View {
     @State private var recordToEdit: CDSleepRecord?
     @State private var showAddSheet = false
     @State private var selectedFilter: SleepLocation? = nil
+    @State private var searchText = ""
 
     @FetchRequest(
         entity: CDSleepRecord.entity(),
@@ -310,8 +311,20 @@ struct AllSleepsView: View {
     ) private var records: FetchedResults<CDSleepRecord>
 
     private var filteredRecords: [CDSleepRecord] {
-        guard let filter = selectedFilter else { return Array(records) }
-        return records.filter { SleepLocation(rawValue: $0.location ?? "") == filter }
+        var result: [CDSleepRecord]
+        if let filter = selectedFilter {
+            result = records.filter { SleepLocation(rawValue: $0.location ?? "") == filter }
+        } else {
+            result = Array(records)
+        }
+        // Apply text search across notes and location name
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return result }
+        return result.filter { record in
+            if let notes = record.notes, notes.lowercased().contains(query) { return true }
+            if let loc = record.location, let sl = SleepLocation(rawValue: loc), sl.displayName.lowercased().contains(query) { return true }
+            return false
+        }
     }
 
     /// Count of records for a given sleep location (for chip badge)
@@ -333,14 +346,20 @@ struct AllSleepsView: View {
                     if filteredRecords.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
-                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            Image(systemName: !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "magnifyingglass" : "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blSleep.opacity(0.4))
-                            Text(String(localized: "allRecords.noFilteredSleeps \(selectedFilter?.displayName ?? "")"))
+                            Text(!searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                 ? String(format: NSLocalizedString("allRecords.noSearchResults %@", comment: ""), searchText)
+                                 : String(localized: "allRecords.noFilteredSleeps \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
+                                .multilineTextAlignment(.center)
                             Button {
-                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedFilter = nil
+                                    searchText = ""
+                                }
                             } label: {
                                 Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
@@ -384,6 +403,7 @@ struct AllSleepsView: View {
         }
         .navigationTitle(String(localized: "allRecords.allSleep"))
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: String(localized: "allRecords.searchSleep"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showAddSheet = true } label: {

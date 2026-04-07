@@ -308,6 +308,7 @@
 "allRecords.noFilteredGrowth %@"   = "%@ 기록 없음";
 "allRecords.showAll"               = "모두 보기";
 "allRecords.searchFeedings"        = "메모, 유형 검색…";
+"allRecords.searchSleep"           = "메모, 장소 검색…";
 "allRecords.noSearchResults %@"    = "\"%@\" 결과 없음";
 "allRecords.filterAll"             = "전체";
 "allRecords.inProgress"            = "진행 중";
