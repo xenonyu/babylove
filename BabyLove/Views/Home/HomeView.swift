@@ -44,7 +44,7 @@ struct HomeView: View {
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingTime: Date?
     @State private var globalLastFeedingIsOngoing: Bool = false
-    @State private var globalLastSleepEnd: Date?
+    @State private var globalLastSleepRecord: CDSleepRecord?
     @State private var globalLastSleepIsOngoing: Bool = false
     @State private var globalLastDiaperRecord: CDDiaperRecord?
     @State private var globalLastGrowthRecord: CDGrowthRecord?
@@ -308,7 +308,8 @@ struct HomeView: View {
     private var sleepTimeSince: String {
         _ = minuteTick
         if globalLastSleepIsOngoing { return NSLocalizedString("home.sleepingNow", comment: "") }
-        return Self.timeSinceText(from: globalLastSleepEnd)
+        let sleepEndDate = globalLastSleepRecord?.endTime
+        return Self.timeSinceText(from: sleepEndDate)
     }
 
     /// Time since last diaper change (global).
@@ -445,12 +446,24 @@ struct HomeView: View {
     }
 
     /// Contextual hint for the Sleep quick log card.
+    /// Shows the last sleep location and time elapsed (e.g. "Crib · 2h ago").
     /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogSleepHint: String? {
         _ = minuteTick
-        if globalLastSleepIsOngoing { return NSLocalizedString("home.sleepingNow", comment: "") }
-        guard let lastTime = globalLastSleepEnd else { return nil }
-        return Self.timeSinceText(from: lastTime)
+        if globalLastSleepIsOngoing {
+            // Show location during ongoing sleep if available (e.g. "Crib · Sleeping")
+            if let loc = globalLastSleepRecord?.location,
+               let sl = SleepLocation(rawValue: loc) {
+                return "\(sl.displayName) · \(NSLocalizedString("home.sleepingNow", comment: ""))"
+            }
+            return NSLocalizedString("home.sleepingNow", comment: "")
+        }
+        guard let record = globalLastSleepRecord, let lastTime = record.endTime else { return nil }
+        let timeSince = Self.timeSinceText(from: lastTime)
+        if let loc = record.location, let sl = SleepLocation(rawValue: loc) {
+            return "\(sl.displayName) · \(timeSince)"
+        }
+        return timeSince
     }
 
     /// Contextual hint for the Diaper quick log card.
@@ -857,15 +870,10 @@ struct HomeView: View {
         sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: false)]
         sleepReq.fetchLimit = 1
         if let lastSleep = (try? ctx.fetch(sleepReq))?.first {
-            if lastSleep.endTime == nil {
-                globalLastSleepEnd = lastSleep.startTime
-                globalLastSleepIsOngoing = true
-            } else {
-                globalLastSleepEnd = lastSleep.endTime
-                globalLastSleepIsOngoing = false
-            }
+            globalLastSleepRecord = lastSleep
+            globalLastSleepIsOngoing = lastSleep.endTime == nil
         } else {
-            globalLastSleepEnd = nil
+            globalLastSleepRecord = nil
             globalLastSleepIsOngoing = false
         }
 
