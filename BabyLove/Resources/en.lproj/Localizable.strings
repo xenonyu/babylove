@@ -153,6 +153,7 @@
 "home.showingLatest %lld"  = "Showing latest 20 of %lld events";
 "home.showAllEvents %lld"  = "Show all %lld events";
 "home.showLess"            = "Show less";
+"home.timeline.all"        = "All";
 "home.backToToday"         = "Back to Today";
 "home.streakDays %lld"     = "%lldd";
 "home.streak %lld"         = "%lld-day logging streak";

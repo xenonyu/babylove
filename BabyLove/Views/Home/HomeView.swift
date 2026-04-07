@@ -42,6 +42,8 @@ struct HomeView: View {
     @State private var activeDays: Set<Date> = []
     /// Whether the timeline is expanded to show all events (beyond the default 20)
     @State private var isTimelineExpanded = false
+    /// Filter for the daily timeline (nil = show all record types)
+    @State private var timelineFilter: TimelineRecordType? = nil
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingRecord: CDFeedingRecord?
@@ -756,6 +758,7 @@ struct HomeView: View {
             }
             .onChange(of: selectedDate) { _, _ in
                 isTimelineExpanded = false
+                timelineFilter = nil
                 withAnimation(.easeInOut(duration: 0.2)) {
                     updatePredicates()
                 }
@@ -2042,6 +2045,38 @@ struct HomeView: View {
     @State private var growthToEdit: CDGrowthRecord?
     @State private var timelineRecordToDelete: NSManagedObject?
 
+    /// Record type for filtering the daily timeline
+    enum TimelineRecordType: String, CaseIterable {
+        case feeding, sleep, diaper, growth
+
+        var label: String {
+            switch self {
+            case .feeding: return NSLocalizedString("home.feeding", comment: "")
+            case .sleep:   return NSLocalizedString("home.sleep", comment: "")
+            case .diaper:  return NSLocalizedString("home.diaper", comment: "")
+            case .growth:  return NSLocalizedString("home.growth", comment: "")
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .feeding: return "drop.fill"
+            case .sleep:   return "moon.zzz.fill"
+            case .diaper:  return "oval.fill"
+            case .growth:  return "chart.bar.fill"
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .feeding: return .blFeeding
+            case .sleep:   return .blSleep
+            case .diaper:  return .blDiaper
+            case .growth:  return .blGrowth
+            }
+        }
+    }
+
     /// A unified activity item for the chronological timeline.
     private struct ActivityItem: Identifiable {
         enum RecordRef {
@@ -2059,6 +2094,7 @@ struct HomeView: View {
         let timeLabel: String
         let notes: String?
         let record: RecordRef
+        let recordType: TimelineRecordType
     }
 
     /// Build a merged, reverse-chronological list of all activities for the selected day.
@@ -2081,7 +2117,8 @@ struct HomeView: View {
                 detail: feedingDetail(r),
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
                 notes: r.notes,
-                record: .feeding(r)
+                record: .feeding(r),
+                recordType: .feeding
             ))
         }
 
@@ -2141,7 +2178,8 @@ struct HomeView: View {
                 detail: detail,
                 timeLabel: timeLabel,
                 notes: r.notes,
-                record: .sleep(r)
+                record: .sleep(r),
+                recordType: .sleep
             ))
         }
 
@@ -2161,7 +2199,8 @@ struct HomeView: View {
                 detail: diaperDetail,
                 timeLabel: ts.formatted(date: .omitted, time: .shortened),
                 notes: r.notes,
-                record: .diaper(r)
+                record: .diaper(r),
+                recordType: .diaper
             ))
         }
 
@@ -2190,7 +2229,8 @@ struct HomeView: View {
                 detail: detail,
                 timeLabel: d.formatted(date: .omitted, time: .shortened),
                 notes: r.notes,
-                record: .growth(r)
+                record: .growth(r),
+                recordType: .growth
             ))
         }
 
@@ -2198,8 +2238,75 @@ struct HomeView: View {
         return items.sorted { $0.date > $1.date }
     }
 
+    /// Compact filter chip bar for the daily timeline
+    @ViewBuilder
+    private func timelineFilterChips(allItems: [ActivityItem]) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                // "All" chip
+                let isAllSelected = timelineFilter == nil
+                Button {
+                    Haptic.selection()
+                    withAnimation(.spring(response: 0.3)) {
+                        timelineFilter = nil
+                        isTimelineExpanded = false
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "square.grid.2x2")
+                            .font(.system(size: 10, weight: .medium))
+                        Text(NSLocalizedString("home.timeline.all", comment: ""))
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(isAllSelected ? .white : .blPrimary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(isAllSelected ? Color.blPrimary : Color.blPrimary.opacity(0.1))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(NSLocalizedString("home.timeline.all", comment: ""))
+                .accessibilityAddTraits(isAllSelected ? .isSelected : [])
+
+                // Per-type chips (only show types that have items)
+                ForEach(TimelineRecordType.allCases, id: \.self) { type in
+                    let count = allItems.filter { $0.recordType == type }.count
+                    if count > 0 {
+                        let isSelected = timelineFilter == type
+                        Button {
+                            Haptic.selection()
+                            withAnimation(.spring(response: 0.3)) {
+                                timelineFilter = isSelected ? nil : type
+                                isTimelineExpanded = false
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: type.icon)
+                                    .font(.system(size: 10, weight: .medium))
+                                Text("\(type.label)")
+                                    .font(.system(size: 12, weight: .medium))
+                                Text("\(count)")
+                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    .foregroundColor(isSelected ? .white.opacity(0.8) : type.color.opacity(0.6))
+                            }
+                            .foregroundColor(isSelected ? .white : type.color)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(isSelected ? type.color : type.color.opacity(0.1))
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(type.label), \(count)")
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    }
+                }
+            }
+        }
+    }
+
     private var recentActivitySection: some View {
-        let items = timelineItems
+        let allItems = timelineItems
+        let items = timelineFilter == nil ? allItems : allItems.filter { $0.recordType == timelineFilter }
         let previewLimit = 20
         let displayItems = isTimelineExpanded ? items : Array(items.prefix(previewLimit))
         let hasMore = items.count > previewLimit
@@ -2215,6 +2322,12 @@ struct HomeView: View {
                 }
             }
             .padding(.horizontal, 20)
+
+            // Filter chips — shown when 5+ events for meaningful filtering
+            if allItems.count >= 5 {
+                timelineFilterChips(allItems: allItems)
+                    .padding(.horizontal, 20)
+            }
 
             VStack(spacing: 1) {
                 ForEach(Array(displayItems.enumerated()), id: \.element.id) { index, item in

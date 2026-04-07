@@ -153,6 +153,7 @@
 "home.showingLatest %lld"  = "最新20件を表示（全%lld件）";
 "home.showAllEvents %lld"  = "全%lld件を表示";
 "home.showLess"            = "折りたたむ";
+"home.timeline.all"        = "すべて";
 "home.backToToday"         = "今日に戻る";
 "home.streakDays %lld"     = "%lld日";
 "home.streak %lld"         = "%lld日連続記録中";
