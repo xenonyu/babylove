@@ -10,6 +10,7 @@ struct AllFeedingsView: View {
     @State private var recordToEdit: CDFeedingRecord?
     @State private var showAddSheet = false
     @State private var selectedFilter: FeedType? = nil
+    @State private var searchText = ""
 
     @FetchRequest(
         entity: CDFeedingRecord.entity(),
@@ -17,8 +18,21 @@ struct AllFeedingsView: View {
     ) private var records: FetchedResults<CDFeedingRecord>
 
     private var filteredRecords: [CDFeedingRecord] {
-        guard let filter = selectedFilter else { return Array(records) }
-        return records.filter { FeedType(rawValue: $0.feedType ?? "") == filter }
+        var result: [CDFeedingRecord]
+        if let filter = selectedFilter {
+            result = records.filter { FeedType(rawValue: $0.feedType ?? "") == filter }
+        } else {
+            result = Array(records)
+        }
+        // Apply text search across notes, feed type, and breast side
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return result }
+        return result.filter { record in
+            if let notes = record.notes, notes.lowercased().contains(query) { return true }
+            if let ft = FeedType(rawValue: record.feedType ?? ""), ft.displayName.lowercased().contains(query) { return true }
+            if let side = record.breastSide, let bs = BreastSide(rawValue: side), bs.displayName.lowercased().contains(query) { return true }
+            return false
+        }
     }
 
     /// Count of records for a given feed type (for chip badge)
@@ -40,14 +54,20 @@ struct AllFeedingsView: View {
                     if filteredRecords.isEmpty {
                         VStack(spacing: 12) {
                             Spacer()
-                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            Image(systemName: !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "magnifyingglass" : "line.3.horizontal.decrease.circle")
                                 .font(.system(size: 36))
                                 .foregroundColor(.blFeeding.opacity(0.4))
-                            Text(String(localized: "allRecords.noFilteredFeedings \(selectedFilter?.displayName ?? "")"))
+                            Text(!searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                 ? String(format: NSLocalizedString("allRecords.noSearchResults %@", comment: ""), searchText)
+                                 : String(localized: "allRecords.noFilteredFeedings \(selectedFilter?.displayName ?? "")"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
+                                .multilineTextAlignment(.center)
                             Button {
-                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                                withAnimation(.spring(response: 0.3)) {
+                                    searchText = ""
+                                    selectedFilter = nil
+                                }
                             } label: {
                                 Text(String(localized: "allRecords.showAll"))
                                     .font(.system(size: 14, weight: .semibold))
@@ -91,6 +111,10 @@ struct AllFeedingsView: View {
         }
         .navigationTitle(String(localized: "allRecords.allFeedings"))
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(
+            text: $searchText,
+            prompt: NSLocalizedString("allRecords.searchFeedings", comment: "")
+        )
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showAddSheet = true } label: {

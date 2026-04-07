@@ -307,6 +307,8 @@
 "allRecords.noFilteredDiapers %@"  = "没有%@尿布记录";
 "allRecords.noFilteredGrowth %@"   = "没有%@记录";
 "allRecords.showAll"               = "显示全部";
+"allRecords.searchFeedings"        = "搜索备注、类型…";
+"allRecords.noSearchResults %@"    = "未找到\"%@\"的结果";
 "allRecords.filterAll"             = "全部";
 "allRecords.inProgress"            = "进行中";
 "allRecords.timerRunning"          = "计时中";

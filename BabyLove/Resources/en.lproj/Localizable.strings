@@ -307,6 +307,8 @@
 "allRecords.noFilteredDiapers %@"  = "No %@ diaper records found";
 "allRecords.noFilteredGrowth %@"   = "No %@ records found";
 "allRecords.showAll"               = "Show All";
+"allRecords.searchFeedings"        = "Search notes, type…";
+"allRecords.noSearchResults %@"    = "No results for \"%@\"";
 "allRecords.filterAll"             = "All";
 "allRecords.inProgress"            = "In Progress";
 "allRecords.timerRunning"          = "Timer Running";

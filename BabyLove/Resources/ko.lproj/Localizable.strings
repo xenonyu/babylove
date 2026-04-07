@@ -307,6 +307,8 @@
 "allRecords.noFilteredDiapers %@"  = "%@ 기저귀 기록 없음";
 "allRecords.noFilteredGrowth %@"   = "%@ 기록 없음";
 "allRecords.showAll"               = "모두 보기";
+"allRecords.searchFeedings"        = "메모, 유형 검색…";
+"allRecords.noSearchResults %@"    = "\"%@\" 결과 없음";
 "allRecords.filterAll"             = "전체";
 "allRecords.inProgress"            = "진행 중";
 "allRecords.timerRunning"          = "타이머 작동 중";

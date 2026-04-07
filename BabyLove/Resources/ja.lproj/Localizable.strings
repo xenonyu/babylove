@@ -307,6 +307,8 @@
 "allRecords.noFilteredDiapers %@"  = "%@のおむつ記録はありません";
 "allRecords.noFilteredGrowth %@"   = "%@の記録はありません";
 "allRecords.showAll"               = "すべて表示";
+"allRecords.searchFeedings"        = "メモ、種類で検索…";
+"allRecords.noSearchResults %@"    = "「%@」の結果なし";
 "allRecords.filterAll"             = "すべて";
 "allRecords.inProgress"            = "進行中";
 "allRecords.timerRunning"          = "タイマー稼働中";
