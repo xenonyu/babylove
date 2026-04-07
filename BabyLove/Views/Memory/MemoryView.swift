@@ -9,6 +9,7 @@ struct MemoryView: View {
     @State private var milestoneToEdit: CDMilestone?
     @State private var milestoneToDelete: CDMilestone?
     @State private var selectedFilter: MilestoneFilter = .all
+    @State private var searchText = ""
 
     enum MilestoneFilter: Hashable {
         case all
@@ -46,11 +47,27 @@ struct MemoryView: View {
     ) private var milestones: FetchedResults<CDMilestone>
 
     private var filteredMilestones: [CDMilestone] {
+        var result: [CDMilestone]
         switch selectedFilter {
         case .all:
-            return Array(milestones)
+            result = Array(milestones)
         case .category(let cat):
-            return milestones.filter { $0.category == cat.rawValue }
+            result = milestones.filter { $0.category == cat.rawValue }
+        }
+        // Apply text search across title, notes, and category display name
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return result }
+        return result.filter { m in
+            if let title = m.title, title.lowercased().contains(query) { return true }
+            if let notes = m.notes, notes.lowercased().contains(query) { return true }
+            if let cat = m.category, let mc = MilestoneCategory(rawValue: cat),
+               mc.displayName.lowercased().contains(query) { return true }
+            // Search by date text (e.g. "April", "2026")
+            if let date = m.date {
+                let dateStr = BLDateFormatters.yearMonth.string(from: date).lowercased()
+                if dateStr.contains(query) { return true }
+            }
+            return false
         }
     }
 
@@ -154,6 +171,7 @@ struct MemoryView: View {
             }
             .navigationTitle(String(localized: "memory.title"))
             .navigationBarTitleDisplayMode(.large)
+            .searchable(text: $searchText, prompt: String(localized: "memory.searchPlaceholder"))
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -294,19 +312,35 @@ struct MemoryView: View {
     // MARK: - No Results for Filter
 
     private var noResultsState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: selectedFilter.icon)
+        let isSearching = !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        return VStack(spacing: 12) {
+            Image(systemName: isSearching ? "magnifyingglass" : selectedFilter.icon)
                 .font(.system(size: 36))
-                .foregroundColor(selectedFilter.color.opacity(0.4))
-            Text(String(format: String(localized: "memory.noMilestones"), selectedFilter.label.lowercased()))
+                .foregroundColor((isSearching ? .blPrimary : selectedFilter.color).opacity(0.4))
+            Text(isSearching
+                 ? String(format: NSLocalizedString("memory.noSearchResults %@", comment: ""), searchText)
+                 : String(format: String(localized: "memory.noMilestones"), selectedFilter.label.lowercased()))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.blTextSecondary)
-            Button {
-                showAddMilestone = true
-            } label: {
-                Text("memory.addOne")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(selectedFilter.color)
+                .multilineTextAlignment(.center)
+            if isSearching {
+                Button {
+                    withAnimation(.spring(response: 0.3)) {
+                        searchText = ""
+                    }
+                } label: {
+                    Text(String(localized: "memory.clearSearch"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blPrimary)
+                }
+            } else {
+                Button {
+                    showAddMilestone = true
+                } label: {
+                    Text("memory.addOne")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(selectedFilter.color)
+                }
             }
         }
         .frame(maxWidth: .infinity)

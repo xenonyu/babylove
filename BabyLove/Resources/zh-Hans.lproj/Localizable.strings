@@ -568,6 +568,9 @@
 "memory.updated"            = "里程碑已更新";
 "memory.saveFailed"         = "保存失败，请重试";
 "memory.filterAll"          = "全部";
+"memory.searchPlaceholder"  = "搜索里程碑…";
+"memory.noSearchResults %@" = "没有匹配「%@」的里程碑";
+"memory.clearSearch"        = "清除搜索";
 
 /* ===== Accessibility 无障碍 ===== */
 "a11y.previousDay"         = "前一天";

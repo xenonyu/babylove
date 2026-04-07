@@ -568,6 +568,9 @@
 "memory.updated"            = "Milestone updated";
 "memory.saveFailed"         = "Save failed — try again";
 "memory.filterAll"          = "All";
+"memory.searchPlaceholder"  = "Search milestones…";
+"memory.noSearchResults %@" = "No milestones matching \"%@\"";
+"memory.clearSearch"        = "Clear Search";
 
 /* ===== Accessibility ===== */
 "a11y.previousDay"         = "Previous day";

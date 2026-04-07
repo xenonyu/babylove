@@ -568,6 +568,9 @@
 "memory.updated"            = "마일스톤이 업데이트되었습니다";
 "memory.saveFailed"         = "저장 실패 — 다시 시도해 주세요";
 "memory.filterAll"          = "전체";
+"memory.searchPlaceholder"  = "마일스톤 검색…";
+"memory.noSearchResults %@" = "\"%@\"와 일치하는 마일스톤이 없습니다";
+"memory.clearSearch"        = "검색 지우기";
 
 /* ===== Accessibility 접근성 ===== */
 "a11y.previousDay"         = "이전 날";

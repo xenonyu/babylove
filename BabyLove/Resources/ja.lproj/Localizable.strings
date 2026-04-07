@@ -568,6 +568,9 @@
 "memory.updated"            = "マイルストーンを更新しました";
 "memory.saveFailed"         = "保存に失敗しました。もう一度お試しください";
 "memory.filterAll"          = "すべて";
+"memory.searchPlaceholder"  = "マイルストーンを検索…";
+"memory.noSearchResults %@" = "「%@」に一致するマイルストーンはありません";
+"memory.clearSearch"        = "検索をクリア";
 
 /* ===== Accessibility アクセシビリティ ===== */
 "a11y.previousDay"         = "前日";
