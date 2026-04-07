@@ -14,6 +14,9 @@ struct SleepLogView: View {
     @State private var startTime = Date().addingTimeInterval(-3600)
     @State private var endTime   = Date()
     @State private var location: SleepLocation = .crib
+
+    /// UserDefaults key for remembering the last-used sleep location
+    private static let lastLocationKey = "lastSleepLocation"
     @State private var notes = ""
     @State private var isOngoing = false
     /// True when another sleep timer is already running (prevents duplicates)
@@ -267,7 +270,11 @@ struct SleepLogView: View {
                                                    icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blSleep : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
+                            if ok {
+                                Self.saveLastLocation(location)
+                                Haptic.success()
+                                dismiss()
+                            } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blSleep))
                         .disabled(!canSave || isSaving)
@@ -312,6 +319,7 @@ struct SleepLogView: View {
                     startTime = initialDate.addingTimeInterval(-3600)
                     endTime = initialDate
                 }
+                if !isEditing { restoreLastLocation() }
                 checkExistingOngoingSleep()
                 updateOngoingElapsed()
                 startElapsedTimerIfNeeded()
@@ -453,5 +461,19 @@ struct SleepLogView: View {
         location = SleepLocation(rawValue: r.location ?? "") ?? .crib
         notes = r.notes ?? ""
         isOngoing = (r.endTime == nil)
+    }
+
+    // MARK: - Remember Last Sleep Location
+
+    /// Restore the last-used sleep location so the user doesn't have to re-select every time.
+    private func restoreLastLocation() {
+        guard let raw = UserDefaults.standard.string(forKey: Self.lastLocationKey),
+              let saved = SleepLocation(rawValue: raw) else { return }
+        location = saved
+    }
+
+    /// Persist the selected sleep location for next time.
+    private static func saveLastLocation(_ loc: SleepLocation) {
+        UserDefaults.standard.set(loc.rawValue, forKey: lastLocationKey)
     }
 }
