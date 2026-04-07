@@ -132,7 +132,11 @@ struct QuickLogCard: View {
     let color: Color
     /// Optional contextual hint shown below the label (e.g. "2h ago", "Next: Right")
     var hint: String? = nil
+    /// When true, shows a pulsing ring animation indicating an active timer (ongoing sleep/feeding)
+    var isActive: Bool = false
     let action: () -> Void
+
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
         Button {
@@ -141,16 +145,42 @@ struct QuickLogCard: View {
         } label: {
             VStack(spacing: 8) {
                 ZStack {
+                    // Pulsing outer ring for active timers
+                    if isActive {
+                        Circle()
+                            .stroke(color.opacity(0.3), lineWidth: 2)
+                            .frame(width: 62, height: 62)
+                            .scaleEffect(pulseScale)
+                            .opacity(Double(2.0 - pulseScale))
+                        Circle()
+                            .stroke(color.opacity(0.5), lineWidth: 1.5)
+                            .frame(width: 56, height: 56)
+                    }
+
                     Circle()
-                        .fill(color.opacity(0.15))
+                        .fill(isActive ? color.opacity(0.25) : color.opacity(0.15))
                         .frame(width: 56, height: 56)
                     Image(systemName: icon)
                         .font(.system(size: 24, weight: .medium))
                         .foregroundColor(color)
+
+                    // Small "live" dot indicator in top-right
+                    if isActive {
+                        Circle()
+                            .fill(color)
+                            .frame(width: 10, height: 10)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.blCard, lineWidth: 2)
+                            )
+                            .offset(x: 20, y: -20)
+                    }
                 }
+                .frame(width: 62, height: 62)
+
                 Text(label)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.blTextSecondary)
+                    .font(.system(size: 13, weight: isActive ? .semibold : .medium))
+                    .foregroundColor(isActive ? color : .blTextSecondary)
                     .multilineTextAlignment(.center)
                 if let hint, !hint.isEmpty {
                     Text(hint)
@@ -165,10 +195,21 @@ struct QuickLogCard: View {
             .blCard()
         }
         .buttonStyle(.plain)
+        .onAppear { if isActive { startPulse() } }
+        .onChange(of: isActive) { _, active in
+            if active { startPulse() } else { pulseScale = 1.0 }
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(quickLogAccessibilityLabel)
         .accessibilityHint(String(format: NSLocalizedString("a11y.logHint %@", comment: ""), label.lowercased()))
         .accessibilityAddTraits(.isButton)
+    }
+
+    private func startPulse() {
+        pulseScale = 1.0
+        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+            pulseScale = 1.25
+        }
     }
 
     /// Combine the action label with the contextual hint for VoiceOver users,

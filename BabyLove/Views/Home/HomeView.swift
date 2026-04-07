@@ -1006,11 +1006,13 @@ struct HomeView: View {
                                 QuickLogCard(icon: "drop.fill",
                                              label: NSLocalizedString("home.feeding", comment: ""),
                                              color: .blFeeding,
-                                             hint: isSelectedDateToday ? quickLogFeedingHint : nil) { showFeedingLog = true }
+                                             hint: isSelectedDateToday ? quickLogFeedingHint : nil,
+                                             isActive: isSelectedDateToday && globalLastFeedingIsOngoing) { showFeedingLog = true }
                                 QuickLogCard(icon: "moon.zzz.fill",
                                              label: NSLocalizedString("home.sleep", comment: ""),
                                              color: .blSleep,
-                                             hint: isSelectedDateToday ? quickLogSleepHint : nil) { showSleepLog = true }
+                                             hint: isSelectedDateToday ? quickLogSleepHint : nil,
+                                             isActive: isSelectedDateToday && globalLastSleepIsOngoing) { showSleepLog = true }
                                 QuickLogCard(icon: "oval.fill",
                                              label: NSLocalizedString("home.diaper", comment: ""),
                                              color: .blDiaper,

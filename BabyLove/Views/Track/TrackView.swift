@@ -171,11 +171,13 @@ struct TrackView: View {
                                 QuickLogCard(icon: "drop.fill",
                                              label: String(localized: "track.feeding"),
                                              color: .blFeeding,
-                                             hint: feedingHint) { showFeedingLog = true }
+                                             hint: feedingHint,
+                                             isActive: isFeedingActive) { showFeedingLog = true }
                                 QuickLogCard(icon: "moon.zzz.fill",
                                              label: String(localized: "track.sleep"),
                                              color: .blSleep,
-                                             hint: sleepHint) { showSleepLog = true }
+                                             hint: sleepHint,
+                                             isActive: isSleepActive) { showSleepLog = true }
                                 QuickLogCard(icon: "oval.fill",
                                              label: String(localized: "track.diaper"),
                                              color: .blDiaper,
@@ -492,6 +494,18 @@ struct TrackView: View {
         let ft = FeedType(rawValue: r.feedType ?? "")
         let isTimerType = ft == .breast || ft == .pump
         return isTimerType && r.durationMinutes == 0
+    }
+
+    /// Whether there's an ongoing feeding timer (for QuickLogCard pulse animation)
+    private var isFeedingActive: Bool {
+        guard let first = recentFeedings.first else { return false }
+        return Self.isFeedingOngoing(first)
+    }
+
+    /// Whether there's an ongoing sleep session (for QuickLogCard pulse animation)
+    private var isSleepActive: Bool {
+        guard let first = recentSleeps.first else { return false }
+        return first.endTime == nil
     }
 
     private func feedingRow(_ r: CDFeedingRecord) -> some View {
