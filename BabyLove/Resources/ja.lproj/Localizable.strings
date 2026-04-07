@@ -493,6 +493,10 @@
 "growth.percentile %lld"  = "パーセンタイル %lld";
 "growth.measured %@"      = "%@ に測定";
 "growth.a11y.delta %@"    = "変化 %@";
+"growth.a11y.inDays %lld" = "%lld日間";
+"growth.spanDays %lld"    = "%lld日";
+"growth.spanWeeks %lld"   = "%lld週";
+"growth.spanMonths %lld"  = "%lldヶ月";
 "growth.viewChart %@"     = "ダブルタップで%@グラフを表示";
 "growth.outsideRange"     = "正常範囲外";
 "growth.worthMonitoring"  = "経過観察推奨";

@@ -232,6 +232,30 @@ struct GrowthView: View {
         return delta
     }
 
+    /// Number of days between the two most recent measurements for a given metric.
+    /// Returns nil if there aren't two dated records to compare.
+    private func deltaSpanDays(for metric: GrowthMetric) -> Int? {
+        guard let latest = latestRecord(for: metric),
+              let previous = previousRecord(for: metric),
+              let latestDate = latest.date,
+              let prevDate = previous.date else { return nil }
+        let days = Calendar.current.dateComponents([.day], from: prevDate, to: latestDate).day ?? 0
+        return days > 0 ? days : nil
+    }
+
+    /// Compact, human-readable span label (e.g. "3d", "2w", "1mo").
+    private static func shortSpanLabel(_ days: Int) -> String {
+        if days < 14 {
+            return String(format: NSLocalizedString("growth.spanDays %lld", comment: ""), days)
+        } else if days < 60 {
+            let weeks = days / 7
+            return String(format: NSLocalizedString("growth.spanWeeks %lld", comment: ""), weeks)
+        } else {
+            let months = days / 30
+            return String(format: NSLocalizedString("growth.spanMonths %lld", comment: ""), months)
+        }
+    }
+
     /// Calculate the baby's WHO percentile for a given metric using the latest record.
     /// Returns nil if baby gender is .other, no data, or age out of WHO range.
     private func whoPercentile(for metric: GrowthMetric) -> Int? {
@@ -380,6 +404,9 @@ struct GrowthView: View {
         let weightDelta = metricDelta(for: .weight, unit: unit)
         let heightDelta = metricDelta(for: .height, unit: unit)
         let headDelta   = metricDelta(for: .head, unit: unit)
+        let weightSpan  = deltaSpanDays(for: .weight)
+        let heightSpan  = deltaSpanDays(for: .height)
+        let headSpan    = deltaSpanDays(for: .head)
 
         return HStack(spacing: 0) {
             // Weight
@@ -391,6 +418,7 @@ struct GrowthView: View {
                 percentile: weightPctl,
                 delta: weightDelta,
                 deltaFormat: "%.2f",
+                deltaSpanDays: weightSpan,
                 measureDate: latestWeight?.date
             ) { selectedMetric = .weight }
 
@@ -405,6 +433,7 @@ struct GrowthView: View {
                 percentile: heightPctl,
                 delta: heightDelta,
                 deltaFormat: "%.1f",
+                deltaSpanDays: heightSpan,
                 measureDate: latestHeight?.date
             ) { selectedMetric = .height }
 
@@ -419,6 +448,7 @@ struct GrowthView: View {
                 percentile: headPctl,
                 delta: headDelta,
                 deltaFormat: "%.1f",
+                deltaSpanDays: headSpan,
                 measureDate: latestHead?.date
             ) { selectedMetric = .head }
         }
@@ -434,7 +464,7 @@ struct GrowthView: View {
             .frame(width: 1, height: 54)
     }
 
-    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, delta: Double? = nil, deltaFormat: String = "%.1f", measureDate: Date? = nil, action: @escaping () -> Void) -> some View {
+    private func metricColumn(value: String?, label: String, icon: String, isSelected: Bool, percentile: Int? = nil, delta: Double? = nil, deltaFormat: String = "%.1f", deltaSpanDays: Int? = nil, measureDate: Date? = nil, action: @escaping () -> Void) -> some View {
         Button(action: {
             Haptic.selection()
             withAnimation(.spring(response: 0.3)) { action() }
@@ -453,17 +483,20 @@ struct GrowthView: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(isSelected ? .blGrowth : .blTextTertiary)
 
-                // Growth delta from previous measurement (e.g. "+0.30")
+                // Growth delta from previous measurement (e.g. "+0.30 · 14d")
                 if let delta {
                     let sign = delta > 0 ? "+" : ""
-                    let text = "\(sign)\(String(format: deltaFormat, delta))"
+                    let deltaText = "\(sign)\(String(format: deltaFormat, delta))"
+                    let spanText = deltaSpanDays.map { " · \(Self.shortSpanLabel($0))" } ?? ""
                     HStack(spacing: 2) {
                         Image(systemName: delta > 0 ? "arrow.up.right" : "arrow.down.right")
                             .font(.system(size: 8, weight: .bold))
-                        Text(text)
+                        Text("\(deltaText)\(spanText)")
                             .font(.system(size: 10, weight: .semibold, design: .rounded))
                     }
                     .foregroundColor(delta > 0 ? .blTeal : .blPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 }
 
                 // WHO percentile badge
@@ -490,13 +523,13 @@ struct GrowthView: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(metricAccessibilityLabel(value: value, label: label, percentile: percentile, delta: delta, deltaFormat: deltaFormat, measureDate: measureDate))
+        .accessibilityLabel(metricAccessibilityLabel(value: value, label: label, percentile: percentile, delta: delta, deltaFormat: deltaFormat, deltaSpanDays: deltaSpanDays, measureDate: measureDate))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityHint(String(localized: "growth.viewChart \(label)"))
     }
 
     /// Build a comprehensive VoiceOver label for a metric column
-    private func metricAccessibilityLabel(value: String?, label: String, percentile: Int?, delta: Double? = nil, deltaFormat: String = "%.1f", measureDate: Date?) -> String {
+    private func metricAccessibilityLabel(value: String?, label: String, percentile: Int?, delta: Double? = nil, deltaFormat: String = "%.1f", deltaSpanDays: Int? = nil, measureDate: Date?) -> String {
         var parts: [String] = [label]
         if let value {
             parts.append(value)
@@ -506,7 +539,11 @@ struct GrowthView: View {
         if let delta {
             let sign = delta > 0 ? "+" : ""
             let formatted = "\(sign)\(String(format: deltaFormat, delta))"
-            parts.append(String(format: NSLocalizedString("growth.a11y.delta %@", comment: ""), formatted))
+            var deltaLabel = String(format: NSLocalizedString("growth.a11y.delta %@", comment: ""), formatted)
+            if let days = deltaSpanDays {
+                deltaLabel += " \(String(format: NSLocalizedString("growth.a11y.inDays %lld", comment: ""), days))"
+            }
+            parts.append(deltaLabel)
         }
         if let pctl = percentile {
             let range = percentileRangeDescription(pctl)

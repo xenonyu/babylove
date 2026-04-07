@@ -493,6 +493,10 @@
 "growth.percentile %lld"  = "percentile %lld";
 "growth.measured %@"      = "measured %@";
 "growth.a11y.delta %@"    = "change %@";
+"growth.a11y.inDays %lld" = "in %lld days";
+"growth.spanDays %lld"    = "%lldd";
+"growth.spanWeeks %lld"   = "%lldw";
+"growth.spanMonths %lld"  = "%lldmo";
 "growth.viewChart %@"     = "Double tap to view %@ chart";
 "growth.outsideRange"     = "outside normal range";
 "growth.worthMonitoring"  = "worth monitoring";
