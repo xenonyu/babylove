@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct GrowthLogView: View {
     @ObservedObject var vm: TrackViewModel
@@ -20,6 +21,8 @@ struct GrowthLogView: View {
     @State private var showJumpConfirmation = false
     /// Guards against double-tap creating duplicate records
     @State private var isSaving = false
+    /// Stats for the context badge showing total measurements and days since last
+    @State private var growthContextStats: GrowthContextStats = .empty
 
     private var isEditing: Bool { editingRecord != nil }
     private var unit: MeasurementUnit { appState.measurementUnit }
@@ -135,12 +138,98 @@ struct GrowthLogView: View {
         return false
     }
 
+    // MARK: - Growth Context Stats
+
+    /// Lightweight struct holding overall growth measurement context
+    struct GrowthContextStats {
+        let totalRecords: Int
+        let daysSinceLast: Int?
+        let lastDate: Date?
+
+        static let empty = GrowthContextStats(totalRecords: 0, daysSinceLast: nil, lastDate: nil)
+    }
+
+    /// Fetch total growth record count and date of last measurement.
+    private func loadGrowthContextStats() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let countReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+        let total = (try? ctx.count(for: countReq)) ?? 0
+
+        let latestReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+        latestReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        latestReq.fetchLimit = 1
+        let lastRecord = (try? ctx.fetch(latestReq))?.first
+        let lastDate = lastRecord?.date
+        let daysSince: Int? = lastDate.flatMap {
+            Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: $0), to: Calendar.current.startOfDay(for: Date())).day
+        }
+        growthContextStats = GrowthContextStats(totalRecords: total, daysSinceLast: daysSince, lastDate: lastDate)
+    }
+
+    /// The context badge showing total measurements and days since last record
+    @ViewBuilder
+    private var growthContextBadge: some View {
+        if !isEditing && growthContextStats.totalRecords > 0 {
+            HStack(spacing: 10) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blGrowth)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(format: NSLocalizedString("growthLog.totalMeasurements %lld", comment: ""), growthContextStats.totalRecords))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    if let days = growthContextStats.daysSinceLast, let lastDate = growthContextStats.lastDate {
+                        HStack(spacing: 4) {
+                            if days == 0 {
+                                Text(String(localized: "growthLog.measuredToday"))
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.blTextSecondary)
+                            } else {
+                                Text(String(format: NSLocalizedString("growthLog.daysSinceLast %lld", comment: ""), days))
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.blTextSecondary)
+                            }
+                            Text("·")
+                                .font(.system(size: 13))
+                                .foregroundColor(.blTextTertiary)
+                            Text(BLDateFormatters.monthDay.string(from: lastDate))
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextTertiary)
+                        }
+                    }
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(Color.blGrowth.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(growthContextAccessibilityLabel)
+        }
+    }
+
+    private var growthContextAccessibilityLabel: String {
+        var parts: [String] = []
+        parts.append(String(format: NSLocalizedString("growthLog.totalMeasurements %lld", comment: ""), growthContextStats.totalRecords))
+        if let days = growthContextStats.daysSinceLast {
+            if days == 0 {
+                parts.append(String(localized: "growthLog.measuredToday"))
+            } else {
+                parts.append(String(format: NSLocalizedString("growthLog.daysSinceLast %lld", comment: ""), days))
+            }
+        }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Growth context badge
+                        growthContextBadge
+
                         // Retroactive date banner — shown when logging to a past day
                         if isRecordDatePastDay && !isEditing {
                             HStack(spacing: 10) {
@@ -327,6 +416,7 @@ struct GrowthLogView: View {
                 }
                 // Fetch the latest previous record to enable jump-detection warnings
                 previousRecord = vm.latestGrowthRecord(excluding: editingRecord?.id)
+                loadGrowthContextStats()
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
         }

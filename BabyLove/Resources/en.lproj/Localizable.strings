@@ -455,6 +455,9 @@
 "growthLog.updated"       = "Growth updated";
 "growthLog.logged"        = "Growth logged";
 "growthLog.saveFailed"    = "Save failed — try again";
+"growthLog.totalMeasurements %lld" = "%lld measurements recorded";
+"growthLog.daysSinceLast %lld" = "%lld days since last";
+"growthLog.measuredToday" = "Measured today";
 "growthLog.enterOne"      = "Enter at least one measurement to save";
 "growthLog.weightNeg"     = "Weight cannot be negative";
 "growthLog.weightHigh %@" = "Weight seems too high (%@)";

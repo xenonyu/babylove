@@ -455,6 +455,9 @@
 "growthLog.updated"       = "成長データを更新しました";
 "growthLog.logged"        = "成長データを記録しました";
 "growthLog.saveFailed"    = "保存に失敗しました。もう一度お試しください";
+"growthLog.totalMeasurements %lld" = "%lld 回の測定を記録済み";
+"growthLog.daysSinceLast %lld" = "前回から %lld 日";
+"growthLog.measuredToday" = "本日測定済み";
 "growthLog.enterOne"      = "保存するには少なくとも1つの測定値を入力してください";
 "growthLog.weightNeg"     = "体重は負の値にできません";
 "growthLog.weightHigh %@" = "体重が高すぎるようです（%@）";

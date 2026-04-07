@@ -455,6 +455,9 @@
 "growthLog.updated"       = "生长数据已更新";
 "growthLog.logged"        = "生长数据已记录";
 "growthLog.saveFailed"    = "保存失败，请重试";
+"growthLog.totalMeasurements %lld" = "已记录 %lld 次测量";
+"growthLog.daysSinceLast %lld" = "距上次 %lld 天";
+"growthLog.measuredToday" = "今天已测量";
 "growthLog.enterOne"      = "请至少输入一项测量数据";
 "growthLog.weightNeg"     = "体重不能为负数";
 "growthLog.weightHigh %@" = "体重似乎过高（%@）";

@@ -455,6 +455,9 @@
 "growthLog.updated"       = "성장 데이터가 업데이트되었습니다";
 "growthLog.logged"        = "성장 데이터가 기록되었습니다";
 "growthLog.saveFailed"    = "저장 실패 — 다시 시도하세요";
+"growthLog.totalMeasurements %lld" = "%lld회 측정 기록됨";
+"growthLog.daysSinceLast %lld" = "마지막 측정 %lld일 전";
+"growthLog.measuredToday" = "오늘 측정 완료";
 "growthLog.enterOne"      = "저장하려면 최소 하나의 측정값을 입력하세요";
 "growthLog.weightNeg"     = "체중은 음수일 수 없습니다";
 "growthLog.weightHigh %@" = "체중이 너무 높은 것 같습니다 (%@)";
