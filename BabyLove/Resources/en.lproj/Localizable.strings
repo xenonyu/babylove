@@ -402,6 +402,7 @@
 "feedLog.largeAmountTitle"= "Unusually Large Amount";
 "feedLog.largeAmountSave" = "Save Anyway";
 "feedLog.largeAmountCancel"= "Go Back";
+"feedLog.lastAmount %@"   = "Last time: %@";
 "feedLog.largeAmountMsg %@"= "%@ is higher than a typical single feeding. Are you sure this is correct?";
 "feedLog.todayCount %lld" = "Today: %lld feedings so far";
 "feedLog.chip.goodLatch"  = "Good latch";

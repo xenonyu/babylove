@@ -441,6 +441,18 @@ struct FeedingLogView: View {
                                         .foregroundColor(.blFeeding)
                                 }
 
+                                // "Pre-filled from last time" hint — shown when amount was auto-restored
+                                if !isEditing, let lastAmountText = lastAmountHint(for: feedType) {
+                                    HStack(spacing: 5) {
+                                        Image(systemName: "clock.arrow.circlepath")
+                                            .font(.system(size: 10, weight: .medium))
+                                            .foregroundColor(.blFeeding.opacity(0.6))
+                                        Text(lastAmountText)
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(.blTextTertiary)
+                                    }
+                                }
+
                                 // Quick amount presets — tap to instantly set a common volume
                                 quickAmountPresets
 
@@ -591,7 +603,12 @@ struct FeedingLogView: View {
                 let usesAmount = newType == .formula || newType == .pump || newType == .solid
                 // Reset fields that are irrelevant to the new type
                 if !usesDuration { duration = 10 }
-                if !usesAmount { amount = 0 }
+                if !usesAmount {
+                    amount = 0
+                } else if !isEditing {
+                    // Pre-fill with last-used amount for this feed type
+                    restoreLastAmount(for: newType)
+                }
                 // Disable timer mode for types that don't support it
                 if !supportsTimer { isTimerMode = false }
             }
@@ -684,6 +701,9 @@ struct FeedingLogView: View {
         }
         if ok {
             Self.saveLastFeedType(feedType)
+            // Remember amount for next time (per feed type)
+            let hasAmount = feedType == .formula || feedType == .pump || feedType == .solid
+            if hasAmount { Self.saveLastAmount(unit.volumeToML(amount), for: feedType) }
             Haptic.success()
             dismiss()
         } else { Haptic.error(); isSaving = false }
@@ -917,7 +937,7 @@ struct FeedingLogView: View {
         didAutoSuggestSide = true
     }
 
-    // MARK: - Remember Last Feed Type
+    // MARK: - Remember Last Feed Type & Amount
 
     /// Restore the last-used feed type so the user doesn't have to re-select every time.
     /// Only applied for new records — editing always uses the record's own feed type.
@@ -925,11 +945,47 @@ struct FeedingLogView: View {
         guard let raw = UserDefaults.standard.string(forKey: Self.lastFeedTypeKey),
               let saved = FeedType(rawValue: raw) else { return }
         feedType = saved
+        // Pre-fill the last-used amount for this feed type (reduces slider fiddling)
+        restoreLastAmount(for: saved)
     }
 
     /// Persist the selected feed type for next time.
     private static func saveLastFeedType(_ type: FeedType) {
         UserDefaults.standard.set(type.rawValue, forKey: lastFeedTypeKey)
+    }
+
+    // MARK: - Remember Last Amount Per Feed Type
+
+    /// UserDefaults key prefix for last-used amount (stored in ML, per feed type)
+    private static func lastAmountKey(for type: FeedType) -> String {
+        "lastFeedAmount_\(type.rawValue)"
+    }
+
+    /// Restore the last-used amount for a given feed type (only for volume-based types).
+    /// Converts from stored ML to the user's display unit.
+    private func restoreLastAmount(for type: FeedType) {
+        let usesAmount = type == .formula || type == .pump || type == .solid
+        guard usesAmount else { return }
+        let savedML = UserDefaults.standard.double(forKey: Self.lastAmountKey(for: type))
+        guard savedML > 0 else { return }
+        amount = unit.volumeFromML(savedML)
+    }
+
+    /// Persist the amount (in ML) for this feed type so it pre-fills next time.
+    private static func saveLastAmount(_ amountML: Double, for type: FeedType) {
+        guard amountML > 0 else { return }
+        UserDefaults.standard.set(amountML, forKey: lastAmountKey(for: type))
+    }
+
+    /// Returns a localized hint like "Last time: 120 ml" if there's a saved amount, nil otherwise.
+    private func lastAmountHint(for type: FeedType) -> String? {
+        let savedML = UserDefaults.standard.double(forKey: Self.lastAmountKey(for: type))
+        guard savedML > 0 else { return nil }
+        let display = unit.volumeFromML(savedML)
+        let text = unit == .metric
+            ? "\(Int(display)) \(unit.volumeLabel)"
+            : String(format: "%.1f %@", display, unit.volumeLabel)
+        return String(format: NSLocalizedString("feedLog.lastAmount %@", comment: ""), text)
     }
 
     /// Start a 15-second timer that keeps the displayed duration in sync
