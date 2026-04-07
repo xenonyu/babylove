@@ -32,6 +32,19 @@ struct SleepLogView: View {
 
     private var isEditing: Bool { editingRecord != nil }
 
+    /// Threshold (in minutes) above which a completed sleep session triggers a
+    /// soft "unusually long" warning. 14 h covers the longest normal newborn naps
+    /// while catching AM/PM data-entry mistakes that create 18-24 h sessions.
+    private static let longSleepThresholdMinutes = 14 * 60
+
+    /// Whether the completed duration exceeds the long-sleep threshold.
+    private var isUnusuallyLongSleep: Bool {
+        !isOngoing && duration > Self.longSleepThresholdMinutes
+    }
+
+    /// Confirmation state: shown when user taps Save while duration is unusually long.
+    @State private var showLongDurationConfirm = false
+
     /// Whether the form has meaningful user input that would be lost on dismiss.
     private var hasUnsavedChanges: Bool {
         if isEditing { return true }
@@ -252,29 +265,12 @@ struct SleepLogView: View {
                                   ? NSLocalizedString("sleepLog.startTimer", comment: "")
                                   : NSLocalizedString("sleepLog.logSleep", comment: ""))) {
                             guard !isSaving else { return }
-                            isSaving = true
-                            var ok = false
-                            if let record = editingRecord {
-                                ok = vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
-                                appState.showToast(ok ? NSLocalizedString("sleepLog.updated", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
-                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blSleep : .red)
-                            } else if isOngoing {
-                                ok = vm.startSleep(at: startTime, location: location, notes: notes)
-                                appState.showToast(ok ? NSLocalizedString("sleepLog.timerStarted", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
-                                                   icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blSleep : .red)
+                            // Gate behind confirmation when duration looks unusually long
+                            if isUnusuallyLongSleep {
+                                showLongDurationConfirm = true
                             } else {
-                                ok = vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
-                                appState.showToast(ok ? NSLocalizedString("sleepLog.logged", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
-                                                   icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blSleep : .red)
+                                performSave()
                             }
-                            if ok {
-                                Self.saveLastLocation(location)
-                                Haptic.success()
-                                dismiss()
-                            } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blSleep))
                         .disabled(!canSave || isSaving)
@@ -291,6 +287,30 @@ struct SleepLogView: View {
                                 .font(.system(size: 13))
                                 .foregroundColor(.blTextSecondary)
                                 .frame(maxWidth: .infinity)
+                        }
+
+                        // Soft warning for unusually long sleep sessions
+                        if isUnusuallyLongSleep {
+                            HStack(spacing: 10) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.orange)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(String(format: NSLocalizedString("sleepLog.longDuration %@", comment: ""), durationText))
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextPrimary)
+                                    Text(NSLocalizedString("sleepLog.longDurationHint", comment: ""))
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.blTextSecondary)
+                                }
+                            }
+                            .padding(14)
+                            .background(Color.orange.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .strokeBorder(Color.orange.opacity(0.2), lineWidth: 1)
+                            )
                         }
                     }
                     .padding(24)
@@ -343,7 +363,43 @@ struct SleepLogView: View {
                 updateOngoingElapsed()
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
+            .alert(NSLocalizedString("sleepLog.longDurationTitle", comment: "Unusually long sleep"), isPresented: $showLongDurationConfirm) {
+                Button(NSLocalizedString("sleepLog.longDurationSave", comment: "Save anyway"), role: .destructive) {
+                    performSave()
+                }
+                Button(NSLocalizedString("sleepLog.longDurationCancel", comment: "Go back and fix"), role: .cancel) { }
+            } message: {
+                Text(String(format: NSLocalizedString("sleepLog.longDurationMsg %@", comment: ""), durationText))
+            }
         }
+    }
+
+    /// Performs the actual save/update after any confirmations are resolved.
+    private func performSave() {
+        guard !isSaving else { return }
+        isSaving = true
+        var ok = false
+        if let record = editingRecord {
+            ok = vm.updateSleep(record, start: startTime, end: isOngoing ? nil : endTime, location: location, notes: notes)
+            appState.showToast(ok ? NSLocalizedString("sleepLog.updated", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
+                               icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blSleep : .red)
+        } else if isOngoing {
+            ok = vm.startSleep(at: startTime, location: location, notes: notes)
+            appState.showToast(ok ? NSLocalizedString("sleepLog.timerStarted", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
+                               icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blSleep : .red)
+        } else {
+            ok = vm.logSleep(start: startTime, end: endTime, location: location, notes: notes)
+            appState.showToast(ok ? NSLocalizedString("sleepLog.logged", comment: "") : NSLocalizedString("sleepLog.saveFailed", comment: ""),
+                               icon: ok ? "moon.zzz.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blSleep : .red)
+        }
+        if ok {
+            Self.saveLastLocation(location)
+            Haptic.success()
+            dismiss()
+        } else { Haptic.error(); isSaving = false }
     }
 
     /// Recalculate the displayed elapsed minutes from the current startTime.

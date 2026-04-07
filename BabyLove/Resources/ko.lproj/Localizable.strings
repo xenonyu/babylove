@@ -395,6 +395,12 @@
 "sleepLog.chip.restless"      = "뒤척임";
 "sleepLog.chip.sleptWell"     = "잘 잤음";
 "sleepLog.chip.nightFeed"     = "밤중 수유";
+"sleepLog.longDuration %@"       = "수면 시간 %@ — 비정상적으로 깁니다";
+"sleepLog.longDurationHint"      = "시작 및 종료 시간을 확인해 주세요. 오전/오후가 바뀌었을 수 있습니다.";
+"sleepLog.longDurationTitle"     = "비정상적으로 긴 수면";
+"sleepLog.longDurationMsg %@"    = "이 수면 기록은 %@입니다. 일반적인 아기 수면보다 깁니다. 시간이 맞나요?";
+"sleepLog.longDurationSave"      = "그래도 저장";
+"sleepLog.longDurationCancel"    = "돌아가기";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "기저귀 기록";

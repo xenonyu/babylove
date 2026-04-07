@@ -395,6 +395,12 @@
 "sleepLog.chip.restless"      = "睡不安稳";
 "sleepLog.chip.sleptWell"     = "睡得好";
 "sleepLog.chip.nightFeed"     = "夜奶";
+"sleepLog.longDuration %@"       = "睡眠时长 %@ — 异常偏长";
+"sleepLog.longDurationHint"      = "请检查开始和结束时间，可能是上午/下午选错了？";
+"sleepLog.longDurationTitle"     = "睡眠时长异常";
+"sleepLog.longDurationMsg %@"    = "本次睡眠记录为 %@，超出了正常范围。请确认时间是否正确？";
+"sleepLog.longDurationSave"      = "仍然保存";
+"sleepLog.longDurationCancel"    = "返回修改";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "记录换尿布";

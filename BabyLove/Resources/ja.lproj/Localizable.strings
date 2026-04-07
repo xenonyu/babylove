@@ -395,6 +395,12 @@
 "sleepLog.chip.restless"      = "眠りが浅い";
 "sleepLog.chip.sleptWell"     = "よく眠れた";
 "sleepLog.chip.nightFeed"     = "夜間授乳";
+"sleepLog.longDuration %@"       = "睡眠時間 %@ — 通常より長いです";
+"sleepLog.longDurationHint"      = "開始・終了時刻をご確認ください。午前/午後の間違いかもしれません。";
+"sleepLog.longDurationTitle"     = "睡眠時間が長すぎます";
+"sleepLog.longDurationMsg %@"    = "この睡眠記録は %@ です。通常の赤ちゃんの睡眠より長いです。時刻は正しいですか？";
+"sleepLog.longDurationSave"      = "このまま保存";
+"sleepLog.longDurationCancel"    = "戻る";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "おむつを記録";
