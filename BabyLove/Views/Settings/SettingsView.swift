@@ -503,6 +503,19 @@ struct EditBabyView: View {
     @State private var photoData: Data?
     @State private var selectedPhoto: PhotosPickerItem?
 
+    // Original values to detect unsaved changes
+    @State private var originalName: String = ""
+    @State private var originalBirthDate: Date = Date()
+    @State private var originalGender: Baby.Gender = .girl
+    @State private var originalPhotoData: Data?
+
+    private var hasUnsavedChanges: Bool {
+        name != originalName ||
+        !Calendar.current.isDate(birthDate, inSameDayAs: originalBirthDate) ||
+        gender != originalGender ||
+        photoData != originalPhotoData
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -620,8 +633,14 @@ struct EditBabyView: View {
                     birthDate = baby.birthDate
                     gender = baby.gender
                     photoData = baby.photoData
+                    // Capture originals for change detection
+                    originalName = baby.name
+                    originalBirthDate = baby.birthDate
+                    originalGender = baby.gender
+                    originalPhotoData = baby.photoData
                 }
             }
+            .interactiveDismissDisabled(hasUnsavedChanges)
             .onChange(of: selectedPhoto) { _, newItem in
                 Task {
                     if let newItem,
