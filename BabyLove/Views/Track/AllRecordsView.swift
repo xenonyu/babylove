@@ -751,11 +751,42 @@ struct AllGrowthView: View {
     @State private var recordToDelete: CDGrowthRecord?
     @State private var recordToEdit: CDGrowthRecord?
     @State private var showAddSheet = false
+    @State private var selectedFilter: GrowthMetricFilter? = nil
+
+    /// Filter options for growth records by metric type.
+    private enum GrowthMetricFilter: String, CaseIterable {
+        case weight, height, head
+
+        var displayName: String {
+            switch self {
+            case .weight: String(localized: "growth.weight")
+            case .height: String(localized: "growth.height")
+            case .head:   String(localized: "growth.head")
+            }
+        }
+
+        func matches(_ r: CDGrowthRecord) -> Bool {
+            switch self {
+            case .weight: r.weightKG > 0
+            case .height: r.heightCM > 0
+            case .head:   r.headCircumferenceCM > 0
+            }
+        }
+    }
 
     @FetchRequest(
         entity: CDGrowthRecord.entity(),
         sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
     ) private var records: FetchedResults<CDGrowthRecord>
+
+    private var filteredRecords: [CDGrowthRecord] {
+        guard let filter = selectedFilter else { return Array(records) }
+        return records.filter { filter.matches($0) }
+    }
+
+    private func countFor(_ metric: GrowthMetricFilter) -> Int {
+        records.filter { metric.matches($0) }.count
+    }
 
     var body: some View {
         ZStack {
@@ -764,37 +795,63 @@ struct AllGrowthView: View {
             if records.isEmpty {
                 emptyState(String(localized: "allRecords.noGrowthYet"), icon: "chart.bar.fill", color: .blGrowth)
             } else {
-                List {
-                    ForEach(groupedByDate(records, keyPath: \.date), id: \.key) { section in
-                        Section {
-                            ForEach(section.records) { r in
-                                growthRow(r)
-                                    .listRowBackground(Color.blCard)
-                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                    .contentShape(Rectangle())
-                                    .onTapGesture { recordToEdit = r }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) { recordToDelete = r } label: {
-                                            Label(String(localized: "track.delete"), systemImage: "trash")
-                                        }
-                                    }
-                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                        Button { recordToEdit = r } label: {
-                                            Label(String(localized: "track.edit"), systemImage: "pencil")
-                                        }
-                                        .tint(.blGrowth)
-                                    }
-                            }
-                        } header: {
-                            Text(section.key)
-                                .font(.system(size: 14, weight: .semibold))
+                VStack(spacing: 0) {
+                    // Filter chips
+                    growthFilterBar
+
+                    if filteredRecords.isEmpty {
+                        VStack(spacing: 12) {
+                            Spacer()
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.system(size: 36))
+                                .foregroundColor(.blGrowth.opacity(0.4))
+                            Text(String(localized: "allRecords.noFilteredGrowth \(selectedFilter?.displayName ?? "")"))
+                                .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
-                                .textCase(nil)
+                            Button {
+                                withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                            } label: {
+                                Text(String(localized: "allRecords.showAll"))
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.blGrowth)
+                            }
+                            Spacer()
                         }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        List {
+                            ForEach(groupedByDate(filteredRecords, keyPath: \.date), id: \.key) { section in
+                                Section {
+                                    ForEach(section.records) { r in
+                                        growthRow(r)
+                                            .listRowBackground(Color.blCard)
+                                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                            .contentShape(Rectangle())
+                                            .onTapGesture { recordToEdit = r }
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                Button(role: .destructive) { recordToDelete = r } label: {
+                                                    Label(String(localized: "track.delete"), systemImage: "trash")
+                                                }
+                                            }
+                                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                                Button { recordToEdit = r } label: {
+                                                    Label(String(localized: "track.edit"), systemImage: "pencil")
+                                                }
+                                                .tint(.blGrowth)
+                                            }
+                                    }
+                                } header: {
+                                    Text(section.key)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextSecondary)
+                                        .textCase(nil)
+                                }
+                            }
+                        }
+                        .listStyle(.insetGrouped)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
             }
         }
         .navigationTitle(String(localized: "allRecords.allGrowth"))
@@ -836,6 +893,41 @@ struct AllGrowthView: View {
         } message: {
             Text(String(localized: "allRecords.deleteConfirmMsg"))
         }
+    }
+
+    private var growthFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                FilterChip(
+                    label: String(localized: "allRecords.filterAll"),
+                    count: records.count,
+                    isSelected: selectedFilter == nil,
+                    color: .blGrowth
+                ) {
+                    Haptic.selection()
+                    withAnimation(.spring(response: 0.3)) { selectedFilter = nil }
+                }
+                ForEach(GrowthMetricFilter.allCases, id: \.self) { metric in
+                    let count = countFor(metric)
+                    if count > 0 {
+                        FilterChip(
+                            label: metric.displayName,
+                            count: count,
+                            isSelected: selectedFilter == metric,
+                            color: .blGrowth
+                        ) {
+                            Haptic.selection()
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedFilter = selectedFilter == metric ? nil : metric
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+        }
+        .background(Color.blBackground)
     }
 
     private func growthRow(_ r: CDGrowthRecord) -> some View {

@@ -293,6 +293,7 @@
 "allRecords.noFilteredFeedings %@" = "%@の授乳記録はありません";
 "allRecords.noFilteredSleeps %@"   = "%@の睡眠記録はありません";
 "allRecords.noFilteredDiapers %@"  = "%@のおむつ記録はありません";
+"allRecords.noFilteredGrowth %@"   = "%@の記録はありません";
 "allRecords.showAll"               = "すべて表示";
 "allRecords.filterAll"             = "すべて";
 "allRecords.inProgress"            = "進行中";

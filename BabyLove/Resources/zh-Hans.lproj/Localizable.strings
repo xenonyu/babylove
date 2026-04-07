@@ -293,6 +293,7 @@
 "allRecords.noFilteredFeedings %@" = "没有%@喂食记录";
 "allRecords.noFilteredSleeps %@"   = "没有%@睡眠记录";
 "allRecords.noFilteredDiapers %@"  = "没有%@尿布记录";
+"allRecords.noFilteredGrowth %@"   = "没有%@记录";
 "allRecords.showAll"               = "显示全部";
 "allRecords.filterAll"             = "全部";
 "allRecords.inProgress"            = "进行中";

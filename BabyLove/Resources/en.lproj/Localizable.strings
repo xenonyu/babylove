@@ -293,6 +293,7 @@
 "allRecords.noFilteredFeedings %@" = "No %@ feedings found";
 "allRecords.noFilteredSleeps %@"   = "No %@ sleep records found";
 "allRecords.noFilteredDiapers %@"  = "No %@ diaper records found";
+"allRecords.noFilteredGrowth %@"   = "No %@ records found";
 "allRecords.showAll"               = "Show All";
 "allRecords.filterAll"             = "All";
 "allRecords.inProgress"            = "In Progress";

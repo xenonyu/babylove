@@ -293,6 +293,7 @@
 "allRecords.noFilteredFeedings %@" = "%@ 수유 기록 없음";
 "allRecords.noFilteredSleeps %@"   = "%@ 수면 기록 없음";
 "allRecords.noFilteredDiapers %@"  = "%@ 기저귀 기록 없음";
+"allRecords.noFilteredGrowth %@"   = "%@ 기록 없음";
 "allRecords.showAll"               = "모두 보기";
 "allRecords.filterAll"             = "전체";
 "allRecords.inProgress"            = "진행 중";
