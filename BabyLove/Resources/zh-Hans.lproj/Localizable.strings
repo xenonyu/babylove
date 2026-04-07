@@ -350,6 +350,12 @@
 "feedLog.timerStarted"    = "喂食计时已开始";
 "feedLog.logged"          = "喂食已记录";
 "feedLog.saveFailed"      = "保存失败，请重试";
+"feedLog.largeAmount %@"  = "%@ 单次喂食量偏大";
+"feedLog.largeAmountHint" = "请确认奶量是否正确，可能是滑块误操作。";
+"feedLog.largeAmountTitle"= "奶量偏大";
+"feedLog.largeAmountSave" = "仍然保存";
+"feedLog.largeAmountCancel"= "返回修改";
+"feedLog.largeAmountMsg %@"= "%@ 超过了常见的单次喂食量，确定要保存吗？";
 "feedLog.chip.goodLatch"  = "衔乳好";
 "feedLog.chip.fussy"      = "哭闹";
 "feedLog.chip.fellAsleep" = "吃着睡着了";

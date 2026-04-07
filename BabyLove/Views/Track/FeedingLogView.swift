@@ -103,6 +103,23 @@ struct FeedingLogView: View {
         return NSLocalizedString("feedLog.logFeeding", comment: "")
     }
 
+    /// Threshold above which a single feeding amount triggers a soft warning.
+    /// 240 ml (≈ 8 oz) is a generous single-feed amount for most babies;
+    /// higher values often result from slider overshoot or unit confusion.
+    private static let largeAmountThresholdML: Double = 240
+
+    /// Whether the entered amount exceeds the large-amount threshold.
+    /// Only meaningful for feed types that track volume.
+    private var isUnusuallyLargeAmount: Bool {
+        let hasAmount = feedType == .formula || feedType == .pump || feedType == .solid
+        guard hasAmount, amount > 0 else { return false }
+        let ml = unit.volumeToML(amount)
+        return ml > Self.largeAmountThresholdML
+    }
+
+    /// Confirmation state: shown when user taps Save with an unusually large amount.
+    @State private var showLargeAmountConfirm = false
+
     /// Whether the form has meaningful user input that would be lost on dismiss.
     /// Used to prevent accidental swipe-to-dismiss on the sheet.
     private var hasUnsavedChanges: Bool {
@@ -403,65 +420,40 @@ struct FeedingLogView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
-                        Button(buttonLabel) {
-                            guard !isSaving else { return }
-                            isSaving = true
-                            let hasDuration = feedType == .breast || feedType == .pump
-                            let hasAmount = feedType == .formula || feedType == .pump || feedType == .solid
-                            // Zero out irrelevant fields to avoid stale data across type switches
-                            let amountML = hasAmount ? unit.volumeToML(amount) : 0
-                            var ok = false
-                            if let record = editingRecord {
-                                // When ending an ongoing feeding, recalculate duration
-                                // at save time to avoid stale elapsed-time values.
-                                let finalDuration: Int
-                                if isEditingOngoingFeeding && hasDuration {
-                                    let elapsed = Date().timeIntervalSince(timestamp) / 60.0
-                                    finalDuration = Int(max(1, min(180, elapsed.rounded())))
-                                } else {
-                                    finalDuration = hasDuration ? Int(duration) : 0
+                        // Large amount warning banner
+                        if isUnusuallyLargeAmount {
+                            HStack(spacing: 10) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.orange)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    let amountText = unit == .metric
+                                        ? "\(Int(amount)) \(unit.volumeLabel)"
+                                        : "\(String(format: "%.1f", amount)) \(unit.volumeLabel)"
+                                    Text(String(format: NSLocalizedString("feedLog.largeAmount %@", comment: ""), amountText))
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blTextPrimary)
+                                    Text(NSLocalizedString("feedLog.largeAmountHint", comment: ""))
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.blTextSecondary)
                                 }
-                                ok = vm.updateFeeding(
-                                    record,
-                                    type: feedType,
-                                    side: hasDuration ? side : nil,
-                                    durationMinutes: finalDuration,
-                                    amountML: amountML,
-                                    notes: notes,
-                                    timestamp: timestamp
-                                )
-                                appState.showToast(ok ? NSLocalizedString("feedLog.updated", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
-                                                   icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blFeeding : .red)
-                            } else if isTimerMode && supportsTimer {
-                                // Start a feeding timer (ongoing record)
-                                ok = vm.startFeeding(
-                                    type: feedType,
-                                    side: side,
-                                    notes: notes,
-                                    timestamp: timestamp
-                                )
-                                appState.showToast(ok ? NSLocalizedString("feedLog.timerStarted", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
-                                                   icon: ok ? "timer" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blFeeding : .red)
-                            } else {
-                                ok = vm.logFeeding(
-                                    type: feedType,
-                                    side: hasDuration ? side : nil,
-                                    durationMinutes: hasDuration ? Int(duration) : 0,
-                                    amountML: amountML,
-                                    notes: notes,
-                                    timestamp: timestamp
-                                )
-                                appState.showToast(ok ? NSLocalizedString("feedLog.logged", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
-                                                   icon: ok ? "drop.fill" : "exclamationmark.triangle.fill",
-                                                   color: ok ? .blFeeding : .red)
                             }
-                            if ok {
-                                Self.saveLastFeedType(feedType)
-                                Haptic.success()
-                                dismiss()
-                            } else { Haptic.error(); isSaving = false }
+                            .padding(14)
+                            .background(Color.orange.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+                            )
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+
+                        Button(buttonLabel) {
+                            if isUnusuallyLargeAmount {
+                                showLargeAmountConfirm = true
+                            } else {
+                                performSave()
+                            }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
                         .disabled(!canSave || isSaving)
@@ -532,7 +524,78 @@ struct FeedingLogView: View {
                 elapsedTimer = nil
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
+            .alert(NSLocalizedString("feedLog.largeAmountTitle", comment: "Unusually large amount"), isPresented: $showLargeAmountConfirm) {
+                Button(NSLocalizedString("feedLog.largeAmountSave", comment: "Save anyway"), role: .destructive) {
+                    performSave()
+                }
+                Button(NSLocalizedString("feedLog.largeAmountCancel", comment: "Go back and fix"), role: .cancel) { }
+            } message: {
+                let amountText = unit == .metric
+                    ? "\(Int(amount)) \(unit.volumeLabel)"
+                    : "\(String(format: "%.1f", amount)) \(unit.volumeLabel)"
+                Text(String(format: NSLocalizedString("feedLog.largeAmountMsg %@", comment: ""), amountText))
+            }
         }
+    }
+
+    // MARK: - Save Logic
+
+    /// Extracted save logic, called directly or after large-amount confirmation.
+    private func performSave() {
+        guard !isSaving else { return }
+        isSaving = true
+        let hasDuration = feedType == .breast || feedType == .pump
+        let hasAmount = feedType == .formula || feedType == .pump || feedType == .solid
+        let amountML = hasAmount ? unit.volumeToML(amount) : 0
+        var ok = false
+        if let record = editingRecord {
+            let finalDuration: Int
+            if isEditingOngoingFeeding && hasDuration {
+                let elapsed = Date().timeIntervalSince(timestamp) / 60.0
+                finalDuration = Int(max(1, min(180, elapsed.rounded())))
+            } else {
+                finalDuration = hasDuration ? Int(duration) : 0
+            }
+            ok = vm.updateFeeding(
+                record,
+                type: feedType,
+                side: hasDuration ? side : nil,
+                durationMinutes: finalDuration,
+                amountML: amountML,
+                notes: notes,
+                timestamp: timestamp
+            )
+            appState.showToast(ok ? NSLocalizedString("feedLog.updated", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
+                               icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blFeeding : .red)
+        } else if isTimerMode && supportsTimer {
+            ok = vm.startFeeding(
+                type: feedType,
+                side: side,
+                notes: notes,
+                timestamp: timestamp
+            )
+            appState.showToast(ok ? NSLocalizedString("feedLog.timerStarted", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
+                               icon: ok ? "timer" : "exclamationmark.triangle.fill",
+                               color: ok ? .blFeeding : .red)
+        } else {
+            ok = vm.logFeeding(
+                type: feedType,
+                side: hasDuration ? side : nil,
+                durationMinutes: hasDuration ? Int(duration) : 0,
+                amountML: amountML,
+                notes: notes,
+                timestamp: timestamp
+            )
+            appState.showToast(ok ? NSLocalizedString("feedLog.logged", comment: "") : NSLocalizedString("feedLog.saveFailed", comment: ""),
+                               icon: ok ? "drop.fill" : "exclamationmark.triangle.fill",
+                               color: ok ? .blFeeding : .red)
+        }
+        if ok {
+            Self.saveLastFeedType(feedType)
+            Haptic.success()
+            dismiss()
+        } else { Haptic.error(); isSaving = false }
     }
 
     // MARK: - Quick Duration Presets

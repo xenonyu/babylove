@@ -350,6 +350,12 @@
 "feedLog.timerStarted"    = "授乳タイマーを開始しました";
 "feedLog.logged"          = "授乳を記録しました";
 "feedLog.saveFailed"      = "保存に失敗しました。もう一度お試しください";
+"feedLog.largeAmount %@"  = "%@ は1回の授乳としては多めです";
+"feedLog.largeAmountHint" = "量が正しいか確認してください。スライダーの誤操作かもしれません。";
+"feedLog.largeAmountTitle"= "量が多めです";
+"feedLog.largeAmountSave" = "このまま保存";
+"feedLog.largeAmountCancel"= "戻って修正";
+"feedLog.largeAmountMsg %@"= "%@ は一般的な1回の授乳量を超えています。この量で保存しますか？";
 "feedLog.chip.goodLatch"  = "吸い付き良好";
 "feedLog.chip.fussy"      = "ぐずり";
 "feedLog.chip.fellAsleep" = "飲みながら寝た";

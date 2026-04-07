@@ -350,6 +350,12 @@
 "feedLog.timerStarted"    = "수유 타이머가 시작되었습니다";
 "feedLog.logged"          = "수유가 기록되었습니다";
 "feedLog.saveFailed"      = "저장 실패 — 다시 시도하세요";
+"feedLog.largeAmount %@"  = "%@은(는) 한 번 수유치고 많은 양입니다";
+"feedLog.largeAmountHint" = "양이 맞는지 확인해 주세요. 슬라이더 오류일 수 있습니다.";
+"feedLog.largeAmountTitle"= "양이 많습니다";
+"feedLog.largeAmountSave" = "그대로 저장";
+"feedLog.largeAmountCancel"= "돌아가기";
+"feedLog.largeAmountMsg %@"= "%@은(는) 일반적인 1회 수유량보다 많습니다. 이대로 저장하시겠습니까?";
 "feedLog.chip.goodLatch"  = "젖물림 좋음";
 "feedLog.chip.fussy"      = "보챔";
 "feedLog.chip.fellAsleep" = "먹다 잠듦";

@@ -350,6 +350,12 @@
 "feedLog.timerStarted"    = "Feeding timer started";
 "feedLog.logged"          = "Feeding logged";
 "feedLog.saveFailed"      = "Save failed — try again";
+"feedLog.largeAmount %@"  = "%@ is unusually large for one feeding";
+"feedLog.largeAmountHint" = "Double-check the amount — it may be a slider overshoot.";
+"feedLog.largeAmountTitle"= "Unusually Large Amount";
+"feedLog.largeAmountSave" = "Save Anyway";
+"feedLog.largeAmountCancel"= "Go Back";
+"feedLog.largeAmountMsg %@"= "%@ is higher than a typical single feeding. Are you sure this is correct?";
 "feedLog.chip.goodLatch"  = "Good latch";
 "feedLog.chip.fussy"      = "Fussy";
 "feedLog.chip.fellAsleep" = "Fell asleep";
