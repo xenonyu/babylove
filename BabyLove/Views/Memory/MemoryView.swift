@@ -284,6 +284,8 @@ struct MemoryView: View {
                         .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(filter.label)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
                 }
             }
         }
@@ -343,6 +345,23 @@ struct MilestoneCard: View {
     }
 
     private var isCompleted: Bool { milestone.isCompleted }
+
+    private var cardAccessibilityLabel: String {
+        var parts: [String] = []
+        parts.append(milestone.title ?? "")
+        parts.append(isCompleted ? String(localized: "memory.achievedBadge") : String(localized: "memory.upcomingBadge"))
+        parts.append(category.displayName)
+        if let date = milestone.date {
+            parts.append(DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none))
+        }
+        if let baby, let date = milestone.date {
+            parts.append(String(format: NSLocalizedString("a11y.atAge %@", comment: ""), baby.ageText(at: date)))
+        }
+        if let notes = milestone.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
+        }
+        return parts.joined(separator: ", ")
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -411,6 +430,9 @@ struct MilestoneCard: View {
         }
         .padding(16)
         .blCard()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(cardAccessibilityLabel)
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
     }
 }
 
@@ -519,6 +541,8 @@ struct AddMilestoneView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                     }
                                     .buttonStyle(.plain)
+                                    .accessibilityLabel(c.displayName)
+                                    .accessibilityAddTraits(category == c ? .isSelected : [])
                                 }
                             }
                         }
