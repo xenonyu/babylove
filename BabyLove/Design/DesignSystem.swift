@@ -165,8 +165,20 @@ struct QuickLogCard: View {
             .blCard()
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(String(format: NSLocalizedString("a11y.logAction %@", comment: ""), label))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(quickLogAccessibilityLabel)
         .accessibilityHint(String(format: NSLocalizedString("a11y.logHint %@", comment: ""), label.lowercased()))
+        .accessibilityAddTraits(.isButton)
+    }
+
+    /// Combine the action label with the contextual hint for VoiceOver users,
+    /// so they hear e.g. "Log Feeding, 2h ago" or "Log Sleep, Currently sleeping".
+    private var quickLogAccessibilityLabel: String {
+        let base = String(format: NSLocalizedString("a11y.logAction %@", comment: ""), label)
+        if let hint, !hint.isEmpty {
+            return "\(base), \(hint)"
+        }
+        return base
     }
 }
 
