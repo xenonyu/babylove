@@ -585,6 +585,18 @@ struct GrowthView: View {
                             .foregroundColor(.blTextSecondary)
                     }
                 }
+                // Notes preview
+                if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                    HStack(spacing: 4) {
+                        Image(systemName: "note.text")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.blTextTertiary)
+                        Text(notes)
+                            .font(.system(size: 12))
+                            .foregroundColor(.blTextTertiary)
+                            .lineLimit(1)
+                    }
+                }
             }
             Spacer()
         }
@@ -592,6 +604,7 @@ struct GrowthView: View {
         .padding(.vertical, 12)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(growthRowAccessibilityLabel(r, unit: unit, baby: baby))
+        .accessibilityHint(NSLocalizedString("a11y.longPressEditDelete", comment: ""))
     }
 
     private func growthRowAccessibilityLabel(_ r: CDGrowthRecord, unit: MeasurementUnit, baby: Baby?) -> String {
@@ -610,6 +623,9 @@ struct GrowthView: View {
         }
         if r.headCircumferenceCM > 0 {
             parts.append("\(String(localized: "growth.headCircLabel")) \(String(format: "%.1f", unit.lengthFromCM(r.headCircumferenceCM))) \(unit.heightLabel)")
+        }
+        if let notes = r.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            parts.append(String(format: NSLocalizedString("a11y.note %@", comment: ""), notes))
         }
         return parts.joined(separator: ", ")
     }

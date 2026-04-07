@@ -1,5 +1,4 @@
 [
-  "[04/07 04:28] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 04:45] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 05:02] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 05:18] API Error: Unable to connect to API (ConnectionRefused)",
@@ -28,5 +27,6 @@
   "[04/07 10:13] ✅ **迭代 #12 完成**\n\n### 改进内容：为 MemoryView 添加 VoiceOver 无障碍支持\n\n*",
   "[04/07 10:21] **Iteration #13 完成 ✅**\n\n**改进**: 修复 `AllRecordsView.swift` 中将",
   "[04/07 10:25] **Iteration #14 完成 ✅**\n\n**改进**: 修复 TrackView 生长记录行中体重显示精度不一致",
-  "[04/07 10:28] **Iteration #15 完成 ✅**\n\n**改进**: 为 AddMilestoneView 的状态按钮（Ach"
+  "[04/07 10:28] **Iteration #15 完成 ✅**\n\n**改进**: 为 AddMilestoneView 的状态按钮（Ach",
+  "[04/07 10:33] **Iteration #16 完成 ✅**\n\n**改进**: 修复 FeedingLogView 中喂养量显示硬编码 "
 ]
