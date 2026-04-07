@@ -98,6 +98,14 @@
 "export.growth.head %@ %@"  = "%@ %@ 머리둘레";
 "export.milestone.completed" = "완료";
 "export.milestone.inProgress" = "진행 중";
+"export.summary.title"       = "BabyLove 데이터 내보내기";
+"export.summary.name"        = "아기";
+"export.summary.age"         = "나이";
+"export.summary.birthDate"   = "생년월일";
+"export.summary.exportDate"  = "내보내기 날짜";
+"export.summary.dateRange"   = "데이터 기간";
+"export.summary.totalRecords" = "총 기록 수";
+"export.summary.to"          = "~";
 "settings.section.journey"            = "나의 기록 여정";
 "settings.journey.totalRecords"       = "총 기록 수";
 "settings.journey.tracking"           = "기록 기간";

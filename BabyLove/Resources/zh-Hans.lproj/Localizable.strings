@@ -98,6 +98,14 @@
 "export.growth.head %@ %@"  = "%@ %@ 头围";
 "export.milestone.completed" = "已完成";
 "export.milestone.inProgress" = "进行中";
+"export.summary.title"       = "BabyLove 数据导出摘要";
+"export.summary.name"        = "宝宝";
+"export.summary.age"         = "年龄";
+"export.summary.birthDate"   = "出生日期";
+"export.summary.exportDate"  = "导出日期";
+"export.summary.dateRange"   = "数据范围";
+"export.summary.totalRecords" = "总记录数";
+"export.summary.to"          = "至";
 "settings.section.journey"            = "你的记录之旅";
 "settings.journey.totalRecords"       = "总记录数";
 "settings.journey.tracking"           = "已记录";

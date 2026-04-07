@@ -98,6 +98,14 @@
 "export.growth.head %@ %@"  = "%@ %@ head";
 "export.milestone.completed" = "Completed";
 "export.milestone.inProgress" = "In Progress";
+"export.summary.title"       = "BabyLove Export Summary";
+"export.summary.name"        = "Baby";
+"export.summary.age"         = "Age";
+"export.summary.birthDate"   = "Birth Date";
+"export.summary.exportDate"  = "Export Date";
+"export.summary.dateRange"   = "Data Range";
+"export.summary.totalRecords" = "Total Records";
+"export.summary.to"          = "to";
 "settings.section.journey"            = "Your Journey";
 "settings.journey.totalRecords"       = "Total Records";
 "settings.journey.tracking"           = "Tracking For";

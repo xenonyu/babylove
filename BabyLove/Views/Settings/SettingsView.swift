@@ -307,7 +307,11 @@ struct SettingsView: View {
         isExporting = true
         // Capture values for use in background task
         let unit = appState.measurementUnit
-        let babyName = appState.currentBaby?.name ?? "Baby"
+        let baby = appState.currentBaby
+        let babyName = baby?.name ?? "Baby"
+        let babyAge = baby?.ageText ?? ""
+        let babyBirthDate = baby?.birthDate
+        let exportDate = Date()
 
         Task.detached(priority: .userInitiated) {
             // Use a dedicated background context so we don't block the main thread
@@ -321,12 +325,27 @@ struct SettingsView: View {
             timeFormatter.dateStyle = .none
             timeFormatter.timeStyle = .short
 
+            // Date formatter for summary header (locale-aware, long date style)
+            let longDateFormatter = DateFormatter()
+            longDateFormatter.dateStyle = .long
+            longDateFormatter.timeStyle = .none
+
             // Pre-resolve localized strings on the calling context (safe from detached task)
             let hdrRecordType = NSLocalizedString("export.header.recordType", comment: "")
             let hdrDate       = NSLocalizedString("export.header.date", comment: "")
             let hdrTime       = NSLocalizedString("export.header.time", comment: "")
             let hdrDetails    = NSLocalizedString("export.header.details", comment: "")
             let hdrNotes      = NSLocalizedString("export.header.notes", comment: "")
+
+            // Summary header labels
+            let sumTitle   = NSLocalizedString("export.summary.title", comment: "")
+            let sumName    = NSLocalizedString("export.summary.name", comment: "")
+            let sumAge     = NSLocalizedString("export.summary.age", comment: "")
+            let sumBirth   = NSLocalizedString("export.summary.birthDate", comment: "")
+            let sumExport  = NSLocalizedString("export.summary.exportDate", comment: "")
+            let sumRange   = NSLocalizedString("export.summary.dateRange", comment: "")
+            let sumTotal   = NSLocalizedString("export.summary.totalRecords", comment: "")
+            let sumTo      = NSLocalizedString("export.summary.to", comment: "")
             let typeFeeding   = NSLocalizedString("export.type.feeding", comment: "")
             let typeSleep     = NSLocalizedString("export.type.sleep", comment: "")
             let typeDiaper    = NSLocalizedString("export.type.diaper", comment: "")
@@ -339,12 +358,58 @@ struct SettingsView: View {
 
             do {
                 let csv: String = try bgCtx.performAndWait {
-                    var csv = "\(hdrRecordType),\(hdrDate),\(hdrTime),\(hdrDetails),\(hdrNotes)\n"
+                    // --- Summary Header ---
+                    var csv = "\(sumTitle)\n"
+                    csv += "\(sumName),\(Self.csvEscape(babyName))\n"
+                    if !babyAge.isEmpty {
+                        csv += "\(sumAge),\(babyAge)\n"
+                    }
+                    if let birth = babyBirthDate {
+                        csv += "\(sumBirth),\(longDateFormatter.string(from: birth))\n"
+                    }
+                    csv += "\(sumExport),\(longDateFormatter.string(from: exportDate))\n"
 
-                    // Feeding records
+                    // Count all records to build summary totals
                     let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
                     feedReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
                     let feedings = try bgCtx.fetch(feedReq)
+
+                    let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+                    sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: true)]
+                    let sleeps = try bgCtx.fetch(sleepReq)
+
+                    let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+                    diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+                    let diapers = try bgCtx.fetch(diaperReq)
+
+                    let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+                    growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+                    let growths = try bgCtx.fetch(growthReq)
+
+                    let mileReq: NSFetchRequest<CDMilestone> = CDMilestone.fetchRequest()
+                    mileReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+                    let milestones = try bgCtx.fetch(mileReq)
+
+                    let totalRecords = feedings.count + sleeps.count + diapers.count + growths.count + milestones.count
+                    csv += "\(sumTotal),\(totalRecords) (\(typeFeeding): \(feedings.count) / \(typeSleep): \(sleeps.count) / \(typeDiaper): \(diapers.count) / \(typeGrowth): \(growths.count) / \(typeMilestone): \(milestones.count))\n"
+
+                    // Data range (earliest → latest record date)
+                    let allDates: [Date] = [
+                        feedings.first?.timestamp, feedings.last?.timestamp,
+                        sleeps.first?.startTime, sleeps.last?.startTime,
+                        diapers.first?.timestamp, diapers.last?.timestamp,
+                        growths.first?.date, growths.last?.date,
+                        milestones.first?.date, milestones.last?.date
+                    ].compactMap { $0 }
+                    if let earliest = allDates.min(), let latest = allDates.max() {
+                        csv += "\(sumRange),\(longDateFormatter.string(from: earliest)) \(sumTo) \(longDateFormatter.string(from: latest))\n"
+                    }
+
+                    // Blank row separator before data
+                    csv += "\n"
+
+                    // --- Data Header ---
+                    csv += "\(hdrRecordType),\(hdrDate),\(hdrTime),\(hdrDetails),\(hdrNotes)\n"
                     for r in feedings {
                         let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
                         let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
@@ -370,9 +435,6 @@ struct SettingsView: View {
                     }
 
                     // Sleep records
-                    let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
-                    sleepReq.sortDescriptors = [NSSortDescriptor(key: "startTime", ascending: true)]
-                    let sleeps = try bgCtx.fetch(sleepReq)
                     for r in sleeps {
                         let date = r.startTime.map { dateFormatter.string(from: $0) } ?? ""
                         let startTime = r.startTime.map { timeFormatter.string(from: $0) } ?? ""
@@ -392,9 +454,6 @@ struct SettingsView: View {
                     }
 
                     // Diaper records
-                    let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
-                    diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-                    let diapers = try bgCtx.fetch(diaperReq)
                     for r in diapers {
                         let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
                         let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
@@ -404,9 +463,6 @@ struct SettingsView: View {
                     }
 
                     // Growth records
-                    let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
-                    growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-                    let growths = try bgCtx.fetch(growthReq)
                     for r in growths {
                         let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
                         var details = [String]()
@@ -427,9 +483,6 @@ struct SettingsView: View {
                     }
 
                     // Milestones
-                    let mileReq: NSFetchRequest<CDMilestone> = CDMilestone.fetchRequest()
-                    mileReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-                    let milestones = try bgCtx.fetch(mileReq)
                     for r in milestones {
                         let date = r.date.map { dateFormatter.string(from: $0) } ?? ""
                         let title = Self.csvEscape(r.title)

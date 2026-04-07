@@ -98,6 +98,14 @@
 "export.growth.head %@ %@"  = "%@ %@ 頭囲";
 "export.milestone.completed" = "完了";
 "export.milestone.inProgress" = "進行中";
+"export.summary.title"       = "BabyLove データエクスポート";
+"export.summary.name"        = "赤ちゃん";
+"export.summary.age"         = "年齢";
+"export.summary.birthDate"   = "生年月日";
+"export.summary.exportDate"  = "エクスポート日";
+"export.summary.dateRange"   = "データ期間";
+"export.summary.totalRecords" = "記録の合計";
+"export.summary.to"          = "〜";
 "settings.section.journey"            = "あなたの記録";
 "settings.journey.totalRecords"       = "記録の合計";
 "settings.journey.tracking"           = "記録期間";
