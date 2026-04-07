@@ -188,6 +188,9 @@ struct SleepLogView: View {
                             }
                             .padding(.vertical, 8)
 
+                            // Quick duration presets
+                            quickSleepDurationPresets
+
                             // Start time
                             VStack(alignment: .leading, spacing: 10) {
                                 Label(NSLocalizedString("sleepLog.startTime", comment: ""), systemImage: "moon.fill")
@@ -462,6 +465,46 @@ struct SleepLogView: View {
     /// Whether a suggestion chip's text is already contained in the notes field
     private func chipAlreadyAdded(_ chip: String) -> Bool {
         notes.localizedCaseInsensitiveContains(chip)
+    }
+
+    // MARK: - Quick Sleep Duration Presets
+
+    /// Common sleep/nap durations in minutes for one-tap selection.
+    private static let quickSleepDurations: [Int] = [15, 20, 30, 45, 60, 90, 120, 180]
+
+    /// Whether a preset matches the current duration (±2 min tolerance for rounding).
+    private func isSleepPresetSelected(_ presetMinutes: Int) -> Bool {
+        abs(duration - presetMinutes) <= 2
+    }
+
+    /// Quick duration preset chips — sets endTime = startTime + preset.
+    private var quickSleepDurationPresets: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(Self.quickSleepDurations, id: \.self) { preset in
+                    let selected = isSleepPresetSelected(preset)
+                    Button {
+                        Haptic.selection()
+                        withAnimation(.spring(response: 0.25)) {
+                            let newEnd = startTime.addingTimeInterval(Double(preset) * 60)
+                            // Clamp to now so we never set a future wake time
+                            endTime = min(newEnd, Date())
+                        }
+                    } label: {
+                        Text(DurationFormat.standard(Int16(preset)))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(selected ? .white : .blSleep)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(selected ? Color.blSleep : Color.blSleep.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(DurationFormat.standard(Int16(preset)))
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
+            }
+        }
     }
 
     private var sleepNoteChips: some View {
