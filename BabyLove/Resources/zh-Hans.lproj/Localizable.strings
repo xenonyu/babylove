@@ -449,6 +449,7 @@
 "sleepLog.updated"        = "睡眠已更新";
 "sleepLog.timerStarted"   = "睡眠计时已开始";
 "sleepLog.logged"         = "睡眠已记录";
+"sleepLog.lastDuration %@" = "上次: %@";
 "sleepLog.saveFailed"     = "保存失败，请重试";
 "sleepLog.chip.fussy"         = "哭闹";
 "sleepLog.chip.fedToSleep"    = "奶睡";

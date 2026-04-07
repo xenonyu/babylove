@@ -449,6 +449,7 @@
 "sleepLog.updated"        = "睡眠を更新しました";
 "sleepLog.timerStarted"   = "睡眠タイマーを開始しました";
 "sleepLog.logged"         = "睡眠を記録しました";
+"sleepLog.lastDuration %@" = "前回: %@";
 "sleepLog.saveFailed"     = "保存に失敗しました。もう一度お試しください";
 "sleepLog.chip.fussy"         = "ぐずり";
 "sleepLog.chip.fedToSleep"    = "授乳で寝かしつけ";

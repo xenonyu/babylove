@@ -17,6 +17,8 @@ struct SleepLogView: View {
 
     /// UserDefaults key for remembering the last-used sleep location
     private static let lastLocationKey = "lastSleepLocation"
+    /// UserDefaults key for remembering the last-used sleep duration (minutes)
+    private static let lastDurationKey = "lastSleepDurationMinutes"
     @State private var notes = ""
     @State private var isOngoing = false
     /// True when another sleep timer is already running (prevents duplicates)
@@ -256,6 +258,18 @@ struct SleepLogView: View {
                             // Quick duration presets
                             quickSleepDurationPresets
 
+                            // "Pre-filled from last time" hint
+                            if !isEditing, let hintText = lastDurationHint() {
+                                HStack(spacing: 5) {
+                                    Image(systemName: "clock.arrow.circlepath")
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundColor(.blSleep.opacity(0.6))
+                                    Text(hintText)
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(.blTextTertiary)
+                                }
+                            }
+
                             // Start time
                             VStack(alignment: .leading, spacing: 10) {
                                 Label(NSLocalizedString("sleepLog.startTime", comment: ""), systemImage: "moon.fill")
@@ -406,7 +420,10 @@ struct SleepLogView: View {
                     startTime = initialDate.addingTimeInterval(-3600)
                     endTime = initialDate
                 }
-                if !isEditing { restoreLastLocation() }
+                if !isEditing {
+                    restoreLastLocation()
+                    restoreLastDuration()
+                }
                 checkExistingOngoingSleep()
                 updateOngoingElapsed()
                 startElapsedTimerIfNeeded()
@@ -466,6 +483,7 @@ struct SleepLogView: View {
         }
         if ok {
             Self.saveLastLocation(location)
+            if !isOngoing { Self.saveLastDuration(duration) }
             Haptic.success()
             dismiss()
         } else { Haptic.error(); isSaving = false }
@@ -640,5 +658,28 @@ struct SleepLogView: View {
     /// Persist the selected sleep location for next time.
     private static func saveLastLocation(_ loc: SleepLocation) {
         UserDefaults.standard.set(loc.rawValue, forKey: lastLocationKey)
+    }
+
+    // MARK: - Last Duration Memory
+
+    /// Restore the last-used sleep duration by adjusting startTime so the interval matches.
+    private func restoreLastDuration() {
+        let saved = UserDefaults.standard.integer(forKey: Self.lastDurationKey)
+        guard saved > 0 else { return }
+        startTime = endTime.addingTimeInterval(-Double(saved) * 60)
+    }
+
+    /// Persist the current sleep duration for next time.
+    private static func saveLastDuration(_ minutes: Int) {
+        guard minutes > 0 else { return }
+        UserDefaults.standard.set(minutes, forKey: lastDurationKey)
+    }
+
+    /// Returns a localized hint like "Last time: 1h 30m" if there's a saved duration, nil otherwise.
+    private func lastDurationHint() -> String? {
+        let saved = UserDefaults.standard.integer(forKey: Self.lastDurationKey)
+        guard saved > 0 else { return nil }
+        let text = DurationFormat.standard(Int16(saved))
+        return String(format: NSLocalizedString("sleepLog.lastDuration %@", comment: ""), text)
     }
 }

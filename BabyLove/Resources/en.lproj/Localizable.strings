@@ -449,6 +449,7 @@
 "sleepLog.updated"        = "Sleep updated";
 "sleepLog.timerStarted"   = "Sleep timer started";
 "sleepLog.logged"         = "Sleep logged";
+"sleepLog.lastDuration %@" = "Last time: %@";
 "sleepLog.saveFailed"     = "Save failed — try again";
 "sleepLog.chip.fussy"         = "Fussy";
 "sleepLog.chip.fedToSleep"    = "Fed to sleep";

@@ -449,6 +449,7 @@
 "sleepLog.updated"        = "수면이 업데이트되었습니다";
 "sleepLog.timerStarted"   = "수면 타이머가 시작되었습니다";
 "sleepLog.logged"         = "수면이 기록되었습니다";
+"sleepLog.lastDuration %@" = "지난번: %@";
 "sleepLog.saveFailed"     = "저장 실패 — 다시 시도하세요";
 "sleepLog.chip.fussy"         = "보챔";
 "sleepLog.chip.fedToSleep"    = "수유 후 잠듦";
