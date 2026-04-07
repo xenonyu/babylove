@@ -441,6 +441,7 @@ struct AllSleepsView: View {
     }
 
     private func sleepRow(_ r: CDSleepRecord) -> some View {
+        let isOngoing = r.endTime == nil
         let locationName: String = {
             if let loc = r.location, let sl = SleepLocation(rawValue: loc) { return sl.displayName }
             return NSLocalizedString("home.sleep", comment: "")
@@ -465,11 +466,12 @@ struct AllSleepsView: View {
         return HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.blSleep.opacity(0.15))
+                    .fill(Color.blSleep.opacity(isOngoing ? 0.25 : 0.15))
                     .frame(width: 40, height: 40)
                 Image(systemName: "moon.zzz.fill")
                     .font(.system(size: 16))
                     .foregroundColor(.blSleep)
+                    .symbolEffect(.pulse, isActive: isOngoing)
             }
 
             VStack(alignment: .leading, spacing: 3) {
@@ -478,14 +480,26 @@ struct AllSleepsView: View {
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
 
+                    if isOngoing {
+                        Text(String(localized: "allRecords.inProgress"))
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.blSleep)
+                            .clipShape(Capsule())
+                    }
+                }
+
+                HStack(spacing: 6) {
                     if let s = r.startTime, let e = r.endTime {
                         let mins = Int(e.timeIntervalSince(s) / 60)
                         Text(DurationFormat.fromMinutes(mins))
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.blSleep)
-                    } else {
-                        Text(String(localized: "allRecords.ongoing"))
-                            .font(.system(size: 13, weight: .medium))
+                    } else if isOngoing {
+                        Text(String(localized: "allRecords.timerRunning"))
+                            .font(.system(size: 13))
                             .foregroundColor(.blSleep)
                     }
                 }
@@ -495,6 +509,8 @@ struct AllSleepsView: View {
                     if r.endTime != nil {
                         Text("–")
                         Text(r.endTime?.formatted(date: .omitted, time: .shortened) ?? "")
+                    } else {
+                        Text("– …")
                     }
                 }
                 .font(.system(size: 13))
