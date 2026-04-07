@@ -237,6 +237,7 @@
 "home.now"                 = "지금";
 "home.edit"                = "편집";
 "home.delete"              = "삭제";
+"home.repeat"              = "반복";
 
 /* Weekly Summary */
 "home.weekly.feedings"     = "수유";
@@ -328,6 +329,7 @@
 "track.seeAll"           = "모두 보기";
 "track.edit"             = "편집";
 "track.delete"           = "삭제";
+"track.repeat"           = "반복";
 "track.deleteRecord"     = "기록을 삭제할까요?";
 "track.deleteConfirmMsg" = "이 기록은 영구적으로 삭제됩니다.";
 "track.inProgress"       = "진행 중";

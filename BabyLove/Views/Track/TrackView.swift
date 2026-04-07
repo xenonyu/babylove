@@ -232,6 +232,12 @@ struct TrackView: View {
                                             } label: {
                                                 Label(String(localized: "track.edit"), systemImage: "pencil")
                                             }
+                                            Button {
+                                                Haptic.success()
+                                                vm.repeatFeeding(r)
+                                            } label: {
+                                                Label(String(localized: "track.repeat"), systemImage: "arrow.2.squarepath")
+                                            }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
@@ -256,6 +262,12 @@ struct TrackView: View {
                                                 sleepToEdit = r
                                             } label: {
                                                 Label(String(localized: "track.edit"), systemImage: "pencil")
+                                            }
+                                            Button {
+                                                Haptic.success()
+                                                vm.repeatSleep(r)
+                                            } label: {
+                                                Label(String(localized: "track.repeat"), systemImage: "arrow.2.squarepath")
                                             }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
@@ -282,6 +294,12 @@ struct TrackView: View {
                                             } label: {
                                                 Label(String(localized: "track.edit"), systemImage: "pencil")
                                             }
+                                            Button {
+                                                Haptic.success()
+                                                vm.repeatDiaper(r)
+                                            } label: {
+                                                Label(String(localized: "track.repeat"), systemImage: "arrow.2.squarepath")
+                                            }
                                             Button(role: .destructive) {
                                                 recordToDelete = r
                                             } label: {
@@ -306,6 +324,12 @@ struct TrackView: View {
                                                 growthToEdit = r
                                             } label: {
                                                 Label(String(localized: "track.edit"), systemImage: "pencil")
+                                            }
+                                            Button {
+                                                Haptic.success()
+                                                vm.repeatGrowth(r)
+                                            } label: {
+                                                Label(String(localized: "track.repeat"), systemImage: "arrow.2.squarepath")
                                             }
                                             Button(role: .destructive) {
                                                 recordToDelete = r

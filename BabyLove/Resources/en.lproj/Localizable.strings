@@ -237,6 +237,7 @@
 "home.now"                 = "Now";
 "home.edit"                = "Edit";
 "home.delete"              = "Delete";
+"home.repeat"              = "Repeat";
 
 /* Weekly Summary */
 "home.weekly.feedings"     = "Feedings";
@@ -328,6 +329,7 @@
 "track.seeAll"           = "See All";
 "track.edit"             = "Edit";
 "track.delete"           = "Delete";
+"track.repeat"           = "Repeat";
 "track.deleteRecord"     = "Delete Record?";
 "track.deleteConfirmMsg" = "This record will be permanently removed.";
 "track.inProgress"       = "In Progress";

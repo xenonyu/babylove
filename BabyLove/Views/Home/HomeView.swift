@@ -2924,6 +2924,17 @@ struct HomeView: View {
                         } label: {
                             Label(NSLocalizedString("home.edit", comment: ""), systemImage: "pencil")
                         }
+                        Button {
+                            Haptic.success()
+                            switch item.record {
+                            case .feeding(let r): vm.repeatFeeding(r)
+                            case .sleep(let r):   vm.repeatSleep(r)
+                            case .diaper(let r):  vm.repeatDiaper(r)
+                            case .growth(let r):  vm.repeatGrowth(r)
+                            }
+                        } label: {
+                            Label(NSLocalizedString("home.repeat", comment: ""), systemImage: "arrow.2.squarepath")
+                        }
                         Button(role: .destructive) {
                             switch item.record {
                             case .feeding(let r): timelineRecordToDelete = r

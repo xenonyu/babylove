@@ -237,6 +237,7 @@
 "home.now"                 = "今";
 "home.edit"                = "編集";
 "home.delete"              = "削除";
+"home.repeat"              = "繰り返す";
 
 /* Weekly Summary */
 "home.weekly.feedings"     = "授乳";
@@ -328,6 +329,7 @@
 "track.seeAll"           = "すべて見る";
 "track.edit"             = "編集";
 "track.delete"           = "削除";
+"track.repeat"           = "繰り返す";
 "track.deleteRecord"     = "記録を削除しますか？";
 "track.deleteConfirmMsg" = "この記録は完全に削除されます。";
 "track.inProgress"       = "進行中";

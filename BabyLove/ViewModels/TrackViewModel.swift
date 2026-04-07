@@ -309,6 +309,49 @@ class TrackViewModel: ObservableObject {
         return save()
     }
 
+    // MARK: - Repeat (Duplicate)
+
+    /// Duplicate a feeding record with the current timestamp.
+    @discardableResult
+    func repeatFeeding(_ record: CDFeedingRecord) -> Bool {
+        let ft = FeedType(rawValue: record.feedType ?? "") ?? .formula
+        let side = record.breastSide.flatMap { BreastSide(rawValue: $0) }
+        return logFeeding(type: ft,
+                          side: side,
+                          durationMinutes: Int(record.durationMinutes),
+                          amountML: record.amountML,
+                          notes: record.notes ?? "")
+    }
+
+    /// Duplicate a sleep record with duration preserved, ending now.
+    @discardableResult
+    func repeatSleep(_ record: CDSleepRecord) -> Bool {
+        let loc = SleepLocation(rawValue: record.location ?? "") ?? .crib
+        let duration: TimeInterval = {
+            guard let s = record.startTime, let e = record.endTime else { return 30 * 60 }
+            return e.timeIntervalSince(s)
+        }()
+        let end = Date()
+        let start = end.addingTimeInterval(-duration)
+        return logSleep(start: start, end: end, location: loc, notes: record.notes ?? "")
+    }
+
+    /// Duplicate a diaper record with the current timestamp.
+    @discardableResult
+    func repeatDiaper(_ record: CDDiaperRecord) -> Bool {
+        let dt = DiaperType(rawValue: record.diaperType ?? "") ?? .wet
+        return logDiaper(type: dt, notes: record.notes ?? "")
+    }
+
+    /// Duplicate a growth record with the current date.
+    @discardableResult
+    func repeatGrowth(_ record: CDGrowthRecord) -> Bool {
+        return logGrowth(weightKG: record.weightKG > 0 ? record.weightKG : nil,
+                         heightCM: record.heightCM > 0 ? record.heightCM : nil,
+                         headCM: record.headCircumferenceCM > 0 ? record.headCircumferenceCM : nil,
+                         notes: record.notes ?? "")
+    }
+
     // MARK: - Delete
 
     @discardableResult
