@@ -10,6 +10,8 @@ struct MemoryView: View {
     @State private var milestoneToDelete: CDMilestone?
     @State private var selectedFilter: MilestoneFilter = .all
     @State private var searchText = ""
+    /// Whether the age-based suggested milestones section is expanded
+    @State private var showSuggestions = true
 
     enum MilestoneFilter: Hashable {
         case all
@@ -95,6 +97,25 @@ struct MemoryView: View {
         return order.map { (key: $0, milestones: dict[$0]!) }
     }
 
+    // MARK: - Age-Based Suggestions
+
+    /// Set of lowercase titles already recorded, used to filter out suggestions
+    private var recordedTitles: Set<String> {
+        Set(milestones.compactMap { $0.title?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() })
+    }
+
+    /// Age-appropriate preset milestones that haven't been recorded yet.
+    /// Only "current" age-range milestones are shown (not upcoming or past).
+    private var suggestedMilestones: [PresetMilestone] {
+        guard let baby = appState.currentBaby else { return [] }
+        let ageMonths = baby.ageInMonths
+        let recorded = recordedTitles
+        return PresetMilestone.all
+            .filter { $0.relevance(forBabyAgeMonths: ageMonths) == .current }
+            .filter { !recorded.contains($0.title.lowercased()) }
+            .sorted { $0.ageMin < $1.ageMin }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -131,6 +152,11 @@ struct MemoryView: View {
                                     Spacer()
                                 }
                                 .padding(.horizontal, 20)
+                            }
+
+                            // Suggested milestones for baby's current age
+                            if selectedFilter == .all && searchText.isEmpty && !suggestedMilestones.isEmpty {
+                                suggestedMilestonesSection
                             }
 
                             // Milestones timeline
@@ -364,7 +390,127 @@ struct MemoryView: View {
             Button(String(localized: "memory.addFirst")) { showAddMilestone = true }
                 .buttonStyle(BLPrimaryButton())
                 .frame(width: 240)
+
+            // Show suggestions even in empty state to encourage first recording
+            if !suggestedMilestones.isEmpty {
+                suggestedMilestonesSection
+                    .padding(.top, 8)
+            }
         }
+    }
+
+    // MARK: - Suggested Milestones
+
+    private var suggestedMilestonesSection: some View {
+        VStack(spacing: 10) {
+            Button {
+                Haptic.selection()
+                withAnimation(.spring(response: 0.3)) {
+                    showSuggestions.toggle()
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.blGrowth)
+                    Text(String(format: NSLocalizedString("memory.suggestions.title %lld", comment: ""), suggestedMilestones.count))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    if let baby = appState.currentBaby {
+                        Text(baby.ageText)
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundColor(.blGrowth)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.blGrowth.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                    Spacer()
+                    Image(systemName: showSuggestions ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.blTextTertiary)
+                }
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 20)
+
+            if showSuggestions {
+                VStack(spacing: 0) {
+                    ForEach(Array(suggestedMilestones.enumerated()), id: \.element.id) { idx, preset in
+                        suggestedRow(preset)
+                        if idx < suggestedMilestones.count - 1 {
+                            Divider().padding(.leading, 56)
+                        }
+                    }
+                }
+                .blCard()
+                .padding(.horizontal, 20)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func suggestedRow(_ preset: PresetMilestone) -> some View {
+        let catColor = Color(hex: preset.category.color)
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(catColor.opacity(0.12))
+                    .frame(width: 38, height: 38)
+                Image(systemName: preset.category.icon)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(catColor)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(preset.title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.blTextPrimary)
+                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(preset.category.displayName)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(catColor)
+                    Text("·")
+                        .font(.system(size: 11))
+                        .foregroundColor(.blTextTertiary)
+                    Text(String(format: NSLocalizedString("memory.suggestions.ageRange %@", comment: ""), preset.ageRangeMonths))
+                        .font(.system(size: 11))
+                        .foregroundColor(.blTextTertiary)
+                }
+            }
+
+            Spacer()
+
+            // One-tap "Mark achieved" button
+            Button {
+                Haptic.success()
+                let ok = vm.addMilestone(
+                    title: preset.title,
+                    category: preset.category,
+                    date: Date(),
+                    notes: "",
+                    isCompleted: true
+                )
+                if ok {
+                    appState.showToast(
+                        String(format: NSLocalizedString("memory.suggestions.achieved %@", comment: ""), preset.title),
+                        icon: "star.fill",
+                        color: catColor
+                    )
+                }
+            } label: {
+                Image(systemName: "checkmark.circle")
+                    .font(.system(size: 22, weight: .medium))
+                    .foregroundColor(catColor.opacity(0.6))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(format: NSLocalizedString("memory.suggestions.markAchieved %@", comment: ""), preset.title))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .accessibilityElement(children: .combine)
     }
 }
 

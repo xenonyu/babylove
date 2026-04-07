@@ -608,6 +608,12 @@
 "memory.noSearchResults %@" = "「%@」に一致するマイルストーンはありません";
 "memory.clearSearch"        = "検索をクリア";
 
+// Suggested Milestones
+"memory.suggestions.title %lld" = "おすすめマイルストーン（%lld件）";
+"memory.suggestions.ageRange %@" = "%@ 対象";
+"memory.suggestions.achieved %@" = "%@ を達成しました";
+"memory.suggestions.markAchieved %@" = "%@ を達成済みにする";
+
 /* ===== Accessibility アクセシビリティ ===== */
 "a11y.previousDay"         = "前日";
 "a11y.previousDayHint"     = "前日の記録を見る";

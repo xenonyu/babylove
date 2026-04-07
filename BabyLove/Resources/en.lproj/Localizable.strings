@@ -608,6 +608,12 @@
 "memory.noSearchResults %@" = "No milestones matching \"%@\"";
 "memory.clearSearch"        = "Clear Search";
 
+/* Suggested Milestones */
+"memory.suggestions.title %lld"       = "%lld milestones for your baby";
+"memory.suggestions.ageRange %@"      = "%@ mo";
+"memory.suggestions.achieved %@"      = "%@ achieved!";
+"memory.suggestions.markAchieved %@"  = "Mark %@ as achieved";
+
 /* ===== Accessibility ===== */
 "a11y.previousDay"         = "Previous day";
 "a11y.previousDayHint"     = "Go to the previous day";

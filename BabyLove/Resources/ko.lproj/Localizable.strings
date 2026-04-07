@@ -608,6 +608,12 @@
 "memory.noSearchResults %@" = "\"%@\"와 일치하는 마일스톤이 없습니다";
 "memory.clearSearch"        = "검색 지우기";
 
+// Suggested Milestones
+"memory.suggestions.title %lld" = "추천 마일스톤 (%lld개)";
+"memory.suggestions.ageRange %@" = "%@ 대상";
+"memory.suggestions.achieved %@" = "%@을(를) 달성했습니다";
+"memory.suggestions.markAchieved %@" = "%@을(를) 달성으로 표시";
+
 /* ===== Accessibility 접근성 ===== */
 "a11y.previousDay"         = "이전 날";
 "a11y.previousDayHint"     = "이전 날 기록 보기";

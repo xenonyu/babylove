@@ -608,6 +608,12 @@
 "memory.noSearchResults %@" = "没有匹配「%@」的里程碑";
 "memory.clearSearch"        = "清除搜索";
 
+/* Suggested Milestones */
+"memory.suggestions.title %lld"       = "宝宝当前阶段的 %lld 个里程碑";
+"memory.suggestions.ageRange %@"      = "%@ 个月";
+"memory.suggestions.achieved %@"      = "%@ 已达成！";
+"memory.suggestions.markAchieved %@"  = "标记 %@ 为已达成";
+
 /* ===== Accessibility 无障碍 ===== */
 "a11y.previousDay"         = "前一天";
 "a11y.previousDayHint"     = "查看前一天的记录";
