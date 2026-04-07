@@ -91,6 +91,7 @@
 "export.type.milestone"     = "Milestone";
 "export.sleep.end %@"       = "End: %@";
 "export.sleep.ongoing"      = "Ongoing";
+"export.feeding.ongoing"    = "In Progress";
 "export.growth.height %@ %@" = "%@ %@ height";
 "export.growth.head %@ %@"  = "%@ %@ head";
 "export.milestone.completed" = "Completed";

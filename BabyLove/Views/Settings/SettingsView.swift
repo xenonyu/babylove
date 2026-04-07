@@ -247,6 +247,7 @@ struct SettingsView: View {
             let typeGrowth    = NSLocalizedString("export.type.growth", comment: "")
             let typeMilestone = NSLocalizedString("export.type.milestone", comment: "")
             let sleepOngoing  = NSLocalizedString("export.sleep.ongoing", comment: "")
+            let feedingOngoing = NSLocalizedString("export.feeding.ongoing", comment: "")
             let mCompleted    = NSLocalizedString("export.milestone.completed", comment: "")
             let mInProgress   = NSLocalizedString("export.milestone.inProgress", comment: "")
 
@@ -261,9 +262,16 @@ struct SettingsView: View {
                     for r in feedings {
                         let date = r.timestamp.map { dateFormatter.string(from: $0) } ?? ""
                         let time = r.timestamp.map { timeFormatter.string(from: $0) } ?? ""
-                        let feedType = FeedType(rawValue: r.feedType ?? "")?.displayName ?? r.feedType ?? ""
+                        let ft = FeedType(rawValue: r.feedType ?? "")
+                        let feedType = ft?.displayName ?? r.feedType ?? ""
                         var details = [feedType]
-                        if r.durationMinutes > 0 { details.append(DurationFormat.standard(r.durationMinutes)) }
+                        // Detect ongoing feeding timer (breast/pump with durationMinutes == 0)
+                        let isOngoing = (ft == .breast || ft == .pump) && r.durationMinutes == 0
+                        if isOngoing {
+                            details.append(feedingOngoing)
+                        } else if r.durationMinutes > 0 {
+                            details.append(DurationFormat.standard(r.durationMinutes))
+                        }
                         if r.amountML > 0 {
                             let val = unit.volumeFromML(r.amountML)
                             details.append(unit == .metric ? "\(Int(val)) \(unit.volumeLabel)" : String(format: "%.1f %@", val, unit.volumeLabel))

@@ -1,5 +1,4 @@
 [
-  "[04/07 05:52] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 06:09] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 06:27] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 06:44] API Error: Unable to connect to API (ConnectionRefused)",
@@ -28,5 +27,6 @@
   "[04/07 10:37] ## 迭代 #17 完成 ✅\n\n### 改进内容：在 GrowthView 记录列表中显示备注预览 + 补充 Voice",
   "[04/07 10:42] ## 迭代 #18 完成 ✅\n\n### 改进内容：为 AllSleepsView 的进行中睡眠添加视觉指示器（与 All",
   "[04/07 10:47] **迭代 #19 完成 ✅**\n\n**改进**: 为 OnboardingView 的宝宝名称输入框添加键盘工具栏 Do",
-  "[04/07 10:52] **迭代 #20 完成 ✅**\n\n**改进**: 为 AllGrowthView 添加按指标类型筛选的 Filter C"
+  "[04/07 10:52] **迭代 #20 完成 ✅**\n\n**改进**: 为 AllGrowthView 添加按指标类型筛选的 Filter C",
+  "[04/07 10:57] **迭代 #21 完成 ✅**\n\n**改进**: 在 AddMilestoneView 的预设建议中标记已记录的里程碑\n"
 ]

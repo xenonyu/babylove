@@ -91,6 +91,7 @@
 "export.type.milestone"     = "里程碑";
 "export.sleep.end %@"       = "结束: %@";
 "export.sleep.ongoing"      = "进行中";
+"export.feeding.ongoing"    = "进行中";
 "export.growth.height %@ %@" = "%@ %@ 身高";
 "export.growth.head %@ %@"  = "%@ %@ 头围";
 "export.milestone.completed" = "已完成";

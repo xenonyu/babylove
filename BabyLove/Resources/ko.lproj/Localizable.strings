@@ -91,6 +91,7 @@
 "export.type.milestone"     = "마일스톤";
 "export.sleep.end %@"       = "종료: %@";
 "export.sleep.ongoing"      = "진행 중";
+"export.feeding.ongoing"    = "진행 중";
 "export.growth.height %@ %@" = "%@ %@ 신장";
 "export.growth.head %@ %@"  = "%@ %@ 머리둘레";
 "export.milestone.completed" = "완료";
