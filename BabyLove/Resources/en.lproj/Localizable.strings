@@ -454,6 +454,12 @@
 "growthLog.headPlaceholder.imperial"   = "e.g. 15.8";
 "growthLog.previous %@"               = "Last: %@";
 "growthLog.previousWithDate %@ %@"    = "Last: %@ · %@";
+"growthLog.chip.withClothes"   = "With clothes";
+"growthLog.chip.afterFeeding"  = "After feeding";
+"growthLog.chip.beforeMeal"    = "Before meal";
+"growthLog.chip.doctorVisit"   = "Doctor visit";
+"growthLog.chip.atHome"        = "At home";
+"growthLog.chip.fussy"         = "Fussy";
 
 /* ===== Growth View ===== */
 "growth.title"            = "Growth";

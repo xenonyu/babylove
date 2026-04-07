@@ -454,6 +454,12 @@
 "growthLog.headPlaceholder.imperial"   = "如 15.8";
 "growthLog.previous %@"               = "上次: %@";
 "growthLog.previousWithDate %@ %@"    = "上次: %@ · %@";
+"growthLog.chip.withClothes"   = "穿衣称重";
+"growthLog.chip.afterFeeding"  = "喂奶后";
+"growthLog.chip.beforeMeal"    = "餐前";
+"growthLog.chip.doctorVisit"   = "就医体检";
+"growthLog.chip.atHome"        = "在家测量";
+"growthLog.chip.fussy"         = "哭闹中";
 
 /* ===== Growth View ===== */
 "growth.title"            = "生长曲线";

@@ -229,10 +229,15 @@ struct GrowthLogView: View {
                             }
                         }
 
+                        // Notes with quick-suggestion chips
                         VStack(alignment: .leading, spacing: 10) {
-                            Label(NSLocalizedString("log.notes", comment: ""), systemImage: "note.text")
+                            Label(NSLocalizedString("log.notesOptional", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
+
+                            // Quick-note suggestion chips — tap to append to notes
+                            quickNoteChips
+
                             TextField(NSLocalizedString("growthLog.notesPlaceholder", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(2...4)
                                 .padding(14)
@@ -347,6 +352,71 @@ struct GrowthLogView: View {
                                color: ok ? .blGrowth : .red)
         }
         if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
+    }
+
+    // MARK: - Quick Note Suggestions
+
+    /// Common observations parents note during growth measurements.
+    private var quickNoteSuggestions: [String] {
+        [
+            NSLocalizedString("growthLog.chip.withClothes", comment: ""),
+            NSLocalizedString("growthLog.chip.afterFeeding", comment: ""),
+            NSLocalizedString("growthLog.chip.beforeMeal", comment: ""),
+            NSLocalizedString("growthLog.chip.doctorVisit", comment: ""),
+            NSLocalizedString("growthLog.chip.atHome", comment: ""),
+            NSLocalizedString("growthLog.chip.fussy", comment: ""),
+        ]
+    }
+
+    /// Whether a suggestion chip's text is already contained in the notes field
+    private func chipAlreadyAdded(_ chip: String) -> Bool {
+        notes.localizedCaseInsensitiveContains(chip)
+    }
+
+    private var quickNoteChips: some View {
+        FlowLayout(spacing: 8) {
+            ForEach(quickNoteSuggestions, id: \.self) { chip in
+                let isAdded = chipAlreadyAdded(chip)
+                Button {
+                    Haptic.selection()
+                    if isAdded {
+                        removeChipFromNotes(chip)
+                    } else {
+                        if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            notes = chip
+                        } else {
+                            notes += ", \(chip)"
+                        }
+                    }
+                } label: {
+                    Text(chip)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(isAdded ? .white : .blGrowth)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(isAdded ? Color.blGrowth : Color.blGrowth.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(chip)
+                .accessibilityAddTraits(isAdded ? .isSelected : [])
+            }
+        }
+    }
+
+    /// Remove a chip's text from the notes field, cleaning up surrounding separators
+    private func removeChipFromNotes(_ chip: String) {
+        if let range = notes.range(of: ", \(chip)", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: "\(chip), ", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: chip, options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        if notes.hasPrefix(", ") { notes = String(notes.dropFirst(2)) }
+        if notes.hasSuffix(",") { notes = String(notes.dropLast()) }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func populateFromRecord() {

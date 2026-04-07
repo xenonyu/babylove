@@ -454,6 +454,12 @@
 "growthLog.headPlaceholder.imperial"   = "例: 15.8";
 "growthLog.previous %@"               = "前回: %@";
 "growthLog.previousWithDate %@ %@"    = "前回: %@ · %@";
+"growthLog.chip.withClothes"   = "服着用";
+"growthLog.chip.afterFeeding"  = "授乳後";
+"growthLog.chip.beforeMeal"    = "食前";
+"growthLog.chip.doctorVisit"   = "健診";
+"growthLog.chip.atHome"        = "自宅で計測";
+"growthLog.chip.fussy"         = "ぐずり中";
 
 /* ===== Growth View ===== */
 "growth.title"            = "成長曲線";

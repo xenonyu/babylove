@@ -454,6 +454,12 @@
 "growthLog.headPlaceholder.imperial"   = "예: 15.8";
 "growthLog.previous %@"               = "이전: %@";
 "growthLog.previousWithDate %@ %@"    = "이전: %@ · %@";
+"growthLog.chip.withClothes"   = "옷 입고";
+"growthLog.chip.afterFeeding"  = "수유 후";
+"growthLog.chip.beforeMeal"    = "식전";
+"growthLog.chip.doctorVisit"   = "병원 검진";
+"growthLog.chip.atHome"        = "집에서 측정";
+"growthLog.chip.fussy"         = "보챔";
 
 /* ===== Growth View ===== */
 "growth.title"            = "성장 곡선";
