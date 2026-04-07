@@ -222,6 +222,8 @@
 "home.noActivityThisDay"   = "No activity on this day";
 "home.tapToStart %@"       = "Tap a Quick Log button above to start tracking %@'s day";
 "home.noRecordsLogged %@"  = "No records were logged for %@ on this date";
+"home.empty.quickStart"    = "Start recording";
+"home.empty.logA11y %@"    = "Log %@";
 
 /* Timeline */
 "home.ongoing"             = "Ongoing";

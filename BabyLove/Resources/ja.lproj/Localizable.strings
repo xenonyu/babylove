@@ -222,6 +222,8 @@
 "home.noActivityThisDay"   = "この日の記録はありません";
 "home.tapToStart %@"       = "上のクイック記録ボタンをタップして、%@の一日を記録しましょう";
 "home.noRecordsLogged %@"  = "%@のこの日の記録はありません";
+"home.empty.quickStart"    = "記録を始める";
+"home.empty.logA11y %@"    = "%@を記録";
 
 /* Timeline */
 "home.ongoing"             = "進行中";

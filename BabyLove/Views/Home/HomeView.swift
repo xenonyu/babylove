@@ -2273,9 +2273,9 @@ struct HomeView: View {
             BLSectionHeader(title: NSLocalizedString("home.recentActivity", comment: ""))
                 .padding(.horizontal, 20)
 
-            VStack(spacing: 14) {
+            VStack(spacing: 18) {
                 Image(systemName: "sun.horizon.fill")
-                    .font(.system(size: 40))
+                    .font(.system(size: 36))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [.blPrimary.opacity(0.5), .blGrowth.opacity(0.5)],
@@ -2296,12 +2296,71 @@ struct HomeView: View {
                     .foregroundColor(.blTextTertiary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 8)
+
+                // Quick-log action buttons in empty state
+                if isSelectedDateToday {
+                    VStack(spacing: 10) {
+                        Divider().padding(.horizontal, 8)
+
+                        Text(String(localized: "home.empty.quickStart"))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.blTextTertiary)
+                            .textCase(.uppercase)
+                            .tracking(0.5)
+
+                        HStack(spacing: 12) {
+                            emptyQuickButton(icon: "drop.fill", label: String(localized: "home.feeding"), color: .blFeeding) {
+                                Haptic.selection()
+                                showFeedingLog = true
+                            }
+                            emptyQuickButton(icon: "moon.zzz.fill", label: String(localized: "home.sleep"), color: .blSleep) {
+                                Haptic.selection()
+                                showSleepLog = true
+                            }
+                            emptyQuickButton(icon: "oval.fill", label: String(localized: "home.diaper"), color: .blDiaper) {
+                                Haptic.selection()
+                                showDiaperLog = true
+                            }
+                            emptyQuickButton(icon: "chart.bar.fill", label: String(localized: "home.growth"), color: .blGrowth) {
+                                Haptic.selection()
+                                showGrowthLog = true
+                            }
+                        }
+                    }
+                    .padding(.top, 2)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 24)
             .blCard()
             .padding(.horizontal, 20)
         }
+    }
+
+    /// Compact quick-log button for the empty state
+    @ViewBuilder
+    private func emptyQuickButton(icon: String, label: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(color.opacity(0.12))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: icon)
+                        .font(.system(size: 20))
+                        .foregroundColor(color)
+                }
+                Text(label)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.blTextSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(String(format: NSLocalizedString("home.empty.logA11y %@", comment: ""), label))
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Recent Activity

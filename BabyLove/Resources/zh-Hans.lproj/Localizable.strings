@@ -222,6 +222,8 @@
 "home.noActivityThisDay"   = "当天没有记录";
 "home.tapToStart %@"       = "点击上方快速记录按钮，开始记录%@的一天";
 "home.noRecordsLogged %@"  = "%@当天没有记录";
+"home.empty.quickStart"    = "开始记录";
+"home.empty.logA11y %@"    = "记录%@";
 
 /* Timeline */
 "home.ongoing"             = "进行中";

@@ -222,6 +222,8 @@
 "home.noActivityThisDay"   = "이 날의 기록이 없어요";
 "home.tapToStart %@"       = "위의 빠른 기록 버튼을 눌러 %@의 하루를 기록해 보세요";
 "home.noRecordsLogged %@"  = "%@의 이 날 기록이 없습니다";
+"home.empty.quickStart"    = "기록 시작";
+"home.empty.logA11y %@"    = "%@ 기록";
 
 /* Timeline */
 "home.ongoing"             = "진행 중";
