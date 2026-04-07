@@ -600,7 +600,7 @@ struct TrackView: View {
                         let w = unit.weightFromKG(r.weightKG)
                         growthMetricPill(
                             icon: "scalemass.fill",
-                            text: String(format: "%.1f %@", w, unit.weightLabel)
+                            text: String(format: "%.2f %@", w, unit.weightLabel)
                         )
                     }
                     if r.heightCM > 0 {
@@ -648,7 +648,7 @@ struct TrackView: View {
         }
         if r.weightKG > 0 {
             let w = unit.weightFromKG(r.weightKG)
-            parts.append("\(String(format: "%.1f", w)) \(unit.weightLabel)")
+            parts.append("\(String(format: "%.2f", w)) \(unit.weightLabel)")
         }
         if r.heightCM > 0 {
             let h = unit.lengthFromCM(r.heightCM)
