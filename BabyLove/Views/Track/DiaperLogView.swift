@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct DiaperLogView: View {
     @ObservedObject var vm: TrackViewModel
@@ -19,6 +20,8 @@ struct DiaperLogView: View {
     @State private var showTimePicker = false
     /// Guards against double-tap creating duplicate records
     @State private var isSaving = false
+    /// Today's diaper stats for the context badge
+    @State private var todayDiaperStats: TodayDiaperStats = .empty
     /// Whether the current timestamp falls on a different calendar day than today
     private var isTimestampPastDay: Bool {
         !Calendar.current.isDateInToday(timestamp)
@@ -33,12 +36,80 @@ struct DiaperLogView: View {
         return false
     }
 
+    // MARK: - Today's Diaper Stats
+
+    /// Lightweight struct holding today's diaper breakdown
+    struct TodayDiaperStats {
+        let total: Int
+        let wet: Int
+        let dirty: Int
+
+        static let empty = TodayDiaperStats(total: 0, wet: 0, dirty: 0)
+    }
+
+    /// Fetch today's diaper records and compute the breakdown.
+    private func loadTodayStats() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let req: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+        let startOfDay = Calendar.current.startOfDay(for: Date()) as NSDate
+        req.predicate = NSPredicate(format: "timestamp >= %@", startOfDay)
+        guard let results = try? ctx.fetch(req) else { return }
+        var wet = 0, dirty = 0
+        for r in results {
+            switch DiaperType(rawValue: r.diaperType ?? "") {
+            case .wet:   wet += 1
+            case .dirty: dirty += 1
+            case .both:  wet += 1; dirty += 1
+            case .dry, .none: break
+            }
+        }
+        todayDiaperStats = TodayDiaperStats(total: results.count, wet: wet, dirty: dirty)
+    }
+
+    /// The context badge showing today's diaper count with wet/dirty breakdown
+    @ViewBuilder
+    private var todayContextBadge: some View {
+        if !isEditing && todayDiaperStats.total > 0 {
+            HStack(spacing: 10) {
+                Image(systemName: "chart.bar.doc.horizontal.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blDiaper)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(format: NSLocalizedString("diaperLog.todayCount %lld", comment: ""), todayDiaperStats.total))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    HStack(spacing: 8) {
+                        if todayDiaperStats.wet > 0 {
+                            Text("💧 \(todayDiaperStats.wet)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                        if todayDiaperStats.dirty > 0 {
+                            Text("💩 \(todayDiaperStats.dirty)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                    }
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(Color.blDiaper.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(format: NSLocalizedString("a11y.diaperTodayCount %lld %lld %lld", comment: ""), todayDiaperStats.total, todayDiaperStats.wet, todayDiaperStats.dirty))
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Today's diaper context (only for new records)
+                        todayContextBadge
+
                         // Retroactive date banner — shown when creating a new record for a past day
                         // Suppressed when editing, since the timestamp already belongs to the record
                         if isTimestampPastDay && !isEditing {
@@ -194,6 +265,8 @@ struct DiaperLogView: View {
                 if !isEditing, let initialDate {
                     timestamp = initialDate
                 }
+                // Load today's diaper stats for context badge
+                loadTodayStats()
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
         }

@@ -427,6 +427,8 @@
 "diaperLog.chip.firm"     = "硬便";
 "diaperLog.chip.greenish" = "偏绿色";
 "diaperLog.chip.creamApplied" = "涂了护臀霜";
+"diaperLog.todayCount %lld"   = "今天已换 %lld 次尿布";
+"a11y.diaperTodayCount %lld %lld %lld" = "今天共换 %lld 次尿布，%lld 次湿尿布，%lld 次脏尿布";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "记录生长";

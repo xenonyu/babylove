@@ -427,6 +427,8 @@
 "diaperLog.chip.firm"     = "딱딱한 변";
 "diaperLog.chip.greenish" = "녹색빛";
 "diaperLog.chip.creamApplied" = "크림 발랐음";
+"diaperLog.todayCount %lld"   = "오늘: 기저귀 %lld회 교환";
+"a11y.diaperTodayCount %lld %lld %lld" = "오늘: 기저귀 총 %lld회, 소변 %lld회, 대변 %lld회";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "성장 기록";

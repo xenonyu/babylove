@@ -427,6 +427,8 @@
 "diaperLog.chip.firm"     = "かため";
 "diaperLog.chip.greenish" = "緑がかり";
 "diaperLog.chip.creamApplied" = "クリーム塗布";
+"diaperLog.todayCount %lld"   = "今日：%lld回のおむつ替え";
+"a11y.diaperTodayCount %lld %lld %lld" = "今日：おむつ替え合計%lld回、おしっこ%lld回、うんち%lld回";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "成長を記録";

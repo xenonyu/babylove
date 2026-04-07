@@ -427,6 +427,8 @@
 "diaperLog.chip.firm"     = "Firm";
 "diaperLog.chip.greenish" = "Greenish";
 "diaperLog.chip.creamApplied" = "Cream applied";
+"diaperLog.todayCount %lld"   = "Today: %lld diapers so far";
+"a11y.diaperTodayCount %lld %lld %lld" = "Today: %lld diapers total, %lld wet, %lld dirty";
 
 /* ===== Growth Log ===== */
 "growthLog.title"         = "Log Growth";
