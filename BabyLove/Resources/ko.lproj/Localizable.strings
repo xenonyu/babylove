@@ -807,3 +807,20 @@
 "a11y.onboarding.step %lld %lld" = "%lld단계 / %lld단계";
 "a11y.onboarding.birthday %@"    = "생일: %@";
 "a11y.onboarding.birthdayHint"   = "이중 탭하여 생일 변경";
+
+/* ===== 스마트 예측 ===== */
+"prediction.title"                  = "스마트 예측";
+"prediction.basedOn %lld"           = "%lld개 기록 기반";
+"prediction.feeding"                = "다음 수유";
+"prediction.nextFeeding"            = "다음 수유";
+"prediction.sleepWindow"            = "수면 시간대";
+"prediction.now"                    = "곧 시작";
+"prediction.countdown.hm %lld %lld" = "약 %lld시간 %lld분 후";
+"prediction.countdown.m %lld"       = "약 %lld분 후";
+"prediction.overdue.hm %lld %lld"  = "%lld시간 %lld분 전";
+"prediction.overdue.m %lld"        = "%lld분 전";
+"prediction.sleepNow"              = "수면 시간대 중 ✨";
+"prediction.sleepPassed"           = "시간대 종료";
+"prediction.needMore"               = "데이터 부족";
+"prediction.insufficientData"       = "더 많은 기록을 남기면 예측이 표시됩니다";
+"prediction.insufficientHint"       = "수유 또는 수면 기록이 3개 이상 필요합니다";

@@ -807,3 +807,20 @@
 "a11y.onboarding.step %lld %lld" = "第 %lld 步，共 %lld 步";
 "a11y.onboarding.birthday %@"    = "生日：%@";
 "a11y.onboarding.birthdayHint"   = "轻点两下更改生日";
+
+/* ===== 智能预测 ===== */
+"prediction.title"                  = "智能预测";
+"prediction.basedOn %lld"           = "基于 %lld 条记录";
+"prediction.feeding"                = "下次喂奶";
+"prediction.nextFeeding"            = "下次喂奶";
+"prediction.sleepWindow"            = "入睡窗口";
+"prediction.now"                    = "就在此刻";
+"prediction.countdown.hm %lld %lld" = "约 %lld小时 %lld分钟后";
+"prediction.countdown.m %lld"       = "约 %lld分钟后";
+"prediction.overdue.hm %lld %lld"  = "%lld小时 %lld分钟前";
+"prediction.overdue.m %lld"        = "%lld分钟前";
+"prediction.sleepNow"              = "正在入睡窗口 ✨";
+"prediction.sleepPassed"           = "窗口已过";
+"prediction.needMore"               = "数据不足";
+"prediction.insufficientData"       = "记录更多数据，预测将更准确";
+"prediction.insufficientHint"       = "至少需要 3 条喂奶或睡眠记录";

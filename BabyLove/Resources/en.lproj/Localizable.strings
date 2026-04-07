@@ -807,3 +807,20 @@
 "a11y.onboarding.step %lld %lld" = "Step %lld of %lld";
 "a11y.onboarding.birthday %@"    = "Birthday: %@";
 "a11y.onboarding.birthdayHint"   = "Double tap to change birthday";
+
+/* ===== Smart Prediction ===== */
+"prediction.title"                  = "Smart Prediction";
+"prediction.basedOn %lld"           = "Based on %lld records";
+"prediction.feeding"                = "Next Feeding";
+"prediction.nextFeeding"            = "Next Feeding";
+"prediction.sleepWindow"            = "Sleep Window";
+"prediction.now"                    = "Any moment now";
+"prediction.countdown.hm %lld %lld" = "≈ %lldh %lldm";
+"prediction.countdown.m %lld"       = "≈ %lldm";
+"prediction.overdue.hm %lld %lld"  = "%lldh %lldm ago";
+"prediction.overdue.m %lld"        = "%lldm ago";
+"prediction.sleepNow"              = "In window now ✨";
+"prediction.sleepPassed"           = "Window passed";
+"prediction.needMore"               = "Need more data";
+"prediction.insufficientData"       = "Log more records and predictions will appear here";
+"prediction.insufficientHint"       = "At least 3 feeding or sleep records needed";

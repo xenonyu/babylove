@@ -991,6 +991,14 @@ struct HomeView: View {
                             .padding(.horizontal, 20)
                         }
 
+                        // Smart prediction card (only on today view)
+                        if isSelectedDateToday {
+                            SmartPredictionCard(
+                                onTapFeeding: { showFeedingLog = true },
+                                onTapSleep: { showSleepLog = true }
+                            )
+                        }
+
                         // Weekly summary (only on today view, only if there's any data)
                         if isSelectedDateToday && (!weekFeedings.isEmpty || !weekSleeps.isEmpty || !weekDiapers.isEmpty) {
                             weeklySummaryCard

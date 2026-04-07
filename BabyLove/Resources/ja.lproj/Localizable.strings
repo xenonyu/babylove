@@ -807,3 +807,20 @@
 "a11y.onboarding.step %lld %lld" = "ステップ %lld / %lld";
 "a11y.onboarding.birthday %@"    = "誕生日：%@";
 "a11y.onboarding.birthdayHint"   = "ダブルタップで誕生日を変更";
+
+/* ===== スマート予測 ===== */
+"prediction.title"                  = "スマート予測";
+"prediction.basedOn %lld"           = "%lld 件の記録に基づく";
+"prediction.feeding"                = "次の授乳";
+"prediction.nextFeeding"            = "次の授乳";
+"prediction.sleepWindow"            = "睡眠ウィンドウ";
+"prediction.now"                    = "まもなく";
+"prediction.countdown.hm %lld %lld" = "約 %lld時間 %lld分後";
+"prediction.countdown.m %lld"       = "約 %lld分後";
+"prediction.overdue.hm %lld %lld"  = "%lld時間 %lld分前";
+"prediction.overdue.m %lld"        = "%lld分前";
+"prediction.sleepNow"              = "入眠ウィンドウ中 ✨";
+"prediction.sleepPassed"           = "ウィンドウ終了";
+"prediction.needMore"               = "データ不足";
+"prediction.insufficientData"       = "もっと記録すると予測が表示されます";
+"prediction.insufficientHint"       = "授乳または睡眠の記録が3件以上必要です";
