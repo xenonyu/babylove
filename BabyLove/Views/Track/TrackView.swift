@@ -33,6 +33,11 @@ struct TrackView: View {
     @State private var totalDiaperCount: Int = 0
     @State private var totalGrowthCount: Int = 0
 
+    /// Tick updated every 60s so "time since" hints stay fresh
+    @State private var minuteTick: Date = Date()
+    /// Timer that fires every 60s to update minuteTick
+    @State private var minuteTimer: Timer?
+
     // Limit high-frequency records to the last 14 days to avoid loading thousands
     // of objects into memory. Only 5 are shown per section; the "See All" views
     // have their own unbounded FetchRequests.
@@ -60,6 +65,95 @@ struct TrackView: View {
         sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
     ) private var recentGrowth: FetchedResults<CDGrowthRecord>
 
+    // MARK: - Quick Log Hints (time since last)
+
+    /// Short "time since" string, e.g. "32m ago", "1h 5m ago", "2d ago"
+    private static func timeSinceText(from date: Date?) -> String {
+        guard let date else { return "" }
+        let seconds = Int(Date().timeIntervalSince(date))
+        guard seconds >= 0 else { return "" }
+        if seconds < 60 { return NSLocalizedString("home.justNow", comment: "") }
+        let minutes = seconds / 60
+        if minutes < 60 { return String(format: NSLocalizedString("home.minsAgo %lld", comment: ""), minutes) }
+        let hours = minutes / 60
+        let remMins = minutes % 60
+        if hours < 24 {
+            return remMins > 0
+                ? String(format: NSLocalizedString("home.hoursMinAgo %lld %lld", comment: ""), hours, remMins)
+                : String(format: NSLocalizedString("home.hoursAgo %lld", comment: ""), hours)
+        }
+        let days = hours / 24
+        return String(format: NSLocalizedString("home.daysAgo %lld", comment: ""), days)
+    }
+
+    /// Contextual hint for the Feeding quick log card.
+    private var feedingHint: String? {
+        _ = minuteTick
+        guard let record = recentFeedings.first else { return nil }
+        let isOngoing = Self.isFeedingOngoing(record)
+        if isOngoing { return NSLocalizedString("home.inProgress", comment: "") }
+        // "Next: Right/Left" if last breast side is known
+        let ft = FeedType(rawValue: record.feedType ?? "")
+        if (ft == .breast || ft == .pump),
+           let sideRaw = record.breastSide, !sideRaw.isEmpty,
+           let side = BreastSide(rawValue: sideRaw), side != .both {
+            let nextSide = side == .left ? BreastSide.right.displayName : BreastSide.left.displayName
+            return String(format: NSLocalizedString("home.next %@", comment: ""), nextSide)
+        }
+        guard let ts = record.timestamp else { return nil }
+        let timeSince = Self.timeSinceText(from: ts)
+        if let ft { return "\(ft.displayName) · \(timeSince)" }
+        return timeSince
+    }
+
+    /// Contextual hint for the Sleep quick log card.
+    private var sleepHint: String? {
+        _ = minuteTick
+        guard let record = recentSleeps.first else { return nil }
+        let isOngoing = record.endTime == nil
+        if isOngoing {
+            if let loc = record.location, let sl = SleepLocation(rawValue: loc) {
+                return "\(sl.displayName) · \(NSLocalizedString("home.sleepingNow", comment: ""))"
+            }
+            return NSLocalizedString("home.sleepingNow", comment: "")
+        }
+        guard let endTime = record.endTime else { return nil }
+        let timeSince = Self.timeSinceText(from: endTime)
+        if let loc = record.location, let sl = SleepLocation(rawValue: loc) {
+            return "\(sl.displayName) · \(timeSince)"
+        }
+        return timeSince
+    }
+
+    /// Contextual hint for the Diaper quick log card.
+    private var diaperHint: String? {
+        _ = minuteTick
+        guard let record = recentDiapers.first, let ts = record.timestamp else { return nil }
+        let timeSince = Self.timeSinceText(from: ts)
+        if let dtype = DiaperType(rawValue: record.diaperType ?? "") {
+            return "\(dtype.icon) \(dtype.displayName) · \(timeSince)"
+        }
+        return timeSince
+    }
+
+    /// Contextual hint for the Growth quick log card.
+    private var growthHint: String? {
+        guard let record = recentGrowth.first, let lastDate = record.date else { return nil }
+        let timeSince = Self.timeSinceText(from: lastDate)
+        let unit = appState.measurementUnit
+        let valueStr: String? = if record.weightKG > 0 {
+            String(format: "%.1f %@", unit.weightFromKG(record.weightKG), unit.weightLabel)
+        } else if record.heightCM > 0 {
+            String(format: "%.1f %@", unit.lengthFromCM(record.heightCM), unit.heightLabel)
+        } else if record.headCircumferenceCM > 0 {
+            String(format: "%.1f %@", unit.lengthFromCM(record.headCircumferenceCM), unit.heightLabel)
+        } else {
+            nil
+        }
+        if let valueStr { return "\(valueStr) · \(timeSince)" }
+        return timeSince
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -76,16 +170,20 @@ struct TrackView: View {
                             ], spacing: 12) {
                                 QuickLogCard(icon: "drop.fill",
                                              label: String(localized: "track.feeding"),
-                                             color: .blFeeding) { showFeedingLog = true }
+                                             color: .blFeeding,
+                                             hint: feedingHint) { showFeedingLog = true }
                                 QuickLogCard(icon: "moon.zzz.fill",
                                              label: String(localized: "track.sleep"),
-                                             color: .blSleep) { showSleepLog = true }
+                                             color: .blSleep,
+                                             hint: sleepHint) { showSleepLog = true }
                                 QuickLogCard(icon: "oval.fill",
                                              label: String(localized: "track.diaper"),
-                                             color: .blDiaper) { showDiaperLog = true }
+                                             color: .blDiaper,
+                                             hint: diaperHint) { showDiaperLog = true }
                                 QuickLogCard(icon: "chart.bar.fill",
                                              label: String(localized: "track.growth"),
-                                             color: .blGrowth) { showGrowthLog = true }
+                                             color: .blGrowth,
+                                             hint: growthHint) { showGrowthLog = true }
                             }
                         }
                         .padding(.horizontal, 20)
@@ -224,9 +322,10 @@ struct TrackView: View {
             }
             .navigationTitle(String(localized: "track.title"))
             .navigationBarTitleDisplayMode(.large)
-            .onAppear { refreshPredicatesIfNeeded(); refreshTotalCounts() }
+            .onAppear { refreshPredicatesIfNeeded(); refreshTotalCounts(); startMinuteTimer() }
+            .onDisappear { stopMinuteTimer() }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active { refreshPredicatesIfNeeded(); refreshTotalCounts() }
+                if phase == .active { refreshPredicatesIfNeeded(); refreshTotalCounts(); minuteTick = Date() }
             }
             .onChange(of: recentFeedings.count) { _, _ in refreshTotalCounts() }
             .onChange(of: recentSleeps.count) { _, _ in refreshTotalCounts() }
@@ -321,6 +420,20 @@ struct TrackView: View {
 
         let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
         totalGrowthCount = (try? context.count(for: growthReq)) ?? 0
+    }
+
+    // MARK: - Minute Timer (keeps "time since" hints fresh)
+
+    private func startMinuteTimer() {
+        stopMinuteTimer()
+        minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            minuteTick = Date()
+        }
+    }
+
+    private func stopMinuteTimer() {
+        minuteTimer?.invalidate()
+        minuteTimer = nil
     }
 
     // MARK: - Recent Section
