@@ -219,7 +219,7 @@
 "home.weekly.hoursValue %@" = "%@시간";
 "home.weekly.perDay"       = "/일";
 "home.weekly.total %lld"   = "총 %lld회";
-"home.weekly.volumeTotal %lld %@" = "총 %lld %@";
+"home.weekly.volumeTotal %@ %@" = "총 %@ %@";
 "home.weekly.naps %lld"    = "총 %lld회 낮잠";
 "home.weekly.upPct %lld"   = "지난주 대비 %lld%% 증가";
 "home.weekly.downPct %lld" = "지난주 대비 %lld%% 감소";

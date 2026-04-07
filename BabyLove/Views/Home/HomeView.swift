@@ -1569,9 +1569,10 @@ struct HomeView: View {
                     let valueText = unit == .metric
                         ? "\(Int(avgDisplay.rounded()))"
                         : String(format: "%.1f", avgDisplay)
-                    let totalText = unit == .metric
-                        ? String(format: NSLocalizedString("home.weekly.volumeTotal %lld %@", comment: ""), Int(totalDisplay.rounded()), unit.volumeLabel)
-                        : String(format: NSLocalizedString("home.weekly.volumeTotal %lld %@", comment: ""), Int(totalDisplay.rounded()), unit.volumeLabel)
+                    let totalNumText = unit == .metric
+                        ? "\(Int(totalDisplay.rounded()))"
+                        : String(format: "%.1f", totalDisplay)
+                    let totalText = String(format: NSLocalizedString("home.weekly.volumeTotal %@ %@", comment: ""), totalNumText, unit.volumeLabel)
                     weeklyRow(
                         icon: "cross.vial.fill",
                         color: .blFeeding,
