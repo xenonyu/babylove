@@ -46,7 +46,7 @@ struct HomeView: View {
     @State private var globalLastFeedingIsOngoing: Bool = false
     @State private var globalLastSleepEnd: Date?
     @State private var globalLastSleepIsOngoing: Bool = false
-    @State private var globalLastDiaperTime: Date?
+    @State private var globalLastDiaperRecord: CDDiaperRecord?
     @State private var globalLastGrowthRecord: CDGrowthRecord?
 
     // Initialize with today's predicate to avoid flashing all-time data
@@ -315,7 +315,7 @@ struct HomeView: View {
     /// References `minuteTick` so the label refreshes every 60 seconds.
     private var diaperTimeSince: String {
         _ = minuteTick
-        return Self.timeSinceText(from: globalLastDiaperTime)
+        return Self.timeSinceText(from: globalLastDiaperRecord?.timestamp)
     }
 
     /// Diaper breakdown subtitle (e.g. "3💧 2💩")
@@ -454,11 +454,16 @@ struct HomeView: View {
     }
 
     /// Contextual hint for the Diaper quick log card.
+    /// Shows the last diaper type and time elapsed (e.g. "💧 Wet · 2h ago").
     /// References `minuteTick` so the hint refreshes every 60 seconds.
     private var quickLogDiaperHint: String? {
         _ = minuteTick
-        guard let lastTime = globalLastDiaperTime else { return nil }
-        return Self.timeSinceText(from: lastTime)
+        guard let record = globalLastDiaperRecord, let lastTime = record.timestamp else { return nil }
+        let timeSince = Self.timeSinceText(from: lastTime)
+        if let dtype = DiaperType(rawValue: record.diaperType ?? "") {
+            return "\(dtype.icon) \(dtype.displayName) · \(timeSince)"
+        }
+        return timeSince
     }
 
     /// Contextual hint for the Growth quick log card.
@@ -868,7 +873,7 @@ struct HomeView: View {
         let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
         diaperReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         diaperReq.fetchLimit = 1
-        globalLastDiaperTime = (try? ctx.fetch(diaperReq))?.first?.timestamp
+        globalLastDiaperRecord = (try? ctx.fetch(diaperReq))?.first
 
         // Last growth measurement (any day)
         let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
