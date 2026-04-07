@@ -244,6 +244,11 @@
 "home.weekly.upPct %lld"   = "지난주 대비 %lld%% 증가";
 "home.weekly.downPct %lld" = "지난주 대비 %lld%% 감소";
 "home.weekly.same"         = "지난주와 동일";
+"home.weekly.chart"        = "7일 패턴";
+"home.weekly.chartFeed"    = "수유";
+"home.weekly.chartSleep"   = "수면";
+"home.weekly.chartDiaper"  = "기저귀";
+"home.weekly.chartA11y %lld %lld %lld" = "7일 활동 차트: 수유 %lld회, 수면 %lld시간, 기저귀 교체 %lld회";
 
 /* Daily Summary */
 "home.summary.feedingsSingular %lld" = "수유 %lld회";

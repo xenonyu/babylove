@@ -244,6 +244,11 @@
 "home.weekly.upPct %lld"   = "比上周增加 %lld%%";
 "home.weekly.downPct %lld" = "比上周减少 %lld%%";
 "home.weekly.same"         = "与上周持平";
+"home.weekly.chart"        = "7天趋势";
+"home.weekly.chartFeed"    = "喂食";
+"home.weekly.chartSleep"   = "睡眠";
+"home.weekly.chartDiaper"  = "尿布";
+"home.weekly.chartA11y %lld %lld %lld" = "7天活动图表：%lld 次喂食、%lld 小时睡眠、%lld 次换尿布";
 
 /* Daily Summary */
 "home.summary.feedingsSingular %lld" = "%lld 次喂食";

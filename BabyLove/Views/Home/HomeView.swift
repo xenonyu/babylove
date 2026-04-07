@@ -2081,10 +2081,170 @@ struct HomeView: View {
                         previous: prevWeekAvgDiapers
                     )
                 }
+
+                // 7-Day Activity Chart
+                Divider().padding(.horizontal, 16)
+                weeklyMiniChart
             }
             .blCard()
             .padding(.horizontal, 20)
         }
+    }
+
+    // MARK: - 7-Day Mini Activity Chart
+
+    /// Per-day activity counts for the last 7 days.
+    private struct DayActivity {
+        let date: Date
+        let feedCount: Int
+        let sleepMinutes: Int
+        let diaperCount: Int
+    }
+
+    /// Computes daily breakdowns from the weekly fetch results.
+    private var weekDailyActivities: [DayActivity] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+
+        // Build 7-day array (oldest first)
+        var days: [DayActivity] = []
+        for offset in stride(from: -6, through: 0, by: 1) {
+            guard let dayStart = cal.date(byAdding: .day, value: offset, to: today),
+                  let dayEnd = cal.date(byAdding: .day, value: 1, to: dayStart) else { continue }
+
+            let feedCount = weekFeedings.filter { r in
+                guard let ts = r.timestamp else { return false }
+                return ts >= dayStart && ts < dayEnd
+            }.count
+
+            let sleepMins = weekSleeps.reduce(0) { sum, r in
+                guard let s = r.startTime, let e = r.endTime else { return sum }
+                let clampedStart = max(s, dayStart)
+                let clampedEnd = min(e, dayEnd)
+                guard clampedEnd > clampedStart else { return sum }
+                return sum + Int(clampedEnd.timeIntervalSince(clampedStart) / 60)
+            }
+
+            let diaperCount = weekDiapers.filter { r in
+                guard let ts = r.timestamp else { return false }
+                return ts >= dayStart && ts < dayEnd
+            }.count
+
+            days.append(DayActivity(date: dayStart, feedCount: feedCount, sleepMinutes: sleepMins, diaperCount: diaperCount))
+        }
+        return days
+    }
+
+    /// Short day-of-week label (e.g. "M", "T", "W")
+    private static let miniDayFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "EEEEE" // single-letter day: M, T, W, T, F, S, S
+        return f
+    }()
+
+    /// Compact 7-day bar chart showing daily activity patterns.
+    private var weeklyMiniChart: some View {
+        let activities = weekDailyActivities
+        let maxFeed = activities.map(\.feedCount).max() ?? 1
+        let maxSleepHrs = activities.map { $0.sleepMinutes / 60 }.max() ?? 1
+        let maxDiaper = activities.map(\.diaperCount).max() ?? 1
+        let cal = Calendar.current
+        let todayStart = cal.startOfDay(for: Date())
+
+        return VStack(spacing: 8) {
+            HStack(spacing: 4) {
+                Image(systemName: "chart.bar.xaxis")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.blTextTertiary)
+                Text(NSLocalizedString("home.weekly.chart", comment: ""))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.blTextTertiary)
+                Spacer()
+                // Legend
+                HStack(spacing: 8) {
+                    legendDot(color: .blFeeding, label: NSLocalizedString("home.weekly.chartFeed", comment: ""))
+                    legendDot(color: .blSleep, label: NSLocalizedString("home.weekly.chartSleep", comment: ""))
+                    legendDot(color: .blDiaper, label: NSLocalizedString("home.weekly.chartDiaper", comment: ""))
+                }
+            }
+
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(activities, id: \.date) { day in
+                    let isToday = cal.isDate(day.date, inSameDayAs: todayStart)
+                    let feedH = maxFeed > 0 ? CGFloat(day.feedCount) / CGFloat(maxFeed) : 0
+                    let sleepH = maxSleepHrs > 0 ? CGFloat(day.sleepMinutes / 60) / CGFloat(maxSleepHrs) : 0
+                    let diaperH = maxDiaper > 0 ? CGFloat(day.diaperCount) / CGFloat(maxDiaper) : 0
+                    let hasData = day.feedCount > 0 || day.sleepMinutes > 0 || day.diaperCount > 0
+
+                    VStack(spacing: 3) {
+                        // Bars
+                        HStack(alignment: .bottom, spacing: 2) {
+                            miniBar(height: feedH, maxHeight: 32, color: .blFeeding, hasData: day.feedCount > 0)
+                            miniBar(height: sleepH, maxHeight: 32, color: .blSleep, hasData: day.sleepMinutes > 0)
+                            miniBar(height: diaperH, maxHeight: 32, color: .blDiaper, hasData: day.diaperCount > 0)
+                        }
+                        .frame(height: 32)
+
+                        // Day label
+                        Text(Self.miniDayFormatter.string(from: day.date))
+                            .font(.system(size: 9, weight: isToday ? .bold : .medium))
+                            .foregroundColor(isToday ? .blPrimary : .blTextTertiary)
+
+                        // Today dot
+                        if isToday {
+                            Circle()
+                                .fill(Color.blPrimary)
+                                .frame(width: 3, height: 3)
+                        } else if !hasData {
+                            Circle()
+                                .fill(Color.clear)
+                                .frame(width: 3, height: 3)
+                        } else {
+                            Circle()
+                                .fill(Color.clear)
+                                .frame(width: 3, height: 3)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(weeklyChartAccessibilityLabel)
+    }
+
+    /// Single mini bar for the 7-day chart
+    @ViewBuilder
+    private func miniBar(height: CGFloat, maxHeight: CGFloat, color: Color, hasData: Bool) -> some View {
+        let barHeight = hasData ? max(3, height * maxHeight) : 2
+        RoundedRectangle(cornerRadius: 2, style: .continuous)
+            .fill(hasData ? color : color.opacity(0.15))
+            .frame(width: 6, height: barHeight)
+    }
+
+    /// Legend dot + label for the mini chart
+    @ViewBuilder
+    private func legendDot(color: Color, label: String) -> some View {
+        HStack(spacing: 2) {
+            Circle()
+                .fill(color)
+                .frame(width: 5, height: 5)
+            Text(label)
+                .font(.system(size: 9, weight: .medium))
+                .foregroundColor(.blTextTertiary)
+        }
+    }
+
+    /// VoiceOver summary for the 7-day chart
+    private var weeklyChartAccessibilityLabel: String {
+        let activities = weekDailyActivities
+        let totalFeeds = activities.reduce(0) { $0 + $1.feedCount }
+        let totalSleepHrs = activities.reduce(0) { $0 + $1.sleepMinutes } / 60
+        let totalDiapers = activities.reduce(0) { $0 + $1.diaperCount }
+        return String(format: NSLocalizedString("home.weekly.chartA11y %lld %lld %lld", comment: ""),
+                      totalFeeds, totalSleepHrs, totalDiapers)
     }
 
     @ViewBuilder

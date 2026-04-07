@@ -244,6 +244,11 @@
 "home.weekly.upPct %lld"   = "up %lld%% from last week";
 "home.weekly.downPct %lld" = "down %lld%% from last week";
 "home.weekly.same"         = "same as last week";
+"home.weekly.chart"        = "7-Day Pattern";
+"home.weekly.chartFeed"    = "Feed";
+"home.weekly.chartSleep"   = "Sleep";
+"home.weekly.chartDiaper"  = "Diaper";
+"home.weekly.chartA11y %lld %lld %lld" = "7-day activity chart: %lld feedings, %lld hours sleep, %lld diapers";
 
 /* Daily Summary */
 "home.summary.feedingsSingular %lld" = "%lld feeding";

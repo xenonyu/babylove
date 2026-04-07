@@ -244,6 +244,11 @@
 "home.weekly.upPct %lld"   = "先週より %lld%% 増加";
 "home.weekly.downPct %lld" = "先週より %lld%% 減少";
 "home.weekly.same"         = "先週と同じ";
+"home.weekly.chart"        = "7日間パターン";
+"home.weekly.chartFeed"    = "授乳";
+"home.weekly.chartSleep"   = "睡眠";
+"home.weekly.chartDiaper"  = "おむつ";
+"home.weekly.chartA11y %lld %lld %lld" = "7日間の活動グラフ：授乳 %lld 回、睡眠 %lld 時間、おむつ交換 %lld 回";
 
 /* Daily Summary */
 "home.summary.feedingsSingular %lld" = "授乳 %lld 回";
