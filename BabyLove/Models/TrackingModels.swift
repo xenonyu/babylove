@@ -165,21 +165,28 @@ struct PresetMilestone: Identifiable {
         PresetMilestone(titleKey: "preset.pulledToStand", category: .motor, ageRangeMonths: "8-12"),
         PresetMilestone(titleKey: "preset.firstSteps", category: .motor, ageRangeMonths: "9-15"),
         PresetMilestone(titleKey: "preset.graspedToy", category: .motor, ageRangeMonths: "3-5"),
+        PresetMilestone(titleKey: "preset.pincerGrasp", category: .motor, ageRangeMonths: "7-10"),
+        PresetMilestone(titleKey: "preset.ranIndependently", category: .motor, ageRangeMonths: "14-20"),
         // Language
         PresetMilestone(titleKey: "preset.firstCoo", category: .language, ageRangeMonths: "1-3"),
         PresetMilestone(titleKey: "preset.babbled", category: .language, ageRangeMonths: "4-6"),
         PresetMilestone(titleKey: "preset.saidFirstWord", category: .language, ageRangeMonths: "10-14"),
         PresetMilestone(titleKey: "preset.respondedToName", category: .language, ageRangeMonths: "5-7"),
+        PresetMilestone(titleKey: "preset.twoWordPhrases", category: .language, ageRangeMonths: "18-24"),
         // Cognitive
         PresetMilestone(titleKey: "preset.followedObject", category: .cognitive, ageRangeMonths: "1-3"),
         PresetMilestone(titleKey: "preset.foundHiddenToy", category: .cognitive, ageRangeMonths: "6-9"),
         PresetMilestone(titleKey: "preset.pointedAtObjects", category: .cognitive, ageRangeMonths: "9-12"),
         PresetMilestone(titleKey: "preset.stackedBlocks", category: .cognitive, ageRangeMonths: "12-18"),
+        PresetMilestone(titleKey: "preset.pretendPlay", category: .cognitive, ageRangeMonths: "18-24"),
+        PresetMilestone(titleKey: "preset.sortedShapes", category: .cognitive, ageRangeMonths: "20-30"),
         // Health
         PresetMilestone(titleKey: "preset.firstTooth", category: .health, ageRangeMonths: "4-10"),
         PresetMilestone(titleKey: "preset.sleptThroughNight", category: .health, ageRangeMonths: "3-6"),
         PresetMilestone(titleKey: "preset.startedSolidFoods", category: .health, ageRangeMonths: "4-6"),
         PresetMilestone(titleKey: "preset.firstHaircut", category: .health, ageRangeMonths: "6-12"),
+        PresetMilestone(titleKey: "preset.drankFromCup", category: .health, ageRangeMonths: "9-15"),
+        PresetMilestone(titleKey: "preset.usedSpoon", category: .health, ageRangeMonths: "12-18"),
     ]
 
     static func forCategory(_ category: MilestoneCategory) -> [PresetMilestone] {

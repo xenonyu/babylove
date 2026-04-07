@@ -577,21 +577,28 @@
 "preset.pulledToStand"       = "Pulled to stand";
 "preset.firstSteps"          = "First steps";
 "preset.graspedToy"          = "Grasped a toy";
+"preset.pincerGrasp"         = "Pincer grasp";
+"preset.ranIndependently"    = "Ran independently";
 // Language
 "preset.firstCoo"            = "First coo";
 "preset.babbled"             = "Babbled (ba-ba, da-da)";
 "preset.saidFirstWord"       = "Said first word";
 "preset.respondedToName"     = "Responded to own name";
+"preset.twoWordPhrases"      = "Two-word phrases";
 // Cognitive
 "preset.followedObject"      = "Followed moving object";
 "preset.foundHiddenToy"      = "Found hidden toy";
 "preset.pointedAtObjects"    = "Pointed at objects";
 "preset.stackedBlocks"       = "Stacked blocks";
+"preset.pretendPlay"         = "Pretend play";
+"preset.sortedShapes"        = "Sorted shapes or colors";
 // Health
 "preset.firstTooth"          = "First tooth";
 "preset.sleptThroughNight"   = "Slept through the night";
 "preset.startedSolidFoods"   = "Started solid foods";
 "preset.firstHaircut"        = "First haircut";
+"preset.drankFromCup"        = "Drank from a cup";
+"preset.usedSpoon"           = "Used a spoon";
 
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "Time to Feed";

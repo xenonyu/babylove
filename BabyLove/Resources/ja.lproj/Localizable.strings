@@ -577,21 +577,28 @@
 "preset.pulledToStand"       = "つかまり立ち";
 "preset.firstSteps"          = "初めての一歩";
 "preset.graspedToy"          = "おもちゃを握った";
+"preset.pincerGrasp"         = "つまみ持ち";
+"preset.ranIndependently"    = "ひとりで走った";
 // 言語
 "preset.firstCoo"            = "初めてのクーイング";
 "preset.babbled"             = "喃語（バブバブ）";
 "preset.saidFirstWord"       = "初めての言葉";
 "preset.respondedToName"     = "名前に反応した";
+"preset.twoWordPhrases"      = "二語文";
 // 認知
 "preset.followedObject"      = "動くものを目で追った";
 "preset.foundHiddenToy"      = "隠したおもちゃを見つけた";
 "preset.pointedAtObjects"    = "指差し";
 "preset.stackedBlocks"       = "積み木を重ねた";
+"preset.pretendPlay"         = "ごっこ遊び";
+"preset.sortedShapes"        = "形や色の仲間分け";
 // 健康
 "preset.firstTooth"          = "初めての歯";
 "preset.sleptThroughNight"   = "夜通し眠った";
 "preset.startedSolidFoods"   = "離乳食を始めた";
 "preset.firstHaircut"        = "初めての散髪";
+"preset.drankFromCup"        = "コップで飲めた";
+"preset.usedSpoon"           = "スプーンを使えた";
 
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "授乳の時間です";

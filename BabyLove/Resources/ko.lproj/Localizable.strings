@@ -577,21 +577,28 @@
 "preset.pulledToStand"       = "잡고 일어서기";
 "preset.firstSteps"          = "첫 걸음";
 "preset.graspedToy"          = "장난감 잡기";
+"preset.pincerGrasp"         = "엄지 검지 집기";
+"preset.ranIndependently"    = "혼자 달리기";
 // 언어
 "preset.firstCoo"            = "첫 옹알이 (쿠잉)";
 "preset.babbled"             = "옹알이 (바바, 다다)";
 "preset.saidFirstWord"       = "첫 단어";
 "preset.respondedToName"     = "이름에 반응";
+"preset.twoWordPhrases"      = "두 단어 문장";
 // 인지
 "preset.followedObject"      = "움직이는 물체 눈으로 따라가기";
 "preset.foundHiddenToy"      = "숨긴 장난감 찾기";
 "preset.pointedAtObjects"    = "손가락으로 가리키기";
 "preset.stackedBlocks"       = "블록 쌓기";
+"preset.pretendPlay"         = "역할 놀이";
+"preset.sortedShapes"        = "모양이나 색 분류하기";
 // 건강
 "preset.firstTooth"          = "첫 이빨";
 "preset.sleptThroughNight"   = "밤새 잠자기";
 "preset.startedSolidFoods"   = "이유식 시작";
 "preset.firstHaircut"        = "첫 이발";
+"preset.drankFromCup"        = "컵으로 마시기";
+"preset.usedSpoon"           = "숟가락 사용하기";
 
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "수유 시간이에요";

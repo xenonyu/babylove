@@ -577,21 +577,28 @@
 "preset.pulledToStand"       = "扶站";
 "preset.firstSteps"          = "迈出第一步";
 "preset.graspedToy"          = "抓握玩具";
+"preset.pincerGrasp"         = "精细捏取";
+"preset.ranIndependently"    = "独立跑步";
 // 语言
 "preset.firstCoo"            = "第一次咿呀发声";
 "preset.babbled"             = "咿呀学语（ba-ba、da-da）";
 "preset.saidFirstWord"       = "说出第一个词";
 "preset.respondedToName"     = "对自己名字有反应";
+"preset.twoWordPhrases"      = "说两个词的短语";
 // 认知
 "preset.followedObject"      = "追视移动物体";
 "preset.foundHiddenToy"      = "找到藏起来的玩具";
 "preset.pointedAtObjects"    = "用手指指物";
 "preset.stackedBlocks"       = "叠积木";
+"preset.pretendPlay"         = "假装游戏";
+"preset.sortedShapes"        = "分类形状或颜色";
 // 健康
 "preset.firstTooth"          = "长出第一颗牙";
 "preset.sleptThroughNight"   = "整夜安睡";
 "preset.startedSolidFoods"   = "开始吃辅食";
 "preset.firstHaircut"        = "第一次理发";
+"preset.drankFromCup"        = "用杯子喝水";
+"preset.usedSpoon"           = "自己用勺子";
 
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "该喂奶了";
