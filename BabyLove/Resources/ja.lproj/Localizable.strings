@@ -590,3 +590,6 @@
 "a11y.weight %@"             = "体重 %@";
 "a11y.height %@"             = "身長 %@";
 "a11y.headCircumference %@"  = "頭囲 %@";
+"a11y.onboarding.step %lld %lld" = "ステップ %lld / %lld";
+"a11y.onboarding.birthday %@"    = "誕生日：%@";
+"a11y.onboarding.birthdayHint"   = "ダブルタップで誕生日を変更";

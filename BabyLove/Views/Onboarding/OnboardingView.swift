@@ -25,6 +25,8 @@ struct OnboardingView: View {
                     }
                 }
                 .padding(.top, 60)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(format: NSLocalizedString("a11y.onboarding.step %lld %lld", comment: ""), page + 1, 3))
 
                 if page == 1 {
                     // Page 1 uses ScrollView so the keyboard doesn't hide the
@@ -140,6 +142,9 @@ struct OnboardingView: View {
                 }
             }
             .padding(.horizontal, 32)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(format: NSLocalizedString("a11y.onboarding.birthday %@", comment: ""), birthDate.formatted(date: .long, time: .omitted)))
+            .accessibilityHint(NSLocalizedString("a11y.onboarding.birthdayHint", comment: ""))
             .sheet(isPresented: $showDatePicker) {
                 DatePickerSheet(date: $birthDate)
             }
@@ -168,6 +173,8 @@ struct OnboardingView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(g.displayName)
+                        .accessibilityAddTraits(gender == g ? .isSelected : [])
                     }
                 }
                 .padding(.horizontal, 32)
