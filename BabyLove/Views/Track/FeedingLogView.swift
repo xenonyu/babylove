@@ -12,6 +12,9 @@ struct FeedingLogView: View {
     var initialDate: Date? = nil
 
     @State private var feedType: FeedType = .breast
+
+    /// UserDefaults key for remembering the last-used feed type
+    private static let lastFeedTypeKey = "lastFeedType"
     @State private var side: BreastSide = .left
     @State private var duration: Double = 10
     @State private var amount: Double = 0
@@ -446,7 +449,11 @@ struct FeedingLogView: View {
                                                    icon: ok ? "drop.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blFeeding : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
+                            if ok {
+                                Self.saveLastFeedType(feedType)
+                                Haptic.success()
+                                dismiss()
+                            } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blFeeding))
                         .disabled(!canSave || isSaving)
@@ -505,7 +512,10 @@ struct FeedingLogView: View {
                 if !isEditing, let initialDate {
                     timestamp = initialDate
                 }
-                if !isEditing { suggestNextSide() }
+                if !isEditing {
+                    restoreLastFeedType()
+                    suggestNextSide()
+                }
                 checkExistingOngoingFeeding()
                 startElapsedTimerIfNeeded()
             }
@@ -663,6 +673,21 @@ struct FeedingLogView: View {
         }
         side = suggested
         didAutoSuggestSide = true
+    }
+
+    // MARK: - Remember Last Feed Type
+
+    /// Restore the last-used feed type so the user doesn't have to re-select every time.
+    /// Only applied for new records — editing always uses the record's own feed type.
+    private func restoreLastFeedType() {
+        guard let raw = UserDefaults.standard.string(forKey: Self.lastFeedTypeKey),
+              let saved = FeedType(rawValue: raw) else { return }
+        feedType = saved
+    }
+
+    /// Persist the selected feed type for next time.
+    private static func saveLastFeedType(_ type: FeedType) {
+        UserDefaults.standard.set(type.rawValue, forKey: lastFeedTypeKey)
     }
 
     /// Start a 15-second timer that keeps the displayed duration in sync
