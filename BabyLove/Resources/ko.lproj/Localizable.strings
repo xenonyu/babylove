@@ -408,6 +408,8 @@
 "sleepLog.longDurationMsg %@"    = "이 수면 기록은 %@입니다. 일반적인 아기 수면보다 깁니다. 시간이 맞나요?";
 "sleepLog.longDurationSave"      = "그래도 저장";
 "sleepLog.longDurationCancel"    = "돌아가기";
+"sleepLog.todayCount %lld"      = "오늘: %lld회 낮잠";
+"a11y.sleepTodayCount %lld %@"  = "오늘: 낮잠 %lld회, 총 %@";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "기저귀 기록";

@@ -408,6 +408,8 @@
 "sleepLog.longDurationMsg %@"    = "This sleep session is %@. That's longer than most baby sleep sessions. Are the times correct?";
 "sleepLog.longDurationSave"      = "Save Anyway";
 "sleepLog.longDurationCancel"    = "Go Back";
+"sleepLog.todayCount %lld"      = "Today: %lld naps so far";
+"a11y.sleepTodayCount %lld %@"  = "Today: %lld naps, total %@";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "Log Diaper";

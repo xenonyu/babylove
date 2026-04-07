@@ -408,6 +408,8 @@
 "sleepLog.longDurationMsg %@"    = "本次睡眠记录为 %@，超出了正常范围。请确认时间是否正确？";
 "sleepLog.longDurationSave"      = "仍然保存";
 "sleepLog.longDurationCancel"    = "返回修改";
+"sleepLog.todayCount %lld"      = "今天已睡 %lld 次";
+"a11y.sleepTodayCount %lld %@"  = "今天共睡 %lld 次，总计 %@";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "记录换尿布";

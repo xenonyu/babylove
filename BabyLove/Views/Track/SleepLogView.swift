@@ -44,6 +44,8 @@ struct SleepLogView: View {
 
     /// Confirmation state: shown when user taps Save while duration is unusually long.
     @State private var showLongDurationConfirm = false
+    /// Today's sleep stats for the context badge
+    @State private var todaySleepStats: TodaySleepStats = .empty
 
     /// Whether the form has meaningful user input that would be lost on dismiss.
     private var hasUnsavedChanges: Bool {
@@ -79,12 +81,75 @@ struct SleepLogView: View {
         return DurationFormat.fromMinutes(mins)
     }
 
+    // MARK: - Today's Sleep Stats
+
+    /// Lightweight struct holding today's sleep summary
+    struct TodaySleepStats {
+        let napCount: Int
+        let totalMinutes: Int
+
+        static let empty = TodaySleepStats(napCount: 0, totalMinutes: 0)
+    }
+
+    /// Fetch today's sleep records and compute the summary.
+    private func loadTodaySleepStats() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let cal = Calendar.current
+        let dayStart = cal.startOfDay(for: Date())
+        guard let dayEnd = cal.date(byAdding: .day, value: 1, to: dayStart) else { return }
+        let req: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        // Overlap predicate: sleeps that started before day-end AND (ended after day-start OR ongoing)
+        req.predicate = NSPredicate(format: "startTime < %@ AND (endTime >= %@ OR endTime == nil)",
+                                    dayEnd as NSDate, dayStart as NSDate)
+        guard let results = try? ctx.fetch(req) else { return }
+        var totalMins = 0
+        for r in results {
+            guard let s = r.startTime else { continue }
+            let e = r.endTime ?? Date()
+            let clippedStart = max(s, dayStart)
+            let clippedEnd = min(e, dayEnd)
+            guard clippedEnd > clippedStart else { continue }
+            totalMins += Int(clippedEnd.timeIntervalSince(clippedStart) / 60)
+        }
+        todaySleepStats = TodaySleepStats(napCount: results.count, totalMinutes: totalMins)
+    }
+
+    /// The context badge showing today's sleep count with total duration
+    @ViewBuilder
+    private var todaySleepContextBadge: some View {
+        if !isEditing && todaySleepStats.napCount > 0 {
+            HStack(spacing: 10) {
+                Image(systemName: "chart.bar.doc.horizontal.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blSleep)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(format: NSLocalizedString("sleepLog.todayCount %lld", comment: ""), todaySleepStats.napCount))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    if todaySleepStats.totalMinutes > 0 {
+                        Text("😴 \(DurationFormat.fromMinutes(todaySleepStats.totalMinutes))")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.blTextSecondary)
+                    }
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(Color.blSleep.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(format: NSLocalizedString("a11y.sleepTodayCount %lld %@", comment: ""), todaySleepStats.napCount, DurationFormat.fromMinutes(todaySleepStats.totalMinutes)))
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Today's sleep context (only for new records)
+                        todaySleepContextBadge
 
                         // Retroactive date banner — shown when logging to a past day
                         if isStartTimePastDay && !isEditing {
@@ -346,6 +411,8 @@ struct SleepLogView: View {
                 checkExistingOngoingSleep()
                 updateOngoingElapsed()
                 startElapsedTimerIfNeeded()
+                // Load today's sleep stats for context badge
+                loadTodaySleepStats()
             }
             .onDisappear {
                 elapsedTimer?.invalidate()

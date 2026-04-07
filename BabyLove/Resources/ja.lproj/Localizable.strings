@@ -408,6 +408,8 @@
 "sleepLog.longDurationMsg %@"    = "この睡眠記録は %@ です。通常の赤ちゃんの睡眠より長いです。時刻は正しいですか？";
 "sleepLog.longDurationSave"      = "このまま保存";
 "sleepLog.longDurationCancel"    = "戻る";
+"sleepLog.todayCount %lld"      = "今日：%lld回のお昼寝";
+"a11y.sleepTodayCount %lld %@"  = "今日：お昼寝%lld回、合計%@";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "おむつを記録";
