@@ -591,6 +591,7 @@
 "a11y.weight %@"             = "体重 %@";
 "a11y.height %@"             = "身高 %@";
 "a11y.headCircumference %@"  = "头围 %@";
+"a11y.milestone.alreadyRecorded %@" = "%@，已记录";
 "a11y.onboarding.step %lld %lld" = "第 %lld 步，共 %lld 步";
 "a11y.onboarding.birthday %@"    = "生日：%@";
 "a11y.onboarding.birthdayHint"   = "轻点两下更改生日";

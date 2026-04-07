@@ -445,6 +445,18 @@ struct AddMilestoneView: View {
     /// When non-nil, we are editing an existing record
     var editingRecord: CDMilestone?
 
+    /// All existing milestones — used to mark already-recorded suggestions with a checkmark
+    @FetchRequest(
+        entity: CDMilestone.entity(),
+        sortDescriptors: []
+    ) private var existingMilestones: FetchedResults<CDMilestone>
+
+    /// Titles of milestones that have already been recorded (case-insensitive, trimmed).
+    /// Used to visually mark preset suggestions that are already in the timeline.
+    private var existingTitles: Set<String> {
+        Set(existingMilestones.compactMap { $0.title?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() })
+    }
+
     @State private var title       = ""
     @State private var category: MilestoneCategory = .social
     @State private var date        = Date()
@@ -666,6 +678,7 @@ struct AddMilestoneView: View {
                 FlowLayout(spacing: 8) {
                     ForEach(currentSuggestions) { preset in
                         let isSelected = title == preset.title
+                        let isAlreadyRecorded = existingTitles.contains(preset.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())
                         let relevance = age.map { preset.relevance(forBabyAgeMonths: $0) }
                         let isCurrent = relevance == .current
                         let isPast = relevance == .past
@@ -678,23 +691,28 @@ struct AddMilestoneView: View {
                             }
                         } label: {
                             HStack(spacing: 4) {
-                                // Show a star for age-appropriate milestones
-                                if isCurrent {
+                                // Show checkmark for already-recorded milestones, star for age-appropriate
+                                if isAlreadyRecorded {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 9))
+                                } else if isCurrent {
                                     Image(systemName: "star.fill")
                                         .font(.system(size: 8))
                                 }
                                 Text(preset.title)
-                                    .font(.system(size: 13, weight: isCurrent ? .semibold : .medium))
+                                    .font(.system(size: 13, weight: isCurrent && !isAlreadyRecorded ? .semibold : .medium))
                                 Text(preset.ageRangeMonths + String(localized: "preset.ageMonths"))
                                     .font(.system(size: 10, weight: .medium))
                                     .foregroundColor(
                                         isSelected ? .white.opacity(0.7) :
+                                        isAlreadyRecorded ? catColor.opacity(0.35) :
                                         isPast ? catColor.opacity(0.3) :
                                         catColor.opacity(0.6)
                                     )
                             }
                             .foregroundColor(
                                 isSelected ? .white :
+                                isAlreadyRecorded ? catColor.opacity(0.45) :
                                 isPast ? catColor.opacity(0.4) :
                                 catColor
                             )
@@ -702,16 +720,22 @@ struct AddMilestoneView: View {
                             .padding(.vertical, 7)
                             .background(
                                 isSelected ? catColor :
+                                isAlreadyRecorded ? catColor.opacity(0.06) :
                                 isCurrent ? catColor.opacity(0.18) :
                                 catColor.opacity(isPast ? 0.05 : 0.1)
                             )
                             .clipShape(Capsule())
                             .overlay(
-                                isCurrent && !isSelected ?
+                                isAlreadyRecorded && !isSelected ?
+                                Capsule().strokeBorder(catColor.opacity(0.15), lineWidth: 1) :
+                                isCurrent && !isSelected && !isAlreadyRecorded ?
                                 Capsule().strokeBorder(catColor.opacity(0.35), lineWidth: 1) : nil
                             )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(isAlreadyRecorded
+                            ? String(format: NSLocalizedString("a11y.milestone.alreadyRecorded %@", comment: ""), preset.title)
+                            : preset.title)
                     }
                 }
             }

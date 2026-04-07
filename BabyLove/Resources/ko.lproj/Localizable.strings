@@ -591,6 +591,7 @@
 "a11y.weight %@"             = "체중 %@";
 "a11y.height %@"             = "신장 %@";
 "a11y.headCircumference %@"  = "머리둘레 %@";
+"a11y.milestone.alreadyRecorded %@" = "%@, 이미 기록됨";
 "a11y.onboarding.step %lld %lld" = "%lld단계 / %lld단계";
 "a11y.onboarding.birthday %@"    = "생일: %@";
 "a11y.onboarding.birthdayHint"   = "이중 탭하여 생일 변경";

@@ -591,6 +591,7 @@
 "a11y.weight %@"             = "weight %@";
 "a11y.height %@"             = "height %@";
 "a11y.headCircumference %@"  = "head circumference %@";
+"a11y.milestone.alreadyRecorded %@" = "%@, already recorded";
 "a11y.onboarding.step %lld %lld" = "Step %lld of %lld";
 "a11y.onboarding.birthday %@"    = "Birthday: %@";
 "a11y.onboarding.birthdayHint"   = "Double tap to change birthday";
