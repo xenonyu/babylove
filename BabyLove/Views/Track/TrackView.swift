@@ -27,6 +27,12 @@ struct TrackView: View {
     @State private var diaperToEdit: CDDiaperRecord?
     @State private var growthToEdit: CDGrowthRecord?
 
+    // Total record counts (for "See All (N)" badges)
+    @State private var totalFeedingCount: Int = 0
+    @State private var totalSleepCount: Int = 0
+    @State private var totalDiaperCount: Int = 0
+    @State private var totalGrowthCount: Int = 0
+
     // Limit high-frequency records to the last 14 days to avoid loading thousands
     // of objects into memory. Only 5 are shown per section; the "See All" views
     // have their own unbounded FetchRequests.
@@ -114,7 +120,7 @@ struct TrackView: View {
                         // Recent feedings
                         if !recentFeedings.isEmpty {
                             let feedingItems = Array(recentFeedings.prefix(5))
-                            recentSection(title: String(localized: "track.feedings"), color: .blFeeding, destination: AllFeedingsView()) {
+                            recentSection(title: String(localized: "track.feedings"), color: .blFeeding, totalCount: totalFeedingCount, destination: AllFeedingsView()) {
                                 ForEach(Array(feedingItems.enumerated()), id: \.element.id) { index, r in
                                     if index > 0 { Divider().padding(.leading, 16) }
                                     feedingRow(r)
@@ -139,7 +145,7 @@ struct TrackView: View {
                         // Recent sleeps
                         if !recentSleeps.isEmpty {
                             let sleepItems = Array(recentSleeps.prefix(5))
-                            recentSection(title: String(localized: "track.sleepSection"), color: .blSleep, destination: AllSleepsView()) {
+                            recentSection(title: String(localized: "track.sleepSection"), color: .blSleep, totalCount: totalSleepCount, destination: AllSleepsView()) {
                                 ForEach(Array(sleepItems.enumerated()), id: \.element.id) { index, r in
                                     if index > 0 { Divider().padding(.leading, 16) }
                                     sleepRow(r)
@@ -164,7 +170,7 @@ struct TrackView: View {
                         // Recent diapers
                         if !recentDiapers.isEmpty {
                             let diaperItems = Array(recentDiapers.prefix(5))
-                            recentSection(title: String(localized: "track.diapers"), color: .blDiaper, destination: AllDiapersView()) {
+                            recentSection(title: String(localized: "track.diapers"), color: .blDiaper, totalCount: totalDiaperCount, destination: AllDiapersView()) {
                                 ForEach(Array(diaperItems.enumerated()), id: \.element.id) { index, r in
                                     if index > 0 { Divider().padding(.leading, 16) }
                                     diaperRow(r)
@@ -189,7 +195,7 @@ struct TrackView: View {
                         // Recent growth
                         if !recentGrowth.isEmpty {
                             let growthItems = Array(recentGrowth.prefix(5))
-                            recentSection(title: String(localized: "track.growthSection"), color: .blGrowth, destination: AllGrowthView()) {
+                            recentSection(title: String(localized: "track.growthSection"), color: .blGrowth, totalCount: totalGrowthCount, destination: AllGrowthView()) {
                                 ForEach(Array(growthItems.enumerated()), id: \.element.id) { index, r in
                                     if index > 0 { Divider().padding(.leading, 16) }
                                     growthRow(r)
@@ -218,10 +224,14 @@ struct TrackView: View {
             }
             .navigationTitle(String(localized: "track.title"))
             .navigationBarTitleDisplayMode(.large)
-            .onAppear { refreshPredicatesIfNeeded() }
+            .onAppear { refreshPredicatesIfNeeded(); refreshTotalCounts() }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active { refreshPredicatesIfNeeded() }
+                if phase == .active { refreshPredicatesIfNeeded(); refreshTotalCounts() }
             }
+            .onChange(of: recentFeedings.count) { _, _ in refreshTotalCounts() }
+            .onChange(of: recentSleeps.count) { _, _ in refreshTotalCounts() }
+            .onChange(of: recentDiapers.count) { _, _ in refreshTotalCounts() }
+            .onChange(of: recentGrowth.count) { _, _ in refreshTotalCounts() }
         }
         .sheet(isPresented: $showFeedingLog) { FeedingLogView(vm: vm) }
         .sheet(isPresented: $showSleepLog)   { SleepLogView(vm: vm) }
@@ -293,9 +303,29 @@ struct TrackView: View {
         recentDiapers.nsPredicate  = NSPredicate(format: "timestamp >= %@", windowStart)
     }
 
+    // MARK: - Total Count Refresh
+
+    /// Fetch total record counts for each entity to show in "See All (N)" badges.
+    /// Uses lightweight `count(for:)` calls instead of loading full objects.
+    private func refreshTotalCounts() {
+        let context = PersistenceController.shared.container.viewContext
+
+        let feedReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        totalFeedingCount = (try? context.count(for: feedReq)) ?? 0
+
+        let sleepReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        totalSleepCount = (try? context.count(for: sleepReq)) ?? 0
+
+        let diaperReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+        totalDiaperCount = (try? context.count(for: diaperReq)) ?? 0
+
+        let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
+        totalGrowthCount = (try? context.count(for: growthReq)) ?? 0
+    }
+
     // MARK: - Recent Section
     @ViewBuilder
-    private func recentSection<Content: View, Dest: View>(title: String, color: Color, destination: Dest, @ViewBuilder content: () -> Content) -> some View {
+    private func recentSection<Content: View, Dest: View>(title: String, color: Color, totalCount: Int, destination: Dest, @ViewBuilder content: () -> Content) -> some View {
         VStack(spacing: 12) {
             HStack {
                 Text(title)
@@ -303,9 +333,15 @@ struct TrackView: View {
                     .foregroundColor(.blTextPrimary)
                 Spacer()
                 NavigationLink(destination: destination) {
-                    Text(String(localized: "track.seeAll"))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.blPrimary)
+                    HStack(spacing: 4) {
+                        Text(String(localized: "track.seeAll"))
+                            .font(.system(size: 14, weight: .medium))
+                        if totalCount > 0 {
+                            Text("(\(totalCount))")
+                                .font(.system(size: 13, weight: .medium))
+                        }
+                    }
+                    .foregroundColor(.blPrimary)
                 }
             }
             .padding(.horizontal, 20)
