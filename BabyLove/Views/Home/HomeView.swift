@@ -47,7 +47,7 @@ struct HomeView: View {
     @State private var globalLastSleepEnd: Date?
     @State private var globalLastSleepIsOngoing: Bool = false
     @State private var globalLastDiaperTime: Date?
-    @State private var globalLastGrowthDate: Date?
+    @State private var globalLastGrowthRecord: CDGrowthRecord?
 
     // Initialize with today's predicate to avoid flashing all-time data
     @FetchRequest(
@@ -462,11 +462,27 @@ struct HomeView: View {
     }
 
     /// Contextual hint for the Growth quick log card.
-    /// Shows how long since the last growth measurement (e.g. "3 days ago").
-    /// Growth is measured infrequently, so this helps parents remember when to measure again.
+    /// Shows the last measurement value and how long ago (e.g. "5.4 kg · 3d ago").
+    /// Growth is measured infrequently, so showing the last value helps parents
+    /// remember context and decide when to measure again.
     private var quickLogGrowthHint: String? {
-        guard let lastDate = globalLastGrowthDate else { return nil }
-        return Self.timeSinceText(from: lastDate)
+        guard let record = globalLastGrowthRecord, let lastDate = record.date else { return nil }
+        let timeSince = Self.timeSinceText(from: lastDate)
+        let unit = appState.measurementUnit
+        // Show the most prominent measurement (weight > height > head)
+        let valueStr: String? = if record.weightKG > 0 {
+            String(format: "%.1f %@", unit.weightFromKG(record.weightKG), unit.weightLabel)
+        } else if record.heightCM > 0 {
+            String(format: "%.1f %@", unit.lengthFromCM(record.heightCM), unit.heightLabel)
+        } else if record.headCircumferenceCM > 0 {
+            String(format: "%.1f %@", unit.lengthFromCM(record.headCircumferenceCM), unit.heightLabel)
+        } else {
+            nil
+        }
+        if let valueStr {
+            return "\(valueStr) · \(timeSince)"
+        }
+        return timeSince
     }
 
     private var totalSleepMinutes: Int {
@@ -858,7 +874,7 @@ struct HomeView: View {
         let growthReq: NSFetchRequest<CDGrowthRecord> = CDGrowthRecord.fetchRequest()
         growthReq.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         growthReq.fetchLimit = 1
-        globalLastGrowthDate = (try? ctx.fetch(growthReq))?.first?.date
+        globalLastGrowthRecord = (try? ctx.fetch(growthReq))?.first
     }
 
     // MARK: - Active Days Indicators
