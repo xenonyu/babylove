@@ -150,8 +150,9 @@ struct FeedingLogView: View {
         let count: Int
         let totalVolumeML: Double
         let totalBreastMinutes: Int
+        let lastFeedingDate: Date?
 
-        static let empty = TodayFeedingStats(count: 0, totalVolumeML: 0, totalBreastMinutes: 0)
+        static let empty = TodayFeedingStats(count: 0, totalVolumeML: 0, totalBreastMinutes: 0, lastFeedingDate: nil)
     }
 
     /// Fetch today's feeding records and compute the summary.
@@ -170,7 +171,31 @@ struct FeedingLogView: View {
                 totalBreast += Int(r.durationMinutes)
             }
         }
-        todayFeedingStats = TodayFeedingStats(count: results.count, totalVolumeML: totalML, totalBreastMinutes: totalBreast)
+        // Fetch most recent feeding globally (not limited to today)
+        let lastReq: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        lastReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        lastReq.fetchLimit = 1
+        let lastDate = (try? ctx.fetch(lastReq))?.first?.timestamp
+        todayFeedingStats = TodayFeedingStats(count: results.count, totalVolumeML: totalML, totalBreastMinutes: totalBreast, lastFeedingDate: lastDate)
+    }
+
+    /// Short "time since" text reusing shared localization keys.
+    private static func timeSinceText(from date: Date?) -> String? {
+        guard let date else { return nil }
+        let seconds = Int(Date().timeIntervalSince(date))
+        guard seconds >= 0 else { return nil }
+        if seconds < 60 { return NSLocalizedString("home.justNow", comment: "") }
+        let minutes = seconds / 60
+        if minutes < 60 { return String(format: NSLocalizedString("home.minsAgo %lld", comment: ""), minutes) }
+        let hours = minutes / 60
+        let remMins = minutes % 60
+        if hours < 24 {
+            return remMins > 0
+                ? String(format: NSLocalizedString("home.hoursMinAgo %lld %lld", comment: ""), hours, remMins)
+                : String(format: NSLocalizedString("home.hoursAgo %lld", comment: ""), hours)
+        }
+        let days = hours / 24
+        return String(format: NSLocalizedString("home.daysAgo %lld", comment: ""), days)
     }
 
     /// The context badge showing today's feeding count with volume/duration breakdown
@@ -200,6 +225,11 @@ struct FeedingLogView: View {
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
                         }
+                        if let ts = Self.timeSinceText(from: todayFeedingStats.lastFeedingDate) {
+                            Text("⏱ \(ts)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
                     }
                 }
                 Spacer()
@@ -224,6 +254,9 @@ struct FeedingLogView: View {
         }
         if todayFeedingStats.totalBreastMinutes > 0 {
             parts.append(DurationFormat.fromMinutes(todayFeedingStats.totalBreastMinutes))
+        }
+        if let ts = Self.timeSinceText(from: todayFeedingStats.lastFeedingDate) {
+            parts.append(ts)
         }
         return parts.joined(separator: ", ")
     }

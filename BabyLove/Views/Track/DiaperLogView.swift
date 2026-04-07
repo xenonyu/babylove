@@ -43,8 +43,9 @@ struct DiaperLogView: View {
         let total: Int
         let wet: Int
         let dirty: Int
+        let lastChangeDate: Date?
 
-        static let empty = TodayDiaperStats(total: 0, wet: 0, dirty: 0)
+        static let empty = TodayDiaperStats(total: 0, wet: 0, dirty: 0, lastChangeDate: nil)
     }
 
     /// Fetch today's diaper records and compute the breakdown.
@@ -63,7 +64,31 @@ struct DiaperLogView: View {
             case .dry, .none: break
             }
         }
-        todayDiaperStats = TodayDiaperStats(total: results.count, wet: wet, dirty: dirty)
+        // Fetch most recent diaper change globally (not limited to today)
+        let lastReq: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+        lastReq.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        lastReq.fetchLimit = 1
+        let lastDate = (try? ctx.fetch(lastReq))?.first?.timestamp
+        todayDiaperStats = TodayDiaperStats(total: results.count, wet: wet, dirty: dirty, lastChangeDate: lastDate)
+    }
+
+    /// Short "time since" text reusing shared localization keys.
+    private static func timeSinceText(from date: Date?) -> String? {
+        guard let date else { return nil }
+        let seconds = Int(Date().timeIntervalSince(date))
+        guard seconds >= 0 else { return nil }
+        if seconds < 60 { return NSLocalizedString("home.justNow", comment: "") }
+        let minutes = seconds / 60
+        if minutes < 60 { return String(format: NSLocalizedString("home.minsAgo %lld", comment: ""), minutes) }
+        let hours = minutes / 60
+        let remMins = minutes % 60
+        if hours < 24 {
+            return remMins > 0
+                ? String(format: NSLocalizedString("home.hoursMinAgo %lld %lld", comment: ""), hours, remMins)
+                : String(format: NSLocalizedString("home.hoursAgo %lld", comment: ""), hours)
+        }
+        let days = hours / 24
+        return String(format: NSLocalizedString("home.daysAgo %lld", comment: ""), days)
     }
 
     /// The context badge showing today's diaper count with wet/dirty breakdown
@@ -89,6 +114,11 @@ struct DiaperLogView: View {
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.blTextSecondary)
                         }
+                        if let ts = Self.timeSinceText(from: todayDiaperStats.lastChangeDate) {
+                            Text("⏱ \(ts)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
                     }
                 }
                 Spacer()
@@ -97,7 +127,13 @@ struct DiaperLogView: View {
             .background(Color.blDiaper.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(format: NSLocalizedString("a11y.diaperTodayCount %lld %lld %lld", comment: ""), todayDiaperStats.total, todayDiaperStats.wet, todayDiaperStats.dirty))
+            .accessibilityLabel({
+                var label = String(format: NSLocalizedString("a11y.diaperTodayCount %lld %lld %lld", comment: ""), todayDiaperStats.total, todayDiaperStats.wet, todayDiaperStats.dirty)
+                if let ts = Self.timeSinceText(from: todayDiaperStats.lastChangeDate) {
+                    label += ", \(ts)"
+                }
+                return label
+            }())
         }
     }
 

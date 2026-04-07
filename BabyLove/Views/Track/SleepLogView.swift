@@ -89,8 +89,9 @@ struct SleepLogView: View {
     struct TodaySleepStats {
         let napCount: Int
         let totalMinutes: Int
+        let lastSleepEndDate: Date?
 
-        static let empty = TodaySleepStats(napCount: 0, totalMinutes: 0)
+        static let empty = TodaySleepStats(napCount: 0, totalMinutes: 0, lastSleepEndDate: nil)
     }
 
     /// Fetch today's sleep records and compute the summary.
@@ -113,7 +114,32 @@ struct SleepLogView: View {
             guard clippedEnd > clippedStart else { continue }
             totalMins += Int(clippedEnd.timeIntervalSince(clippedStart) / 60)
         }
-        todaySleepStats = TodaySleepStats(napCount: results.count, totalMinutes: totalMins)
+        // Fetch most recent completed sleep globally (not limited to today)
+        let lastReq: NSFetchRequest<CDSleepRecord> = CDSleepRecord.fetchRequest()
+        lastReq.predicate = NSPredicate(format: "endTime != nil")
+        lastReq.sortDescriptors = [NSSortDescriptor(key: "endTime", ascending: false)]
+        lastReq.fetchLimit = 1
+        let lastEnd = (try? ctx.fetch(lastReq))?.first?.endTime
+        todaySleepStats = TodaySleepStats(napCount: results.count, totalMinutes: totalMins, lastSleepEndDate: lastEnd)
+    }
+
+    /// Short "time since" text reusing shared localization keys.
+    private static func timeSinceText(from date: Date?) -> String? {
+        guard let date else { return nil }
+        let seconds = Int(Date().timeIntervalSince(date))
+        guard seconds >= 0 else { return nil }
+        if seconds < 60 { return NSLocalizedString("home.justNow", comment: "") }
+        let minutes = seconds / 60
+        if minutes < 60 { return String(format: NSLocalizedString("home.minsAgo %lld", comment: ""), minutes) }
+        let hours = minutes / 60
+        let remMins = minutes % 60
+        if hours < 24 {
+            return remMins > 0
+                ? String(format: NSLocalizedString("home.hoursMinAgo %lld %lld", comment: ""), hours, remMins)
+                : String(format: NSLocalizedString("home.hoursAgo %lld", comment: ""), hours)
+        }
+        let days = hours / 24
+        return String(format: NSLocalizedString("home.daysAgo %lld", comment: ""), days)
     }
 
     /// The context badge showing today's sleep count with total duration
@@ -128,10 +154,17 @@ struct SleepLogView: View {
                     Text(String(format: NSLocalizedString("sleepLog.todayCount %lld", comment: ""), todaySleepStats.napCount))
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.blTextPrimary)
-                    if todaySleepStats.totalMinutes > 0 {
-                        Text("😴 \(DurationFormat.fromMinutes(todaySleepStats.totalMinutes))")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.blTextSecondary)
+                    HStack(spacing: 8) {
+                        if todaySleepStats.totalMinutes > 0 {
+                            Text("😴 \(DurationFormat.fromMinutes(todaySleepStats.totalMinutes))")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                        if let ts = Self.timeSinceText(from: todaySleepStats.lastSleepEndDate) {
+                            Text("⏱ \(ts)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
                     }
                 }
                 Spacer()
@@ -140,7 +173,13 @@ struct SleepLogView: View {
             .background(Color.blSleep.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(format: NSLocalizedString("a11y.sleepTodayCount %lld %@", comment: ""), todaySleepStats.napCount, DurationFormat.fromMinutes(todaySleepStats.totalMinutes)))
+            .accessibilityLabel({
+                var label = String(format: NSLocalizedString("a11y.sleepTodayCount %lld %@", comment: ""), todaySleepStats.napCount, DurationFormat.fromMinutes(todaySleepStats.totalMinutes))
+                if let ts = Self.timeSinceText(from: todaySleepStats.lastSleepEndDate) {
+                    label += ", \(ts)"
+                }
+                return label
+            }())
         }
     }
 
