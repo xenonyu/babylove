@@ -21,6 +21,9 @@ struct SettingsView: View {
     /// Pre-computed message shown in the reset confirmation dialog
     @State private var resetConfirmMessage = ""
 
+    // Journey stats
+    @State private var journeyStats: JourneyStats?
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -138,6 +141,60 @@ struct SettingsView: View {
                         Text(String(localized: "settings.export.footer"))
                     }
 
+                    // Your Journey — motivational stats overview
+                    if let stats = journeyStats, stats.totalRecords > 0 {
+                        Section {
+                            // Total records
+                            HStack {
+                                Label(String(localized: "settings.journey.totalRecords"), systemImage: "heart.text.clipboard.fill")
+                                Spacer()
+                                Text("\(stats.totalRecords)")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.blPrimary)
+                            }
+                            .accessibilityElement(children: .combine)
+
+                            // Tracking duration
+                            if let daysText = stats.trackingDurationText {
+                                HStack {
+                                    Label(String(localized: "settings.journey.tracking"), systemImage: "calendar.badge.clock")
+                                    Spacer()
+                                    Text(daysText)
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(.blTextSecondary)
+                                }
+                                .accessibilityElement(children: .combine)
+                            }
+
+                            // Category breakdown
+                            VStack(spacing: 8) {
+                                journeyStatRow(icon: "drop.fill", color: .blFeeding,
+                                               label: NSLocalizedString("home.feedings", comment: ""),
+                                               count: stats.feedings)
+                                journeyStatRow(icon: "moon.zzz.fill", color: .blSleep,
+                                               label: NSLocalizedString("home.sleep", comment: ""),
+                                               count: stats.sleeps)
+                                journeyStatRow(icon: "oval.fill", color: .blDiaper,
+                                               label: NSLocalizedString("home.diapers", comment: ""),
+                                               count: stats.diapers)
+                                journeyStatRow(icon: "chart.bar.fill", color: .blGrowth,
+                                               label: NSLocalizedString("growth.title", comment: ""),
+                                               count: stats.growths)
+                                journeyStatRow(icon: "star.fill", color: .blPrimary,
+                                               label: NSLocalizedString("memory.title", comment: ""),
+                                               count: stats.milestones)
+                            }
+                            .padding(.vertical, 4)
+                        } header: {
+                            Text(String(localized: "settings.section.journey"))
+                        } footer: {
+                            if let firstDate = stats.firstRecordDate {
+                                Text(String(format: NSLocalizedString("settings.journey.since %@", comment: ""),
+                                            firstDate.formatted(date: .long, time: .omitted)))
+                            }
+                        }
+                    }
+
                     // App info
                     Section {
                         HStack {
@@ -179,6 +236,8 @@ struct SettingsView: View {
                     feedingReminderEnabled = false
                     NotificationManager.shared.isEnabled = false
                 }
+                // Load journey stats
+                journeyStats = JourneyStats.load(ctx: PersistenceController.shared.container.viewContext)
             }
         }
         .sheet(isPresented: $showEditBaby) {
@@ -461,6 +520,25 @@ struct SettingsView: View {
         return String(format: NSLocalizedString("settings.reset.detailedMessage %@", comment: ""), joined)
     }
 
+    // MARK: - Journey Stat Row
+
+    private func journeyStatRow(icon: String, color: Color, label: String, count: Int) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(color)
+                .frame(width: 20)
+            Text(label)
+                .font(.system(size: 14))
+                .foregroundColor(.blTextSecondary)
+            Spacer()
+            Text("\(count)")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundColor(count > 0 ? .blTextPrimary : .blTextTertiary)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
     private func resetAllData() {
         // 1. Cancel all pending notifications and reset reminder state
         NotificationManager.shared.isEnabled = false  // cancels pending + writes UserDefaults
@@ -497,6 +575,68 @@ struct SettingsView: View {
             appState.hasCompletedOnboarding = false
             appState.currentBaby = nil
         }
+    }
+}
+
+// MARK: - Journey Stats
+
+/// Snapshot of aggregate record counts and tracking duration for the "Your Journey" section.
+struct JourneyStats {
+    let feedings: Int
+    let sleeps: Int
+    let diapers: Int
+    let growths: Int
+    let milestones: Int
+    let firstRecordDate: Date?
+
+    var totalRecords: Int { feedings + sleeps + diapers + growths + milestones }
+
+    /// Human-readable tracking duration, e.g. "42 days" or "3 months"
+    var trackingDurationText: String? {
+        guard let first = firstRecordDate else { return nil }
+        let cal = Calendar.current
+        let components = cal.dateComponents([.month, .day], from: cal.startOfDay(for: first), to: cal.startOfDay(for: Date()))
+        let months = components.month ?? 0
+        let days = components.day ?? 0
+        if months >= 1 {
+            return String(format: NSLocalizedString("settings.journey.months %lld", comment: ""), months)
+        } else if days >= 1 {
+            return String(format: NSLocalizedString("settings.journey.days %lld", comment: ""), days)
+        }
+        return NSLocalizedString("settings.journey.today", comment: "")
+    }
+
+    static func load(ctx: NSManagedObjectContext) -> JourneyStats {
+        func count(_ entity: String) -> Int {
+            let req = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+            return (try? ctx.count(for: req)) ?? 0
+        }
+
+        func earliest(_ entity: String, dateKey: String) -> Date? {
+            let req = NSFetchRequest<NSManagedObject>(entityName: entity)
+            req.sortDescriptors = [NSSortDescriptor(key: dateKey, ascending: true)]
+            req.fetchLimit = 1
+            req.propertiesToFetch = [dateKey]
+            return (try? ctx.fetch(req))?.first?.value(forKey: dateKey) as? Date
+        }
+
+        let dates: [Date?] = [
+            earliest("CDFeedingRecord", dateKey: "timestamp"),
+            earliest("CDSleepRecord", dateKey: "startTime"),
+            earliest("CDDiaperRecord", dateKey: "timestamp"),
+            earliest("CDGrowthRecord", dateKey: "date"),
+            earliest("CDMilestone", dateKey: "date")
+        ]
+        let firstDate = dates.compactMap { $0 }.min()
+
+        return JourneyStats(
+            feedings: count("CDFeedingRecord"),
+            sleeps: count("CDSleepRecord"),
+            diapers: count("CDDiaperRecord"),
+            growths: count("CDGrowthRecord"),
+            milestones: count("CDMilestone"),
+            firstRecordDate: firstDate
+        )
     }
 }
 

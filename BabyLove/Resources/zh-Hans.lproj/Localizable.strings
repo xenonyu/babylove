@@ -96,6 +96,13 @@
 "export.growth.head %@ %@"  = "%@ %@ 头围";
 "export.milestone.completed" = "已完成";
 "export.milestone.inProgress" = "进行中";
+"settings.section.journey"            = "你的记录之旅";
+"settings.journey.totalRecords"       = "总记录数";
+"settings.journey.tracking"           = "已记录";
+"settings.journey.days %lld"          = "%lld 天";
+"settings.journey.months %lld"        = "%lld 个月";
+"settings.journey.today"              = "今天开始";
+"settings.journey.since %@"           = "从 %@ 起开始记录";
 "settings.section.about"              = "关于";
 "settings.version"                    = "版本";
 "settings.privacyPolicy"              = "隐私政策";

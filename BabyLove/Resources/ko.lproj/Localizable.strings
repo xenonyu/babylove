@@ -96,6 +96,13 @@
 "export.growth.head %@ %@"  = "%@ %@ 머리둘레";
 "export.milestone.completed" = "완료";
 "export.milestone.inProgress" = "진행 중";
+"settings.section.journey"            = "나의 기록 여정";
+"settings.journey.totalRecords"       = "총 기록 수";
+"settings.journey.tracking"           = "기록 기간";
+"settings.journey.days %lld"          = "%lld일";
+"settings.journey.months %lld"        = "%lld개월";
+"settings.journey.today"              = "오늘 시작";
+"settings.journey.since %@"           = "%@부터 기록 중";
 "settings.section.about"              = "정보";
 "settings.version"                    = "버전";
 "settings.privacyPolicy"              = "개인정보 처리방침";

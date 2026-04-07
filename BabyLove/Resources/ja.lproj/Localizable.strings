@@ -96,6 +96,13 @@
 "export.growth.head %@ %@"  = "%@ %@ 頭囲";
 "export.milestone.completed" = "完了";
 "export.milestone.inProgress" = "進行中";
+"settings.section.journey"            = "あなたの記録";
+"settings.journey.totalRecords"       = "記録の合計";
+"settings.journey.tracking"           = "記録期間";
+"settings.journey.days %lld"          = "%lld 日間";
+"settings.journey.months %lld"        = "%lld ヶ月";
+"settings.journey.today"              = "今日から開始";
+"settings.journey.since %@"           = "%@ から記録中";
 "settings.section.about"              = "アプリについて";
 "settings.version"                    = "バージョン";
 "settings.privacyPolicy"              = "プライバシーポリシー";

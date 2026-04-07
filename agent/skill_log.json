@@ -1,8 +1,4 @@
 [
-  "[04/07 06:09] API Error: Unable to connect to API (ConnectionRefused)",
-  "[04/07 06:27] API Error: Unable to connect to API (ConnectionRefused)",
-  "[04/07 06:44] API Error: Unable to connect to API (ConnectionRefused)",
-  "[04/07 07:01] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 07:17] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 07:34] API Error: Unable to connect to API (ConnectionRefused)",
   "[04/07 07:52] API Error: Unable to connect to API (ConnectionRefused)",
@@ -28,5 +24,9 @@
   "[04/07 10:42] ## 迭代 #18 完成 ✅\n\n### 改进内容：为 AllSleepsView 的进行中睡眠添加视觉指示器（与 All",
   "[04/07 10:47] **迭代 #19 完成 ✅**\n\n**改进**: 为 OnboardingView 的宝宝名称输入框添加键盘工具栏 Do",
   "[04/07 10:52] **迭代 #20 完成 ✅**\n\n**改进**: 为 AllGrowthView 添加按指标类型筛选的 Filter C",
-  "[04/07 10:57] **迭代 #21 完成 ✅**\n\n**改进**: 在 AddMilestoneView 的预设建议中标记已记录的里程碑\n"
+  "[04/07 10:57] **迭代 #21 完成 ✅**\n\n**改进**: 在 AddMilestoneView 的预设建议中标记已记录的里程碑\n",
+  "[04/07 12:05] ✅ **迭代 #23 完成**\n\n**改进**: 在 GrowthLogView 的测量输入字段旁显示上次记录值作为参考",
+  "[04/07 12:07] ✅ **迭代 #24 完成**\n\n**改进**: 修复每周摘要中英制奶量总量的小数精度丢失问题\n\n**问题**: \n- ",
+  "[04/07 12:23] ✅ **迭代 #27 完成**\n\n**改进**: 为 FeedingLogView 添加按喂养类型自适应的快捷备注标签\n",
+  "[04/07 12:26] ✅ **迭代 #28 完成**\n\n**改进**: 在每周摘要的尿布统计行添加湿/脏尿布分类计数\n\n**详情**:\n- 尿"
 ]

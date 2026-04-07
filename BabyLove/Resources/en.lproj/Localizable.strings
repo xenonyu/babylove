@@ -96,6 +96,13 @@
 "export.growth.head %@ %@"  = "%@ %@ head";
 "export.milestone.completed" = "Completed";
 "export.milestone.inProgress" = "In Progress";
+"settings.section.journey"            = "Your Journey";
+"settings.journey.totalRecords"       = "Total Records";
+"settings.journey.tracking"           = "Tracking For";
+"settings.journey.days %lld"          = "%lld days";
+"settings.journey.months %lld"        = "%lld months";
+"settings.journey.today"              = "Started today";
+"settings.journey.since %@"           = "Recording since %@";
 "settings.section.about"              = "About";
 "settings.version"                    = "Version";
 "settings.privacyPolicy"              = "Privacy Policy";
