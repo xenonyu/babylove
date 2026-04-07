@@ -36,8 +36,9 @@ struct DiaperLogView: View {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Retroactive date banner — shown when logging to a past day
-                        if isTimestampPastDay {
+                        // Retroactive date banner — shown when creating a new record for a past day
+                        // Suppressed when editing, since the timestamp already belongs to the record
+                        if isTimestampPastDay && !isEditing {
                             HStack(spacing: 10) {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
