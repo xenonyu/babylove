@@ -113,8 +113,10 @@ struct TrackView: View {
 
                         // Recent feedings
                         if !recentFeedings.isEmpty {
+                            let feedingItems = Array(recentFeedings.prefix(5))
                             recentSection(title: String(localized: "track.feedings"), color: .blFeeding, destination: AllFeedingsView()) {
-                                ForEach(recentFeedings.prefix(5)) { r in
+                                ForEach(Array(feedingItems.enumerated()), id: \.element.id) { index, r in
+                                    if index > 0 { Divider().padding(.leading, 16) }
                                     feedingRow(r)
                                         .contentShape(Rectangle())
                                         .onTapGesture { feedingToEdit = r }
@@ -136,8 +138,10 @@ struct TrackView: View {
 
                         // Recent sleeps
                         if !recentSleeps.isEmpty {
+                            let sleepItems = Array(recentSleeps.prefix(5))
                             recentSection(title: String(localized: "track.sleepSection"), color: .blSleep, destination: AllSleepsView()) {
-                                ForEach(recentSleeps.prefix(5)) { r in
+                                ForEach(Array(sleepItems.enumerated()), id: \.element.id) { index, r in
+                                    if index > 0 { Divider().padding(.leading, 16) }
                                     sleepRow(r)
                                         .contentShape(Rectangle())
                                         .onTapGesture { sleepToEdit = r }
@@ -159,8 +163,10 @@ struct TrackView: View {
 
                         // Recent diapers
                         if !recentDiapers.isEmpty {
+                            let diaperItems = Array(recentDiapers.prefix(5))
                             recentSection(title: String(localized: "track.diapers"), color: .blDiaper, destination: AllDiapersView()) {
-                                ForEach(recentDiapers.prefix(5)) { r in
+                                ForEach(Array(diaperItems.enumerated()), id: \.element.id) { index, r in
+                                    if index > 0 { Divider().padding(.leading, 16) }
                                     diaperRow(r)
                                         .contentShape(Rectangle())
                                         .onTapGesture { diaperToEdit = r }
@@ -182,8 +188,10 @@ struct TrackView: View {
 
                         // Recent growth
                         if !recentGrowth.isEmpty {
+                            let growthItems = Array(recentGrowth.prefix(5))
                             recentSection(title: String(localized: "track.growthSection"), color: .blGrowth, destination: AllGrowthView()) {
-                                ForEach(recentGrowth.prefix(5)) { r in
+                                ForEach(Array(growthItems.enumerated()), id: \.element.id) { index, r in
+                                    if index > 0 { Divider().padding(.leading, 16) }
                                     growthRow(r)
                                         .contentShape(Rectangle())
                                         .onTapGesture { growthToEdit = r }
