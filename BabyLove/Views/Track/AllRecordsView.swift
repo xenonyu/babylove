@@ -243,7 +243,7 @@ struct AllFeedingsView: View {
                         let displayAmount = unit.volumeFromML(r.amountML)
                         Text(unit == .metric
                              ? "\(Int(displayAmount)) \(unit.volumeLabel)"
-                             : String(format: "%.1f \(unit.volumeLabel)", displayAmount))
+                             : String(format: "%.1f %@", displayAmount, unit.volumeLabel))
                             .font(.system(size: 13))
                             .foregroundColor(.blTextSecondary)
                     }
