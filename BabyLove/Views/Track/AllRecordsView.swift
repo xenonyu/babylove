@@ -79,10 +79,7 @@ struct AllFeedingsView: View {
                                             }
                                     }
                                 } header: {
-                                    Text(section.key)
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.blTextSecondary)
-                                        .textCase(nil)
+                                    dateSectionHeader(section.key, count: section.records.count)
                                 }
                             }
                         }
@@ -351,10 +348,7 @@ struct AllSleepsView: View {
                                             }
                                     }
                                 } header: {
-                                    Text(section.key)
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.blTextSecondary)
-                                        .textCase(nil)
+                                    dateSectionHeader(section.key, count: section.records.count)
                                 }
                             }
                         }
@@ -609,10 +603,7 @@ struct AllDiapersView: View {
                                             }
                                     }
                                 } header: {
-                                    Text(section.key)
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.blTextSecondary)
-                                        .textCase(nil)
+                                    dateSectionHeader(section.key, count: section.records.count)
                                 }
                             }
                         }
@@ -841,10 +832,7 @@ struct AllGrowthView: View {
                                             }
                                     }
                                 } header: {
-                                    Text(section.key)
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.blTextSecondary)
-                                        .textCase(nil)
+                                    dateSectionHeader(section.key, count: section.records.count)
                                 }
                             }
                         }
@@ -1064,6 +1052,25 @@ private struct FilterChip: View {
 }
 
 // MARK: - Shared Helpers
+
+/// Section header for date-grouped record lists: shows the date and a subtle record count badge.
+@ViewBuilder
+private func dateSectionHeader(_ title: String, count: Int) -> some View {
+    HStack {
+        Text(title)
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundColor(.blTextSecondary)
+            .textCase(nil)
+        Spacer()
+        Text("\(count)")
+            .font(.system(size: 12, weight: .semibold, design: .rounded))
+            .foregroundColor(.blTextTertiary)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(Color.blTextTertiary.opacity(0.1))
+            .clipShape(Capsule())
+    }
+}
 
 private struct DateSection<T>: Identifiable {
     let key: String
