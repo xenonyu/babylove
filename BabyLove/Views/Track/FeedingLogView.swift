@@ -305,6 +305,10 @@ struct FeedingLogView: View {
                                             .font(.system(size: 17, weight: .bold))
                                             .foregroundColor(.blFeeding)
                                     }
+
+                                    // Quick duration presets — tap to set a common feeding time
+                                    quickDurationPresets
+
                                     Slider(value: $duration, in: 1...180, step: 1)
                                         .tint(.blFeeding)
                                         .accessibilityLabel(NSLocalizedString("feedLog.duration", comment: ""))
@@ -528,6 +532,36 @@ struct FeedingLogView: View {
                 elapsedTimer = nil
             }
             .interactiveDismissDisabled(hasUnsavedChanges)
+        }
+    }
+
+    // MARK: - Quick Duration Presets
+
+    /// Common breast/pump feeding durations (in minutes) for one-tap selection.
+    private let quickDurationValues: [Double] = [5, 10, 15, 20, 25, 30, 45, 60]
+
+    private var quickDurationPresets: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(quickDurationValues, id: \.self) { preset in
+                    let isSelected = abs(duration - preset) < 0.5
+                    Button {
+                        Haptic.selection()
+                        withAnimation(.spring(response: 0.25)) { duration = preset }
+                    } label: {
+                        Text(DurationFormat.standard(Int16(preset)))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(isSelected ? .white : .blFeeding)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(isSelected ? Color.blFeeding : Color.blFeeding.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(DurationFormat.standard(Int16(preset)))
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
         }
     }
 
