@@ -749,7 +749,7 @@ struct AllDiapersView: View {
                                             }
                                     }
                                 } header: {
-                                    dateSectionHeader(section.key, count: section.records.count)
+                                    diaperSectionHeader(section.key, records: section.records)
                                 }
                             }
                         }
@@ -878,6 +878,47 @@ struct AllDiapersView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
         .accessibilityHint(NSLocalizedString("a11y.tapEditSwipeDelete", comment: ""))
+    }
+
+    /// Enhanced section header for diaper records: shows date, count, and type breakdown.
+    @ViewBuilder
+    private func diaperSectionHeader(_ title: String, records: [CDDiaperRecord]) -> some View {
+        let wetCount = records.filter { DiaperType(rawValue: $0.diaperType ?? "") == .wet }.count
+        let dirtyCount = records.filter { DiaperType(rawValue: $0.diaperType ?? "") == .dirty }.count
+        let bothCount = records.filter { DiaperType(rawValue: $0.diaperType ?? "") == .both }.count
+
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.blTextSecondary)
+                    .textCase(nil)
+
+                let parts: [(String, Int)] = [
+                    ("💧", wetCount),
+                    ("💩", dirtyCount),
+                    ("💧💩", bothCount)
+                ].filter { $0.1 > 0 }
+
+                if !parts.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(parts, id: \.0) { icon, count in
+                            Text("\(icon) \(count)")
+                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                                .foregroundColor(.blDiaper)
+                        }
+                    }
+                }
+            }
+            Spacer()
+            Text("\(records.count)")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(.blTextTertiary)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Color.blTextTertiary.opacity(0.1))
+                .clipShape(Capsule())
+        }
     }
 }
 
