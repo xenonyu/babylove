@@ -103,6 +103,10 @@
 "settings.journey.months %lld"        = "%lld ヶ月";
 "settings.journey.today"              = "今日から開始";
 "settings.journey.since %@"           = "%@ から記録中";
+"settings.journey.streak"             = "連続記録";
+"settings.journey.streakDays %lld"    = "%lld 日";
+"settings.journey.bestStreak %lld"    = "最長: %lld";
+"settings.journey.streakA11y %lld %lld" = "現在の連続記録: %lld 日、最長連続記録: %lld 日";
 "settings.section.about"              = "アプリについて";
 "settings.version"                    = "バージョン";
 "settings.privacyPolicy"              = "プライバシーポリシー";

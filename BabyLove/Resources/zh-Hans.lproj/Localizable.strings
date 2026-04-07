@@ -103,6 +103,10 @@
 "settings.journey.months %lld"        = "%lld 个月";
 "settings.journey.today"              = "今天开始";
 "settings.journey.since %@"           = "从 %@ 起开始记录";
+"settings.journey.streak"             = "连续记录";
+"settings.journey.streakDays %lld"    = "%lld 天";
+"settings.journey.bestStreak %lld"    = "最长: %lld";
+"settings.journey.streakA11y %lld %lld" = "当前连续记录: %lld 天，最长连续记录: %lld 天";
 "settings.section.about"              = "关于";
 "settings.version"                    = "版本";
 "settings.privacyPolicy"              = "隐私政策";

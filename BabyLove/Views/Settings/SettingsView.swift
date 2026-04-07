@@ -166,6 +166,33 @@ struct SettingsView: View {
                                 .accessibilityElement(children: .combine)
                             }
 
+                            // Logging streak
+                            if stats.currentStreak > 0 {
+                                HStack {
+                                    Label {
+                                        Text(String(localized: "settings.journey.streak"))
+                                    } icon: {
+                                        Image(systemName: "flame.fill")
+                                            .foregroundColor(.orange)
+                                    }
+                                    Spacer()
+                                    HStack(spacing: 6) {
+                                        Text(String(format: NSLocalizedString("settings.journey.streakDays %lld", comment: ""), stats.currentStreak))
+                                            .font(.system(size: 15, weight: .semibold))
+                                            .foregroundColor(.orange)
+                                        if stats.longestStreak > stats.currentStreak {
+                                            Text("·")
+                                                .foregroundColor(.blTextTertiary)
+                                            Text(String(format: NSLocalizedString("settings.journey.bestStreak %lld", comment: ""), stats.longestStreak))
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.blTextTertiary)
+                                        }
+                                    }
+                                }
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel(String(format: NSLocalizedString("settings.journey.streakA11y %lld %lld", comment: ""), stats.currentStreak, stats.longestStreak))
+                            }
+
                             // Category breakdown
                             VStack(spacing: 8) {
                                 journeyStatRow(icon: "drop.fill", color: .blFeeding,
@@ -588,6 +615,8 @@ struct JourneyStats {
     let growths: Int
     let milestones: Int
     let firstRecordDate: Date?
+    let currentStreak: Int
+    let longestStreak: Int
 
     var totalRecords: Int { feedings + sleeps + diapers + growths + milestones }
 
@@ -629,14 +658,95 @@ struct JourneyStats {
         ]
         let firstDate = dates.compactMap { $0 }.min()
 
+        // Compute logging streaks by collecting all unique record dates
+        let streaks = computeStreaks(ctx: ctx)
+
         return JourneyStats(
             feedings: count("CDFeedingRecord"),
             sleeps: count("CDSleepRecord"),
             diapers: count("CDDiaperRecord"),
             growths: count("CDGrowthRecord"),
             milestones: count("CDMilestone"),
-            firstRecordDate: firstDate
+            firstRecordDate: firstDate,
+            currentStreak: streaks.current,
+            longestStreak: streaks.longest
         )
+    }
+
+    /// Collect all record dates, deduplicate by calendar day, then walk backwards
+    /// from today to compute current streak and longest streak.
+    private static func computeStreaks(ctx: NSManagedObjectContext) -> (current: Int, longest: Int) {
+        let cal = Calendar.current
+
+        func allDates(_ entity: String, dateKey: String) -> [Date] {
+            let req = NSFetchRequest<NSManagedObject>(entityName: entity)
+            req.propertiesToFetch = [dateKey]
+            guard let results = try? ctx.fetch(req) else { return [] }
+            return results.compactMap { $0.value(forKey: dateKey) as? Date }
+        }
+
+        // Gather all dates from every entity
+        var rawDates: [Date] = []
+        rawDates.append(contentsOf: allDates("CDFeedingRecord", dateKey: "timestamp"))
+        rawDates.append(contentsOf: allDates("CDSleepRecord", dateKey: "startTime"))
+        rawDates.append(contentsOf: allDates("CDDiaperRecord", dateKey: "timestamp"))
+        rawDates.append(contentsOf: allDates("CDGrowthRecord", dateKey: "date"))
+        rawDates.append(contentsOf: allDates("CDMilestone", dateKey: "date"))
+
+        guard !rawDates.isEmpty else { return (0, 0) }
+
+        // Convert to unique calendar days (as Date at start-of-day) and sort descending
+        let uniqueDays: [Date] = Array(Set(rawDates.map { cal.startOfDay(for: $0) })).sorted(by: >)
+
+        let today = cal.startOfDay(for: Date())
+
+        // Current streak: count consecutive days backwards from today (or yesterday)
+        var currentStreak = 0
+        var expectedDay = today
+        // Allow streak to start from yesterday if no records today
+        if let first = uniqueDays.first, first != today {
+            if cal.isDate(first, inSameDayAs: cal.date(byAdding: .day, value: -1, to: today)!) {
+                expectedDay = first
+            } else {
+                // Gap > 1 day: no current streak
+                // Still compute longest streak below
+                currentStreak = 0
+                expectedDay = today // won't match, so loop below won't increment
+            }
+        }
+
+        for day in uniqueDays {
+            if cal.isDate(day, inSameDayAs: expectedDay) {
+                currentStreak += 1
+                expectedDay = cal.date(byAdding: .day, value: -1, to: expectedDay)!
+            } else if day < expectedDay {
+                break
+            }
+        }
+
+        // Longest streak: walk all sorted days
+        let ascending = uniqueDays.reversed() // now ascending
+        var longest = 0
+        var streak = 0
+        var prev: Date?
+        for day in ascending {
+            if let p = prev {
+                let diff = cal.dateComponents([.day], from: p, to: day).day ?? 0
+                if diff == 1 {
+                    streak += 1
+                } else if diff > 1 {
+                    longest = max(longest, streak)
+                    streak = 1
+                }
+                // diff == 0 shouldn't happen since we deduplicated
+            } else {
+                streak = 1
+            }
+            prev = day
+        }
+        longest = max(longest, streak)
+
+        return (currentStreak, longest)
     }
 }
 

@@ -103,6 +103,10 @@
 "settings.journey.months %lld"        = "%lld months";
 "settings.journey.today"              = "Started today";
 "settings.journey.since %@"           = "Recording since %@";
+"settings.journey.streak"             = "Logging Streak";
+"settings.journey.streakDays %lld"    = "%lld days";
+"settings.journey.bestStreak %lld"    = "best: %lld";
+"settings.journey.streakA11y %lld %lld" = "Current logging streak: %lld days, best streak: %lld days";
 "settings.section.about"              = "About";
 "settings.version"                    = "Version";
 "settings.privacyPolicy"              = "Privacy Policy";

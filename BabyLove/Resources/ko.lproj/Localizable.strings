@@ -103,6 +103,10 @@
 "settings.journey.months %lld"        = "%lld개월";
 "settings.journey.today"              = "오늘 시작";
 "settings.journey.since %@"           = "%@부터 기록 중";
+"settings.journey.streak"             = "연속 기록";
+"settings.journey.streakDays %lld"    = "%lld일";
+"settings.journey.bestStreak %lld"    = "최고: %lld";
+"settings.journey.streakA11y %lld %lld" = "현재 연속 기록: %lld일, 최고 연속 기록: %lld일";
 "settings.section.about"              = "정보";
 "settings.version"                    = "버전";
 "settings.privacyPolicy"              = "개인정보 처리방침";
