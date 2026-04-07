@@ -253,6 +253,20 @@
 "home.summary.and"          = "和";
 "home.summary.commaAnd"     = "、";
 
+/* Share Day Summary */
+"home.share.button"                    = "分享日报";
+"home.share.hint"                      = "将今天的记录分享给家人或照护者";
+"home.share.feedingsSingular %lld"     = "%lld 次喂奶";
+"home.share.feedingsPlural %lld"       = "%lld 次喂奶";
+"home.share.every %@"                  = "≈ 每隔 %@";
+"home.share.napSingular %lld"          = "%lld 次小睡";
+"home.share.napsPlural %lld"           = "%lld 次小睡";
+"home.share.diaperSingular %lld"       = "%lld 次换尿布";
+"home.share.diapersPlural %lld"        = "%lld 次换尿布";
+"home.share.headCirc"                  = "头围";
+"home.share.noRecords"                 = "今天还没有记录";
+"home.share.sentFrom"                  = "来自 BabyLove";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "1 次小睡";
 "home.naps.plural %lld"    = "%lld 次小睡";

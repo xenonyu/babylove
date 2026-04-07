@@ -46,6 +46,10 @@ struct HomeView: View {
     @State private var timelineFilter: TimelineRecordType? = nil
     /// Whether the "Jump to Date" calendar picker is shown
     @State private var showDateJumpPicker = false
+    /// Whether the share sheet for the day summary is shown
+    @State private var showShareSheet = false
+    /// The generated share text for the day summary
+    @State private var shareText: String = ""
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingRecord: CDFeedingRecord?
@@ -472,6 +476,132 @@ struct HomeView: View {
         return sentence
     }
 
+    // MARK: - Shareable Day Summary
+
+    /// Builds a rich, formatted text summary of the day suitable for sharing
+    /// with a partner, family member, or pediatrician via Messages, email, etc.
+    private func buildShareableDaySummary() -> String {
+        let babyName = baby?.name ?? "Baby"
+        let unit = appState.measurementUnit
+        let dateStr = selectedDate.formatted(date: .long, time: .omitted)
+        let ageStr: String = {
+            guard let baby else { return "" }
+            let age = isSelectedDateToday ? baby.ageText : baby.ageText(at: selectedDate)
+            return age.isEmpty ? "" : " (\(age))"
+        }()
+
+        var lines: [String] = []
+
+        // Header
+        lines.append("🍼 \(babyName)\(ageStr)")
+        lines.append("📅 \(dateStr)")
+        lines.append("")
+
+        // Feedings
+        let feedCount = todayFeedings.count
+        if feedCount > 0 {
+            let feedKey = feedCount == 1
+                ? NSLocalizedString("home.share.feedingsSingular %lld", comment: "")
+                : NSLocalizedString("home.share.feedingsPlural %lld", comment: "")
+            var feedLine = "🍼 " + String(format: feedKey, feedCount)
+
+            // Volume total
+            if totalFeedingVolumeML > 0 {
+                let display = unit.volumeFromML(totalFeedingVolumeML)
+                if unit == .metric {
+                    feedLine += " · \(Int(display)) \(unit.volumeLabel)"
+                } else {
+                    feedLine += " · \(String(format: "%.1f", display)) \(unit.volumeLabel)"
+                }
+            }
+
+            // Total breast/pump duration
+            let totalBreastMins = todayFeedings.reduce(0) { sum, r in
+                let ft = FeedType(rawValue: r.feedType ?? "")
+                guard ft == .breast || ft == .pump, r.durationMinutes > 0 else { return sum }
+                return sum + Int(r.durationMinutes)
+            }
+            if totalBreastMins > 0 {
+                feedLine += " · \(DurationFormat.fromMinutes(totalBreastMins))"
+            }
+
+            lines.append(feedLine)
+
+            // Average interval
+            if feedCount >= 2, let intervalText = avgFeedingIntervalText {
+                lines.append("   " + String(format: NSLocalizedString("home.share.every %@", comment: ""), intervalText))
+            }
+        }
+
+        // Sleep
+        let sleepMins = totalSleepMinutes
+        if sleepMins > 0 {
+            let napCount = todaySleeps.count
+            let napKey = napCount == 1
+                ? NSLocalizedString("home.share.napSingular %lld", comment: "")
+                : NSLocalizedString("home.share.napsPlural %lld", comment: "")
+            let napStr = String(format: napKey, napCount)
+            lines.append("😴 \(DurationFormat.fromMinutes(sleepMins)) · \(napStr)")
+        }
+
+        // Diapers
+        let diaperCount = todayDiapers.count
+        if diaperCount > 0 {
+            var wet = 0, dirty = 0
+            for r in todayDiapers {
+                switch DiaperType(rawValue: r.diaperType ?? "") {
+                case .wet:   wet += 1
+                case .dirty: dirty += 1
+                case .both:  wet += 1; dirty += 1
+                case .dry, .none: break
+                }
+            }
+            let diaperKey = diaperCount == 1
+                ? NSLocalizedString("home.share.diaperSingular %lld", comment: "")
+                : NSLocalizedString("home.share.diapersPlural %lld", comment: "")
+            var diaperLine = "🧷 " + String(format: diaperKey, diaperCount)
+            var breakdown: [String] = []
+            if wet > 0 { breakdown.append("💧\(wet)") }
+            if dirty > 0 { breakdown.append("💩\(dirty)") }
+            if !breakdown.isEmpty {
+                diaperLine += " (\(breakdown.joined(separator: " ")))"
+            }
+            lines.append(diaperLine)
+        }
+
+        // Growth
+        if !todayGrowth.isEmpty {
+            if let latest = todayGrowth.first {
+                var parts: [String] = []
+                if latest.weightKG > 0 {
+                    let w = unit.weightFromKG(latest.weightKG)
+                    parts.append(String(format: "%.2f %@", w, unit.weightLabel))
+                }
+                if latest.heightCM > 0 {
+                    let h = unit.lengthFromCM(latest.heightCM)
+                    parts.append(String(format: "%.1f %@", h, unit.heightLabel))
+                }
+                if latest.headCircumferenceCM > 0 {
+                    let hc = unit.lengthFromCM(latest.headCircumferenceCM)
+                    parts.append(String(format: "%.1f %@ %@", hc, unit.heightLabel, NSLocalizedString("home.share.headCirc", comment: "")))
+                }
+                if !parts.isEmpty {
+                    lines.append("📏 " + parts.joined(separator: " · "))
+                }
+            }
+        }
+
+        // Footer
+        if feedCount == 0 && sleepMins == 0 && diaperCount == 0 && todayGrowth.isEmpty {
+            lines.append(NSLocalizedString("home.share.noRecords", comment: ""))
+        }
+
+        lines.append("")
+        lines.append("— \(NSLocalizedString("home.share.sentFrom", comment: ""))")
+
+        return lines.joined(separator: "\n")
+    }
+
     // MARK: - Quick Log Hints
 
     /// Contextual hint for the Feeding quick log card.
@@ -660,7 +790,7 @@ struct HomeView: View {
                             }
                             .padding(.horizontal, 20)
 
-                            // Smart daily summary sentence
+                            // Smart daily summary sentence with share button
                             if let summary = dailySummaryText {
                                 HStack(spacing: 8) {
                                     Image(systemName: "text.bubble.fill")
@@ -671,6 +801,22 @@ struct HomeView: View {
                                         .foregroundColor(.blTextSecondary)
                                         .lineLimit(3)
                                         .fixedSize(horizontal: false, vertical: true)
+                                    Spacer(minLength: 4)
+                                    Button {
+                                        Haptic.light()
+                                        shareText = buildShareableDaySummary()
+                                        showShareSheet = true
+                                    } label: {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.blPrimary)
+                                            .frame(width: 28, height: 28)
+                                            .background(Color.blPrimary.opacity(0.1))
+                                            .clipShape(Circle())
+                                    }
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel(NSLocalizedString("home.share.button", comment: ""))
+                                    .accessibilityHint(NSLocalizedString("home.share.hint", comment: ""))
                                 }
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 10)
@@ -678,8 +824,7 @@ struct HomeView: View {
                                 .background(Color.blPrimary.opacity(0.04))
                                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 .padding(.horizontal, 20)
-                                .accessibilityElement(children: .ignore)
-                                .accessibilityLabel(summary)
+                                .accessibilityElement(children: .combine)
                             }
                         }
 
@@ -813,6 +958,9 @@ struct HomeView: View {
                     stopFeedingTimer()
                 }
             }
+        }
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(activityItems: [shareText])
         }
         .sheet(isPresented: $showDateJumpPicker) {
             DateJumpPickerView(

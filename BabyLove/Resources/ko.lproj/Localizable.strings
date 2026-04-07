@@ -253,6 +253,20 @@
 "home.summary.and"          = "과(와) ";
 "home.summary.commaAnd"     = ", ";
 
+/* Share Day Summary */
+"home.share.button"                    = "일일 요약 공유";
+"home.share.hint"                      = "오늘의 기록을 가족이나 돌봄 제공자에게 공유합니다";
+"home.share.feedingsSingular %lld"     = "수유 %lld회";
+"home.share.feedingsPlural %lld"       = "수유 %lld회";
+"home.share.every %@"                  = "≈ %@마다";
+"home.share.napSingular %lld"          = "낮잠 %lld회";
+"home.share.napsPlural %lld"           = "낮잠 %lld회";
+"home.share.diaperSingular %lld"       = "기저귀 교체 %lld회";
+"home.share.diapersPlural %lld"        = "기저귀 교체 %lld회";
+"home.share.headCirc"                  = "머리둘레";
+"home.share.noRecords"                 = "아직 기록이 없습니다";
+"home.share.sentFrom"                  = "BabyLove에서 보냄";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "낮잠 1회";
 "home.naps.plural %lld"    = "낮잠 %lld회";

@@ -253,6 +253,20 @@
 "home.summary.and"          = "と";
 "home.summary.commaAnd"     = "、";
 
+/* Share Day Summary */
+"home.share.button"                    = "日報を共有";
+"home.share.hint"                      = "今日の記録を家族やケアラーに共有します";
+"home.share.feedingsSingular %lld"     = "授乳 %lld 回";
+"home.share.feedingsPlural %lld"       = "授乳 %lld 回";
+"home.share.every %@"                  = "≈ %@おき";
+"home.share.napSingular %lld"          = "お昼寝 %lld 回";
+"home.share.napsPlural %lld"           = "お昼寝 %lld 回";
+"home.share.diaperSingular %lld"       = "おむつ替え %lld 回";
+"home.share.diapersPlural %lld"        = "おむつ替え %lld 回";
+"home.share.headCirc"                  = "頭囲";
+"home.share.noRecords"                 = "まだ記録がありません";
+"home.share.sentFrom"                  = "BabyLoveより";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "1 回のお昼寝";
 "home.naps.plural %lld"    = "%lld 回のお昼寝";

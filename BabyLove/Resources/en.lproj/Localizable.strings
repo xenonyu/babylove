@@ -253,6 +253,20 @@
 "home.summary.and"          = " and ";
 "home.summary.commaAnd"     = ", and ";
 
+/* Share Day Summary */
+"home.share.button"                    = "Share day summary";
+"home.share.hint"                      = "Share this day's summary with family or caregivers";
+"home.share.feedingsSingular %lld"     = "%lld feeding";
+"home.share.feedingsPlural %lld"       = "%lld feedings";
+"home.share.every %@"                  = "≈ every %@";
+"home.share.napSingular %lld"          = "%lld nap";
+"home.share.napsPlural %lld"           = "%lld naps";
+"home.share.diaperSingular %lld"       = "%lld diaper change";
+"home.share.diapersPlural %lld"        = "%lld diaper changes";
+"home.share.headCirc"                  = "head";
+"home.share.noRecords"                 = "No records logged yet.";
+"home.share.sentFrom"                  = "Sent from BabyLove";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "1 nap";
 "home.naps.plural %lld"    = "%lld naps";
