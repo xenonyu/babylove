@@ -2322,6 +2322,7 @@ struct HomeView: View {
 
     private var babyHeroCard: some View {
         let streak = currentStreak
+        let greeting = timeOfDayGreeting
         return HStack(spacing: 16) {
             // Avatar
             if let baby {
@@ -2337,6 +2338,18 @@ struct HomeView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
+                // Time-of-day greeting (only for today)
+                if isSelectedDateToday {
+                    HStack(spacing: 5) {
+                        Image(systemName: greeting.icon)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(greeting.color)
+                        Text(greeting.text)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(greeting.color)
+                    }
+                }
+
                 HStack(spacing: 8) {
                     Text(baby?.name ?? "Baby")
                         .font(.system(size: 22, weight: .bold))
@@ -2384,6 +2397,47 @@ struct HomeView: View {
         .accessibilityLabel(babyHeroAccessibilityLabel)
     }
 
+    // MARK: - Time-of-Day Greeting
+
+    /// Contextual greeting info based on current hour
+    private struct GreetingInfo {
+        let text: String
+        let icon: String
+        let color: Color
+    }
+
+    /// Returns a warm, localized greeting with matching icon and colour.
+    /// Morning (5-12) / Afternoon (12-17) / Evening (17-21) / Night (21-5)
+    private var timeOfDayGreeting: GreetingInfo {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12:
+            return GreetingInfo(
+                text: NSLocalizedString("home.greeting.morning", comment: ""),
+                icon: "sun.horizon.fill",
+                color: .blGrowth  // warm amber
+            )
+        case 12..<17:
+            return GreetingInfo(
+                text: NSLocalizedString("home.greeting.afternoon", comment: ""),
+                icon: "sun.max.fill",
+                color: .blGrowth
+            )
+        case 17..<21:
+            return GreetingInfo(
+                text: NSLocalizedString("home.greeting.evening", comment: ""),
+                icon: "sunset.fill",
+                color: .blPrimary  // warm coral
+            )
+        default: // 21-4
+            return GreetingInfo(
+                text: NSLocalizedString("home.greeting.night", comment: ""),
+                icon: "moon.stars.fill",
+                color: .blSleep  // calming lavender
+            )
+        }
+    }
+
     /// Age text for the hero card — shows baby's age at the selected date.
     /// When viewing a past date, this reflects how old the baby was on that day.
     private var heroAgeText: String {
@@ -2415,6 +2469,9 @@ struct HomeView: View {
 
     private var babyHeroAccessibilityLabel: String {
         var parts: [String] = []
+        if isSelectedDateToday {
+            parts.append(timeOfDayGreeting.text)
+        }
         parts.append(baby?.name ?? "Baby")
         if let baby {
             let ageStr = isSelectedDateToday ? baby.localizedAge : baby.ageText(at: selectedDate)

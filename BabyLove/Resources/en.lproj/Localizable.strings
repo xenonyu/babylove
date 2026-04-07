@@ -173,6 +173,12 @@
 "home.streakDays %lld"     = "%lldd";
 "home.streak %lld"         = "%lld-day logging streak";
 
+/* Time-of-day greeting */
+"home.greeting.morning"    = "Good morning";
+"home.greeting.afternoon"  = "Good afternoon";
+"home.greeting.evening"    = "Good evening";
+"home.greeting.night"      = "Good night";
+
 /* Quick Log Cards */
 "home.feeding"             = "Feeding";
 "home.sleep"               = "Sleep";

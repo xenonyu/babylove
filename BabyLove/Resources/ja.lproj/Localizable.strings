@@ -173,6 +173,12 @@
 "home.streakDays %lld"     = "%lld日";
 "home.streak %lld"         = "%lld日連続記録中";
 
+/* Time-of-day greeting */
+"home.greeting.morning"    = "おはようございます";
+"home.greeting.afternoon"  = "こんにちは";
+"home.greeting.evening"    = "こんばんは";
+"home.greeting.night"      = "おやすみなさい";
+
 /* Quick Log Cards */
 "home.feeding"             = "授乳";
 "home.sleep"               = "睡眠";

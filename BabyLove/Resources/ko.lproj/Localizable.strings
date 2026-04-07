@@ -173,6 +173,12 @@
 "home.streakDays %lld"     = "%lld일";
 "home.streak %lld"         = "%lld일 연속 기록";
 
+/* Time-of-day greeting */
+"home.greeting.morning"    = "좋은 아침이에요";
+"home.greeting.afternoon"  = "좋은 오후예요";
+"home.greeting.evening"    = "좋은 저녁이에요";
+"home.greeting.night"      = "좋은 밤이에요";
+
 /* Quick Log Cards */
 "home.feeding"             = "수유";
 "home.sleep"               = "수면";
