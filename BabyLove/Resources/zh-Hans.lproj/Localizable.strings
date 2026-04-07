@@ -617,6 +617,17 @@
 "growth.reminder.a11y.label"   = "测量提醒 — 点击记录新测量";
 "growth.reminder.a11y.hint %lld" = "距上次测量已 %lld 天";
 
+// 生长洞察卡片
+"growth.insight.healthyGrowing %@ %lld" = "好消息！%@正在稳步增长，处于第 %lld 百分位——一切正常";
+"growth.insight.healthySteady %@ %lld"  = "很好！%@稳定在第 %lld 百分位";
+"growth.insight.healthySlowing %@ %lld" = "%@增长略有放缓，但仍在健康范围内（P%lld）";
+"growth.insight.monitorGrowing %@ %lld" = "%@处于第 %lld 百分位且呈上升趋势——继续记录";
+"growth.insight.monitorSteady %@ %lld"  = "%@处于第 %lld 百分位——建议下次体检时提一下";
+"growth.insight.outside %@ %lld"        = "%@处于第 %lld 百分位——建议咨询儿科医生";
+"growth.insight.pctlOnly %@ %lld"       = "%@处于第 %lld 百分位——在健康范围内";
+"growth.insight.pctlOnlyMonitor %@ %lld" = "%@处于第 %lld 百分位——需要持续关注";
+"growth.insight.trendOnly %@ %@ %@"     = "%@在过去 %3$@ 变化了 %2$@——添加更多数据以查看百分位";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "回忆";
 "memory.achieved %lld"      = "%lld 已达成";

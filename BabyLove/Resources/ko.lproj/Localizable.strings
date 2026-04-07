@@ -617,6 +617,17 @@
 "growth.reminder.a11y.label"   = "측정 알림 — 탭하여 새 측정 기록";
 "growth.reminder.a11y.hint %lld" = "마지막 측정 후 %lld일";
 
+// 성장 인사이트 카드
+"growth.insight.healthyGrowing %@ %lld" = "좋은 소식! %@이(가) %lld 백분위에서 꾸준히 성장 중이에요";
+"growth.insight.healthySteady %@ %lld"  = "잘 가고 있어요! %@이(가) %lld 백분위로 안정적이에요";
+"growth.insight.healthySlowing %@ %lld" = "%@ 성장이 조금 느려졌지만 건강 범위 내예요 (P%lld)";
+"growth.insight.monitorGrowing %@ %lld" = "%@이(가) %lld 백분위이며 상승 추세예요 — 계속 기록하세요";
+"growth.insight.monitorSteady %@ %lld"  = "%@이(가) %lld 백분위예요 — 다음 검진 때 말씀해 보세요";
+"growth.insight.outside %@ %lld"        = "%@이(가) %lld 백분위예요 — 소아과 의사와 상담을 권합니다";
+"growth.insight.pctlOnly %@ %lld"       = "%@이(가) %lld 백분위 — 건강 범위 내예요";
+"growth.insight.pctlOnlyMonitor %@ %lld" = "%@이(가) %lld 백분위 — 지켜봐 주세요";
+"growth.insight.trendOnly %@ %@ %@"     = "%@이(가) 지난 %3$@ 동안 %2$@ 변화 — 백분위를 보려면 데이터를 더 추가하세요";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "추억";
 "memory.achieved %lld"      = "%lld 달성";

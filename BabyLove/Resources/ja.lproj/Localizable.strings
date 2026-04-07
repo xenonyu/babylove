@@ -617,6 +617,17 @@
 "growth.reminder.a11y.label"   = "測定リマインダー — タップして新しい測定を記録";
 "growth.reminder.a11y.hint %lld" = "前回の測定から %lld 日";
 
+// 成長インサイトカード
+"growth.insight.healthyGrowing %@ %lld" = "順調です！%@は第 %lld パーセンタイルで安定して成長中";
+"growth.insight.healthySteady %@ %lld"  = "いい感じ！%@は第 %lld パーセンタイルで安定しています";
+"growth.insight.healthySlowing %@ %lld" = "%@の成長は少しゆっくりですが、健康範囲内です（P%lld）";
+"growth.insight.monitorGrowing %@ %lld" = "%@は第 %lld パーセンタイルで上昇傾向——記録を続けましょう";
+"growth.insight.monitorSteady %@ %lld"  = "%@は第 %lld パーセンタイル——次の健診で相談してみましょう";
+"growth.insight.outside %@ %lld"        = "%@は第 %lld パーセンタイル——小児科医に相談をおすすめします";
+"growth.insight.pctlOnly %@ %lld"       = "%@は第 %lld パーセンタイル——健康範囲内です";
+"growth.insight.pctlOnlyMonitor %@ %lld" = "%@は第 %lld パーセンタイル——経過を見守りましょう";
+"growth.insight.trendOnly %@ %@ %@"     = "%@は過去 %3$@ で %2$@ 変化——パーセンタイルを見るにはデータを追加";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "思い出";
 "memory.achieved %lld"      = "%lld 達成済み";

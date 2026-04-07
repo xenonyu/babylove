@@ -617,6 +617,17 @@
 "growth.reminder.a11y.label"   = "Measurement reminder — tap to record new measurement";
 "growth.reminder.a11y.hint %lld" = "Last measurement was %lld days ago";
 
+// Growth Insight Card
+"growth.insight.healthyGrowing %@ %lld" = "Great news! %@ is growing steadily at the %lld percentile — right on track";
+"growth.insight.healthySteady %@ %lld"  = "Looking good! %@ is holding steady at the %lld percentile";
+"growth.insight.healthySlowing %@ %lld" = "%@ growth has slowed a bit but is still in the healthy range (P%lld)";
+"growth.insight.monitorGrowing %@ %lld" = "%@ is at the %lld percentile and trending upward — keep tracking";
+"growth.insight.monitorSteady %@ %lld"  = "%@ is at the %lld percentile — worth mentioning at your next checkup";
+"growth.insight.outside %@ %lld"        = "%@ is at the %lld percentile — consider discussing with your pediatrician";
+"growth.insight.pctlOnly %@ %lld"       = "%@ is at the %lld percentile — in the healthy range";
+"growth.insight.pctlOnlyMonitor %@ %lld" = "%@ is at the %lld percentile — keep an eye on it";
+"growth.insight.trendOnly %@ %@ %@"     = "%@ changed %@ over the past %@ — add more data for percentile insights";
+
 /* ===== Memory / Milestone ===== */
 "memory.title"              = "Memories";
 "memory.achieved %lld"      = "%lld Achieved";

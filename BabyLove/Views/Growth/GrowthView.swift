@@ -417,12 +417,140 @@ struct GrowthView: View {
         .accessibilityAddTraits(.isButton)
     }
 
+    // MARK: - Growth Insight
+
+    /// Insight message combining percentile + trend for the selected metric
+    private struct GrowthInsightInfo {
+        let icon: String
+        let message: String
+        let color: Color
+    }
+
+    private var growthInsight: GrowthInsightInfo? {
+        let metric = selectedMetric
+        let unit = appState.measurementUnit
+        let pctl = whoPercentile(for: metric)
+        let delta = metricDelta(for: metric, unit: unit)
+        let spanDays = deltaSpanDays(for: metric)
+        let metricName = metric.localizedAccessibilityName
+
+        // Need at least a percentile or a delta to show an insight
+        guard pctl != nil || delta != nil else { return nil }
+
+        // Determine trend
+        enum Trend { case growing, steady, declining }
+        let trend: Trend? = delta.map { d in
+            if d > 0.01 { return .growing }
+            if d < -0.01 { return .declining }
+            return .steady
+        }
+
+        // Build message based on available data
+        if let pctl, let trend {
+            // Both percentile and trend available — richest insight
+            let pctlRange: String
+            let icon: String
+            let color: Color
+            if pctl >= 15 && pctl <= 85 {
+                // Healthy range
+                color = .blTeal
+                switch trend {
+                case .growing:
+                    icon = "leaf.fill"
+                    pctlRange = String(format: NSLocalizedString("growth.insight.healthyGrowing %@ %lld", comment: ""), metricName, pctl)
+                case .steady:
+                    icon = "checkmark.seal.fill"
+                    pctlRange = String(format: NSLocalizedString("growth.insight.healthySteady %@ %lld", comment: ""), metricName, pctl)
+                case .declining:
+                    icon = "leaf.fill"
+                    pctlRange = String(format: NSLocalizedString("growth.insight.healthySlowing %@ %lld", comment: ""), metricName, pctl)
+                }
+            } else if (pctl >= 3 && pctl < 15) || (pctl > 85 && pctl <= 97) {
+                // Worth monitoring
+                color = .blGrowth
+                icon = "eye.fill"
+                switch trend {
+                case .growing:
+                    pctlRange = String(format: NSLocalizedString("growth.insight.monitorGrowing %@ %lld", comment: ""), metricName, pctl)
+                case .steady, .declining:
+                    pctlRange = String(format: NSLocalizedString("growth.insight.monitorSteady %@ %lld", comment: ""), metricName, pctl)
+                }
+            } else {
+                // Outside range
+                color = .blPrimary
+                icon = "heart.text.clipboard.fill"
+                pctlRange = String(format: NSLocalizedString("growth.insight.outside %@ %lld", comment: ""), metricName, pctl)
+            }
+            return GrowthInsightInfo(icon: icon, message: pctlRange, color: color)
+        } else if let pctl {
+            // Only percentile, no trend yet
+            let color: Color
+            let icon: String
+            let message: String
+            if pctl >= 15 && pctl <= 85 {
+                color = .blTeal; icon = "checkmark.seal.fill"
+                message = String(format: NSLocalizedString("growth.insight.pctlOnly %@ %lld", comment: ""), metricName, pctl)
+            } else if (pctl >= 3 && pctl < 15) || (pctl > 85 && pctl <= 97) {
+                color = .blGrowth; icon = "eye.fill"
+                message = String(format: NSLocalizedString("growth.insight.pctlOnlyMonitor %@ %lld", comment: ""), metricName, pctl)
+            } else {
+                color = .blPrimary; icon = "heart.text.clipboard.fill"
+                message = String(format: NSLocalizedString("growth.insight.outside %@ %lld", comment: ""), metricName, pctl)
+            }
+            return GrowthInsightInfo(icon: icon, message: message, color: color)
+        } else if let delta, let spanDays {
+            // No percentile, but have a trend
+            let unitLabel = metric == .weight ? unit.weightLabel : unit.heightLabel
+            let sign = delta > 0 ? "+" : ""
+            let fmt = metric == .weight ? "%.2f" : "%.1f"
+            let deltaStr = "\(sign)\(String(format: fmt, delta)) \(unitLabel)"
+            let spanStr = Self.shortSpanLabel(spanDays)
+            let message = String(format: NSLocalizedString("growth.insight.trendOnly %@ %@ %@", comment: ""), metricName, deltaStr, spanStr)
+            let color: Color = delta > 0 ? .blTeal : .blGrowth
+            let icon = delta > 0 ? "arrow.up.forward.circle.fill" : "arrow.down.forward.circle.fill"
+            return GrowthInsightInfo(icon: icon, message: message, color: color)
+        }
+
+        return nil
+    }
+
+    @ViewBuilder
+    private var growthInsightCard: some View {
+        if let insight = growthInsight {
+            HStack(spacing: 10) {
+                Image(systemName: insight.icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(insight.color)
+                    .frame(width: 28)
+
+                Text(insight.message)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.blTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(insight.color.opacity(0.08))
+            )
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(insight.message)
+            .transition(.opacity.combined(with: .move(edge: .top)))
+        }
+    }
+
     // MARK: - Chart Area
     private var chartArea: some View {
         VStack(spacing: 16) {
             // Latest measurements overview — shows most recent non-zero value for each metric
             if !records.isEmpty {
                 latestMeasurementsCard
+
+                // Growth insight — friendly interpretation of percentile + trend
+                growthInsightCard
 
                 // Hint explaining why WHO percentile isn't available
                 if let reason = percentileUnavailableReason {
