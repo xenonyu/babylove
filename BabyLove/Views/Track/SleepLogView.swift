@@ -227,11 +227,15 @@ struct SleepLogView: View {
                             }
                         }
 
-                        // Notes
+                        // Notes with quick-suggestion chips
                         VStack(alignment: .leading, spacing: 10) {
                             Label(NSLocalizedString("log.notes", comment: ""), systemImage: "note.text")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.blTextSecondary)
+
+                            // Quick-note suggestion chips — tap to append to notes
+                            sleepNoteChips
+
                             TextField(NSLocalizedString("log.addNote", comment: ""), text: $notes, axis: .vertical)
                                 .lineLimit(2...4)
                                 .padding(14)
@@ -366,6 +370,80 @@ struct SleepLogView: View {
         } else {
             hasExistingOngoingSleep = !results.isEmpty
         }
+    }
+
+    // MARK: - Quick Note Suggestions
+
+    /// Common sleep observations. Contextual: chips differ between
+    /// ongoing (start-of-sleep) and finished (post-sleep) modes.
+    private var sleepNoteSuggestions: [String] {
+        if isOngoing {
+            return [
+                NSLocalizedString("sleepLog.chip.fussy", comment: ""),
+                NSLocalizedString("sleepLog.chip.fedToSleep", comment: ""),
+                NSLocalizedString("sleepLog.chip.rockedToSleep", comment: ""),
+                NSLocalizedString("sleepLog.chip.selfSoothed", comment: ""),
+            ]
+        } else {
+            return [
+                NSLocalizedString("sleepLog.chip.wokeOnce", comment: ""),
+                NSLocalizedString("sleepLog.chip.wokeCrying", comment: ""),
+                NSLocalizedString("sleepLog.chip.restless", comment: ""),
+                NSLocalizedString("sleepLog.chip.sleptWell", comment: ""),
+                NSLocalizedString("sleepLog.chip.nightFeed", comment: ""),
+            ]
+        }
+    }
+
+    /// Whether a suggestion chip's text is already contained in the notes field
+    private func chipAlreadyAdded(_ chip: String) -> Bool {
+        notes.localizedCaseInsensitiveContains(chip)
+    }
+
+    private var sleepNoteChips: some View {
+        FlowLayout(spacing: 8) {
+            ForEach(sleepNoteSuggestions, id: \.self) { chip in
+                let isAdded = chipAlreadyAdded(chip)
+                Button {
+                    Haptic.selection()
+                    if isAdded {
+                        removeChipFromNotes(chip)
+                    } else {
+                        if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            notes = chip
+                        } else {
+                            notes += ", \(chip)"
+                        }
+                    }
+                } label: {
+                    Text(chip)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(isAdded ? .white : .blSleep)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(isAdded ? Color.blSleep : Color.blSleep.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(chip)
+                .accessibilityAddTraits(isAdded ? .isSelected : [])
+            }
+        }
+    }
+
+    /// Remove a chip's text from the notes field, cleaning up surrounding separators
+    private func removeChipFromNotes(_ chip: String) {
+        if let range = notes.range(of: ", \(chip)", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: "\(chip), ", options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        } else if let range = notes.range(of: chip, options: .caseInsensitive) {
+            notes.removeSubrange(range)
+        }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        if notes.hasPrefix(", ") { notes = String(notes.dropFirst(2)) }
+        if notes.hasSuffix(",") { notes = String(notes.dropLast()) }
+        notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func populateFromRecord() {

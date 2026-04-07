@@ -366,6 +366,15 @@
 "sleepLog.timerStarted"   = "睡眠计时已开始";
 "sleepLog.logged"         = "睡眠已记录";
 "sleepLog.saveFailed"     = "保存失败，请重试";
+"sleepLog.chip.fussy"         = "哭闹";
+"sleepLog.chip.fedToSleep"    = "奶睡";
+"sleepLog.chip.rockedToSleep" = "抱睡";
+"sleepLog.chip.selfSoothed"   = "自主入睡";
+"sleepLog.chip.wokeOnce"      = "醒了一次";
+"sleepLog.chip.wokeCrying"    = "哭醒";
+"sleepLog.chip.restless"      = "睡不安稳";
+"sleepLog.chip.sleptWell"     = "睡得好";
+"sleepLog.chip.nightFeed"     = "夜奶";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "记录换尿布";

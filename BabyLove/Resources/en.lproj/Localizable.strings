@@ -366,6 +366,15 @@
 "sleepLog.timerStarted"   = "Sleep timer started";
 "sleepLog.logged"         = "Sleep logged";
 "sleepLog.saveFailed"     = "Save failed — try again";
+"sleepLog.chip.fussy"         = "Fussy";
+"sleepLog.chip.fedToSleep"    = "Fed to sleep";
+"sleepLog.chip.rockedToSleep" = "Rocked to sleep";
+"sleepLog.chip.selfSoothed"   = "Self-soothed";
+"sleepLog.chip.wokeOnce"      = "Woke once";
+"sleepLog.chip.wokeCrying"    = "Woke crying";
+"sleepLog.chip.restless"      = "Restless";
+"sleepLog.chip.sleptWell"     = "Slept well";
+"sleepLog.chip.nightFeed"     = "Night feed";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "Log Diaper";

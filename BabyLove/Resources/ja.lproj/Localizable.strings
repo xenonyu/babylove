@@ -366,6 +366,15 @@
 "sleepLog.timerStarted"   = "睡眠タイマーを開始しました";
 "sleepLog.logged"         = "睡眠を記録しました";
 "sleepLog.saveFailed"     = "保存に失敗しました。もう一度お試しください";
+"sleepLog.chip.fussy"         = "ぐずり";
+"sleepLog.chip.fedToSleep"    = "授乳で寝かしつけ";
+"sleepLog.chip.rockedToSleep" = "抱っこで寝かしつけ";
+"sleepLog.chip.selfSoothed"   = "ひとりで入眠";
+"sleepLog.chip.wokeOnce"      = "1回起きた";
+"sleepLog.chip.wokeCrying"    = "泣いて起きた";
+"sleepLog.chip.restless"      = "眠りが浅い";
+"sleepLog.chip.sleptWell"     = "よく眠れた";
+"sleepLog.chip.nightFeed"     = "夜間授乳";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "おむつを記録";

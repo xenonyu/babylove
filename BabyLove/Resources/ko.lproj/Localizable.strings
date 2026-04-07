@@ -366,6 +366,15 @@
 "sleepLog.timerStarted"   = "수면 타이머가 시작되었습니다";
 "sleepLog.logged"         = "수면이 기록되었습니다";
 "sleepLog.saveFailed"     = "저장 실패 — 다시 시도하세요";
+"sleepLog.chip.fussy"         = "보챔";
+"sleepLog.chip.fedToSleep"    = "수유 후 잠듦";
+"sleepLog.chip.rockedToSleep" = "안아서 재움";
+"sleepLog.chip.selfSoothed"   = "스스로 잠듦";
+"sleepLog.chip.wokeOnce"      = "한 번 깸";
+"sleepLog.chip.wokeCrying"    = "울면서 깸";
+"sleepLog.chip.restless"      = "뒤척임";
+"sleepLog.chip.sleptWell"     = "잘 잤음";
+"sleepLog.chip.nightFeed"     = "밤중 수유";
 
 /* ===== Diaper Log ===== */
 "diaperLog.title"         = "기저귀 기록";
