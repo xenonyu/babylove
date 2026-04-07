@@ -151,6 +151,8 @@
 "home.lastOneDay"          = "Last 1 Day";
 "home.events %lld"         = "%lld events";
 "home.showingLatest %lld"  = "Showing latest 20 of %lld events";
+"home.showAllEvents %lld"  = "Show all %lld events";
+"home.showLess"            = "Show less";
 "home.backToToday"         = "Back to Today";
 
 /* Quick Log Cards */

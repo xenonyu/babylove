@@ -40,6 +40,8 @@ struct HomeView: View {
     @State private var lastActiveCalendarDay: Date = Calendar.current.startOfDay(for: Date())
     /// Set of start-of-day dates that have at least one record (within the date range window)
     @State private var activeDays: Set<Date> = []
+    /// Whether the timeline is expanded to show all events (beyond the default 20)
+    @State private var isTimelineExpanded = false
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingRecord: CDFeedingRecord?
@@ -736,6 +738,7 @@ struct HomeView: View {
                 stopMinuteTimer()
             }
             .onChange(of: selectedDate) { _, _ in
+                isTimelineExpanded = false
                 withAnimation(.easeInOut(duration: 0.2)) {
                     updatePredicates()
                 }
@@ -2120,7 +2123,9 @@ struct HomeView: View {
 
     private var recentActivitySection: some View {
         let items = timelineItems
-        let displayItems = Array(items.prefix(20))
+        let previewLimit = 20
+        let displayItems = isTimelineExpanded ? items : Array(items.prefix(previewLimit))
+        let hasMore = items.count > previewLimit
 
         return VStack(spacing: 12) {
             HStack {
@@ -2195,11 +2200,27 @@ struct HomeView: View {
             .blCard()
             .padding(.horizontal, 20)
 
-            if items.count > 20 {
-                Text(String(format: NSLocalizedString("home.showingLatest %lld", comment: ""), items.count))
-                    .font(.system(size: 12))
-                    .foregroundColor(.blTextTertiary)
-                    .padding(.horizontal, 20)
+            if hasMore {
+                Button {
+                    Haptic.selection()
+                    withAnimation(.spring(response: 0.35)) {
+                        isTimelineExpanded.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(isTimelineExpanded
+                             ? NSLocalizedString("home.showLess", comment: "")
+                             : String(format: NSLocalizedString("home.showAllEvents %lld", comment: ""), items.count))
+                            .font(.system(size: 14, weight: .medium))
+                        Image(systemName: isTimelineExpanded ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .foregroundColor(.blPrimary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 20)
             }
         }
     }

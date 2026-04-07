@@ -151,6 +151,8 @@
 "home.lastOneDay"          = "최근 1일";
 "home.events %lld"         = "%lld건";
 "home.showingLatest %lld"  = "최근 20건 표시 (전체 %lld건)";
+"home.showAllEvents %lld"  = "전체 %lld건 보기";
+"home.showLess"            = "접기";
 "home.backToToday"         = "오늘로 돌아가기";
 
 /* Quick Log Cards */

@@ -151,6 +151,8 @@
 "home.lastOneDay"          = "過去 1 日間";
 "home.events %lld"         = "%lld 件";
 "home.showingLatest %lld"  = "最新20件を表示（全%lld件）";
+"home.showAllEvents %lld"  = "全%lld件を表示";
+"home.showLess"            = "折りたたむ";
 "home.backToToday"         = "今日に戻る";
 
 /* Quick Log Cards */

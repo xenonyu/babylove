@@ -151,6 +151,8 @@
 "home.lastOneDay"          = "最近 1 天";
 "home.events %lld"         = "%lld 条记录";
 "home.showingLatest %lld"  = "显示最近 20 条（共 %lld 条）";
+"home.showAllEvents %lld"  = "查看全部 %lld 条记录";
+"home.showLess"            = "收起";
 "home.backToToday"         = "返回今天";
 
 /* Quick Log Cards */
