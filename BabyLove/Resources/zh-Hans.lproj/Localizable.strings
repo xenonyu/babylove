@@ -73,9 +73,10 @@
 "units.imperial"                      = "英制 (lbs, in, oz)";
 "settings.section.reminders"          = "提醒";
 "settings.feedingReminders"           = "喂食提醒";
+"settings.diaperReminders"            = "换尿布提醒";
 "settings.interval"                   = "间隔";
-"settings.reminders.footer.on"        = "每次喂食后，将根据上面设定的间隔提醒您。";
-"settings.reminders.footer.off"       = "在下次喂食时间到时提醒您。";
+"settings.reminders.footer.active"    = "每次事件后，将根据上面设定的间隔提醒您。";
+"settings.reminders.footer.off"       = "在下次喂食或换尿布时间到时提醒您。";
 "settings.section.data"               = "数据";
 "settings.exportCSV"                  = "导出所有数据 (CSV)";
 "settings.export.footer"              = "将所有记录导出为 CSV 文件，分享给儿科医生或作为备份。";
@@ -678,6 +679,10 @@
 "memory.searchPlaceholder"  = "搜索里程碑…";
 "memory.noSearchResults %@" = "没有匹配「%@」的里程碑";
 "memory.clearSearch"        = "清除搜索";
+"memory.photo"              = "照片";
+"memory.takePhoto"          = "拍照";
+"memory.choosePhoto"        = "从相册选择";
+"memory.removePhoto"        = "删除照片";
 
 /* Suggested Milestones */
 "memory.suggestions.title %lld"       = "宝宝当前阶段的 %lld 个里程碑";
@@ -751,6 +756,8 @@
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "该喂奶了";
 "notification.feedingBody %@"          = "距上次喂奶已过 %@。";
+"notification.diaperTitle"             = "该换尿布了";
+"notification.diaperBody %@"           = "距上次换尿布已过 %@。";
 "notification.hours %lld"             = "%lld 小时";
 "notification.hoursMinutes %lld %lld" = "%lld小时%lld分钟";
 "notification.interval.1_5h"          = "1.5 小时";

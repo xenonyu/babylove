@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-BabyLove 自主迭代 Agent
-设计哲学：乔布斯式精简 × 功能完整 × 国际化 × 企业级测试
-持续循环：分析 → 改进 → Build验证 → Simulator测试 → Commit → 重复
+BabyLove AI 功能迭代 Agent
+每次从 ai_todo.json 取一个 pending 任务 → 实现 → 标记 done → 全部完成后退出
 """
 
 import anyio
@@ -19,9 +18,7 @@ from claude_agent_sdk import (
     ResultMessage,
     SystemMessage,
     TextBlock,
-    ToolResultBlock,
     ToolUseBlock,
-    query,
 )
 
 # ─── 项目配置 ────────────────────────────────────────────────────────────────
@@ -29,101 +26,130 @@ PROJECT_DIR = "/Users/yaxinli/xym/babylove"
 SIM_ID      = "8457B971-4286-457B-8AE0-8A6728C35CC5"   # iPhone 17 / iOS 26.2
 BUNDLE_ID   = "com.babylove.app"
 SCHEME      = "BabyLove"
+AI_TODO     = Path(PROJECT_DIR) / "agent" / "ai_todo.json"
 SKILL_LOG   = Path(PROJECT_DIR) / "agent" / "skill_log.json"
 
-# ─── 优雅退出信号处理 ─────────────────────────────────────────────────────────
+# ─── 优雅退出 ─────────────────────────────────────────────────────────────────
 _shutdown = False
-_session_id: str | None = None
-SESSION_RESET_EVERY = 8          # fresh session every N iterations
 
 def _sigint(sig, frame):
     global _shutdown
     if _shutdown:
-        # 第二次 Ctrl+C → 立即强制退出
         print("\n\n💀 强制退出", flush=True)
         sys.exit(1)
     _shutdown = True
-    print("\n\n⚠️  收到停止信号，等待本次迭代结束…（再按一次强制退出）", flush=True)
+    print("\n\n⚠️  收到停止信号，等待本次任务结束…（再按一次强制退出）", flush=True)
 
 signal.signal(signal.SIGINT, _sigint)
 
+# ─── Todo 管理 ────────────────────────────────────────────────────────────────
+def load_todo() -> list[dict]:
+    try:
+        return json.loads(AI_TODO.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+def next_task() -> dict | None:
+    """返回第一个 pending 任务，无则返回 None"""
+    for t in load_todo():
+        if t.get("status") == "pending":
+            return t
+    return None
+
+def mark_done(task_id: int):
+    tasks = load_todo()
+    for t in tasks:
+        if t["id"] == task_id:
+            t["status"] = "done"
+            t["done_at"] = datetime.now().strftime("%m/%d %H:%M")
+    AI_TODO.write_text(json.dumps(tasks, ensure_ascii=False, indent=2), encoding="utf-8")
+
+def print_todo_status():
+    tasks = load_todo()
+    done  = sum(1 for t in tasks if t["status"] == "done")
+    total = len(tasks)
+    bar   = "".join("█" if t["status"] == "done" else "░" for t in tasks)
+    print(f"  📋 进度 [{bar}] {done}/{total}", flush=True)
+    for t in tasks:
+        icon = "✅" if t["status"] == "done" else "⬜"
+        at   = f"  ({t.get('done_at','')})" if t["status"] == "done" else ""
+        print(f"     {icon} #{t['id']} {t['title']}{at}", flush=True)
+
+# ─── Skill 日志 ───────────────────────────────────────────────────────────────
+def save_skill(description: str):
+    skills: list[str] = []
+    if SKILL_LOG.exists():
+        try:
+            skills = json.loads(SKILL_LOG.read_text())
+        except Exception:
+            pass
+    entry = f"[{datetime.now().strftime('%m/%d %H:%M')}] {description}"
+    skills = (skills + [entry])[-30:]
+    SKILL_LOG.write_text(json.dumps(skills, ensure_ascii=False, indent=2))
+
 # ─── 系统 Prompt ─────────────────────────────────────────────────────────────
-SYSTEM_PROMPT = """你是一位有乔布斯式产品直觉的 iOS Swift 工程师，负责打磨 BabyLove——一款让每位家长优雅记录宝宝成长的应用。
+SYSTEM_PROMPT = """你是一位有乔布斯式产品直觉的 iOS Swift 工程师，负责为 BabyLove 实现 AI 智能功能。
 
 ## 产品核心理念
 BabyLove = 极简记录 × 深度洞察 × 永久珍藏
-- 乔布斯原则：每个 UI 元素都必须存在理由；单手操作，2次点击内完成记录
 - 全球化：中/英/日/韩语言，公制/英制，WHO 生长曲线
-- 差异化特色：Lightning Quick Log / Smart Summaries / WHO Chart / Memory Timeline / Zero-sync Privacy
 
 ## 架构
 Bundle ID: com.babylove.app | iOS 26.0+ | SwiftUI + CoreData + MVVM | Swift 6
 项目路径: /Users/yaxinli/xym/babylove
 
-核心文件（高频修改）:
-  BabyLove/Design/DesignSystem.swift      — 品牌色/组件
-  BabyLove/ViewModels/TrackViewModel.swift — 记录 CRUD
-  BabyLove/Views/Home/HomeView.swift      — 今日仪表盘
-  BabyLove/Views/Track/TrackView.swift    — 记录列表
-  BabyLove/Views/ContentView.swift        — Tab 导航
+核心文件:
+  BabyLove/Design/DesignSystem.swift       — 品牌色/组件
+  BabyLove/ViewModels/TrackViewModel.swift  — 记录 CRUD
+  BabyLove/Views/Home/HomeView.swift       — 今日仪表盘
+  BabyLove/Views/Track/TrackView.swift     — 记录列表
+  BabyLove/Views/ContentView.swift         — Tab 导航
 
-CoreData entities (只读，不修改 xcdatamodeld): CDFeedingRecord / CDSleepRecord / CDDiaperRecord / CDGrowthRecord / CDMilestone
+CoreData entities (只读，不修改 xcdatamodeld):
+  CDFeedingRecord / CDSleepRecord / CDDiaperRecord / CDGrowthRecord / CDMilestone
 
 设计色系 (严禁修改): Primary #FF7B6B · Feeding #4BAEE8 · Sleep #9B8EC4 · Diaper #55C189 · Growth #F5A623 · BG #FFF9F5
 
-## 迭代流程（每次严格执行）
-1. `git log --oneline -15` — 避免重复已有改进
-2. 阅读相关代码，找高价值改进点（优先级：编译错误 > 核心功能缺失 > UI/UX > 数据准确性 > 国际化 > 辅助功能）
-3. 完整实现，不留 TODO/占位代码
+## AI 功能实现原则
+- 纯 Swift 统计算法，不引入 SPM 依赖，不调用外部 API
+- 算法：均值/标准差预测、线性趋势、规则引擎
+- UI 简洁：一个卡片 / 一个标签 / 一行文字，不堆砌
+- 需要支持4种语言：en / zh-Hans / ja / ko（Localizable.strings）
+
+## 迭代流程（严格执行）
+1. `git log --oneline -10` — 确认最近提交，避免重复
+2. 阅读涉及文件，理解现有代码结构
+3. 完整实现功能，不留 TODO/占位代码
 4. `xcodegen generate && xcodebuild build -project BabyLove.xcodeproj -scheme BabyLove -destination 'id=8457B971-4286-457B-8AE0-8A6728C35CC5' -configuration Debug ONLY_ACTIVE_ARCH=YES 2>&1 | grep -E "error:|BUILD SUCCEEDED|BUILD FAILED"` — 必须 BUILD SUCCEEDED
-5. Simulator 测试：boot → install → launch → screenshot → check crash → terminate（截图存 agent/screenshots/）
-6. `git add -A && git commit -m "fix/feat/ui: <英文描述>\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`
+5. Simulator 测试：xcrun simctl boot → install → launch → screenshot → terminate（截图存 agent/screenshots/）
+6. `git add -A && git commit -m "feat(ai): <英文简述>\\n\\nCo-Authored-By: Claude <noreply@anthropic.com>"`
 
 ## 硬性约束
-- iOS 26+ Swift 6.0 兼容；不引入 SPM 依赖；不修改 xcdatamodeld；每次只做一个聚焦改进；BUILD SUCCEEDED 后才能提交
+- iOS 26+ Swift 6.0 兼容；不引入 SPM 依赖；不修改 xcdatamodeld；BUILD SUCCEEDED 后才能提交
 """
 
-# ─── 迭代 Prompt ─────────────────────────────────────────────────────────────
-ITERATION_PROMPT = """分析 BabyLove iOS 项目（{project_dir}）。
+# ─── 任务 Prompt ─────────────────────────────────────────────────────────────
+TASK_PROMPT = """实现以下 AI 功能（任务 #{task_id}/{total}）：
 
-当前迭代 #{iteration}，累计花费 ${total_cost:.4f}
+**功能名称**: {title}
+**功能描述**: {desc}
 
-已完成改进（避免重复）:
-{completed_skills}
+请严格按系统提示的迭代流程执行：
+1. git log 确认无重复
+2. 阅读相关代码
+3. 完整实现（含国际化 en/zh-Hans/ja/ko）
+4. xcodebuild BUILD SUCCEEDED
+5. Simulator 启动截图
+6. git commit
 
-**任务**：
-1. 运行 `git log --oneline -15` 了解最近改动
-2. 深入阅读相关代码，找到一个高价值改进点
-3. 完整实现
-4. xcodebuild BUILD SUCCEEDED（必须）
-5. Simulator 启动测试（必须）
-6. 提交
-
-聚焦原则：一次只做一件事，做完做好。"""
-
-# ─── Skill 日志（减少重复改进，节省 token） ──────────────────────────────────
-def load_skill_log() -> list[str]:
-    if SKILL_LOG.exists():
-        try:
-            return json.loads(SKILL_LOG.read_text())
-        except Exception:
-            return []
-    return []
-
-def save_skill(description: str):
-    skills = load_skill_log()
-    entry = f"[{datetime.now().strftime('%m/%d %H:%M')}] {description}"
-    skills.append(entry)
-    # 只保留最近 30 条
-    skills = skills[-30:]
-    SKILL_LOG.write_text(json.dumps(skills, ensure_ascii=False, indent=2))
+聚焦原则：只实现上述这一个功能，做完做好。"""
 
 # ─── 格式化工具调用 ──────────────────────────────────────────────────────────
 def fmt_tool(block: ToolUseBlock) -> str:
     name = block.name
     inp  = block.input or {}
     if name == "Bash":
-        cmd = str(inp.get("command", "")).strip().replace("\n", " ")[:100]
+        cmd = str(inp.get("command", "")).strip().replace("\n", " ")[:120]
         return f"🔧 Bash   │ {cmd}"
     elif name == "Read":
         return f"📖 Read   │ {inp.get('file_path', '')}"
@@ -137,22 +163,19 @@ def fmt_tool(block: ToolUseBlock) -> str:
         return f"🔍 Grep   │ {inp.get('pattern', '')}"
     return f"🛠  {name}"
 
-# ─── 单次迭代 ────────────────────────────────────────────────────────────────
-async def run_iteration(iteration: int, total_cost: float) -> tuple[float, str]:
-    global _session_id
+# ─── 单次任务执行 ─────────────────────────────────────────────────────────────
+async def run_task(task: dict, task_num: int, total: int, total_cost: float) -> float:
     ts = datetime.now().strftime("%H:%M:%S")
-    skills = load_skill_log()
-    skills_text = "\n".join(f"  • {s}" for s in skills[-5:]) if skills else "  （无）"
-
-    prompt = ITERATION_PROMPT.format(
-        project_dir=PROJECT_DIR,
-        iteration=iteration,
-        total_cost=total_cost,
-        completed_skills=skills_text,
+    prompt = TASK_PROMPT.format(
+        task_id=task["id"],
+        total=total,
+        title=task["title"],
+        desc=task["desc"],
     )
 
     print(f"\n{'─' * 66}")
-    print(f"  [{ts}] 迭代 #{iteration}  累计: ${total_cost:.4f}  模型: claude-opus-4-6")
+    print(f"  [{ts}] 任务 #{task['id']}/{total}: {task['title']}")
+    print(f"  {task['desc'][:80]}…")
     print(f"{'─' * 66}", flush=True)
 
     options = ClaudeAgentOptions(
@@ -160,11 +183,11 @@ async def run_iteration(iteration: int, total_cost: float) -> tuple[float, str]:
         allowed_tools=["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
         permission_mode="bypassPermissions",
         system_prompt=SYSTEM_PROMPT,
-        max_turns=50,
+        max_turns=60,
         model="claude-opus-4-6",
-        resume=_session_id,
     )
 
+    cost = 0.0
     result_summary = ""
 
     try:
@@ -188,34 +211,26 @@ async def run_iteration(iteration: int, total_cost: float) -> tuple[float, str]:
                             print(f"  {fmt_tool(block)}", flush=True)
 
                 elif isinstance(message, ResultMessage):
-                    cost  = message.total_cost_usd or 0.0
-                    turns = message.num_turns
-                    usage = message.usage or {}
-                    inp   = usage.get("input_tokens", 0)
-                    out   = usage.get("output_tokens", 0)
+                    cost           = message.total_cost_usd or 0.0
+                    turns          = message.num_turns
+                    usage          = message.usage or {}
+                    inp_tok        = usage.get("input_tokens", 0)
+                    out_tok        = usage.get("output_tokens", 0)
                     result_summary = (message.result or "").strip()
-                    preview = result_summary[:200]
 
-                    # Session continuation: carry forward session_id, reset every N iters
-                    _session_id = getattr(message, "session_id", None)
-                    if iteration % SESSION_RESET_EVERY == 0:
-                        _session_id = None
-                        print(f"  🔄 Session reset (iter {iteration})", flush=True)
-
-                    print(f"\n  ✓ 完成  💰 ${cost:.4f}  🔄 {turns}轮  📊 {inp:,}in/{out:,}out", flush=True)
-                    print(f"  {preview}", flush=True)
+                    print(f"\n  ✓ 完成  💰 ${cost:.4f}  🔄 {turns}轮  📊 {inp_tok:,}in/{out_tok:,}out", flush=True)
+                    print(f"  {result_summary[:200]}", flush=True)
 
                     if result_summary:
-                        save_skill(result_summary[:60])
+                        save_skill(f"[AI#{task['id']}] {task['title']}: {result_summary[:50]}")
 
-                    return cost, result_summary
+                    return cost
 
     except Exception as e:
         if not _shutdown:
             print(f"\n  ✗ 出错: {type(e).__name__}: {e}", flush=True)
-        return 0.0, ""
 
-    return 0.0, ""
+    return cost
 
 # ─── 主循环 ──────────────────────────────────────────────────────────────────
 async def main():
@@ -226,25 +241,35 @@ async def main():
         except ValueError:
             pass
 
-    print("🍼 BabyLove 自主迭代 Agent  (Ctrl+C 停止)")
+    all_tasks = load_todo()
+    total     = len(all_tasks)
+
+    print("🍼 BabyLove AI 功能 Agent  (Ctrl+C 停止)")
     print(f"   项目:      {PROJECT_DIR}")
     print(f"   Simulator: iPhone 17 / iOS 26.2 ({SIM_ID[:8]}…)")
-    print(f"   模型:      claude-opus-4-6 (1M context)")
+    print(f"   模型:      claude-opus-4-6")
     print(f"   间隔:      {interval}s")
-    print(f"   Skill Log: {SKILL_LOG}\n")
+    print(f"   Todo:      {AI_TODO}\n")
+    print_todo_status()
 
-    # 确保 skill log 目录存在
-    SKILL_LOG.parent.mkdir(parents=True, exist_ok=True)
-
-    iteration  = 1
     total_cost = 0.0
     errors     = 0
 
     while not _shutdown:
+        task = next_task()
+        if task is None:
+            print(f"\n🎉 所有 AI 功能已完成！总花费: ${total_cost:.4f}")
+            print_todo_status()
+            break
+
         try:
-            cost, _ = await run_iteration(iteration, total_cost)
+            cost = await run_task(task, task["id"], total, total_cost)
             total_cost += cost
             errors = 0
+            if not _shutdown:
+                mark_done(task["id"])
+                print(f"\n  ✅ 已标记完成: #{task['id']} {task['title']}")
+                print_todo_status()
         except Exception as e:
             errors += 1
             print(f"  ⚠️  未处理错误 ({errors}/3): {e}", flush=True)
@@ -255,16 +280,20 @@ async def main():
         if _shutdown:
             break
 
-        iteration += 1
-        print(f"\n  ⏳ {interval}s 后开始迭代 #{iteration}…  [累计: ${total_cost:.4f}]", flush=True)
+        next_t = next_task()
+        if next_t is None:
+            print(f"\n🎉 所有 AI 功能已完成！总花费: ${total_cost:.4f}")
+            print_todo_status()
+            break
 
-        # 分段 sleep，每秒检查一次 _shutdown flag
+        print(f"\n  ⏳ {interval}s 后开始下一任务: #{next_t['id']} {next_t['title']}  [累计: ${total_cost:.4f}]", flush=True)
         for _ in range(interval):
             if _shutdown:
                 break
             await anyio.sleep(1)
 
-    print(f"\n👋 已停止  迭代: {iteration - 1}次  总花费: ${total_cost:.4f}")
+    if _shutdown:
+        print(f"\n👋 已停止  总花费: ${total_cost:.4f}")
 
 
 if __name__ == "__main__":

@@ -929,76 +929,35 @@ struct HomeView: View {
 
                         // Day stats
                         VStack(spacing: 12) {
-                            BLSectionHeader(title: isSelectedDateToday ? NSLocalizedString("home.todaysSummary", comment: "") : NSLocalizedString("home.daySummary", comment: ""))
-                                .padding(.horizontal, 20)
+                            BLSectionHeader(
+                                title: isSelectedDateToday ? NSLocalizedString("home.todaysSummary", comment: "") : NSLocalizedString("home.daySummary", comment: ""),
+                                action: isSelectedDateToday ? NSLocalizedString("home.share.button", comment: "") : nil,
+                                onTap: isSelectedDateToday ? {
+                                    Haptic.light()
+                                    shareText = buildShareableDaySummary()
+                                    showShareSheet = true
+                                } : nil
+                            )
+                            .padding(.horizontal, 20)
 
                             HStack(spacing: 12) {
                                 StatBadge(value: "\(todayFeedings.count)",
                                           label: NSLocalizedString("home.feedings", comment: ""),
                                           color: .blFeeding,
                                           subtitle: feedingVolumeSubtitle,
-                                          timeSince: isSelectedDateToday ? feedingTimeSince : nil,
-                                          timeSinceUrgency: isSelectedDateToday ? feedingUrgency : .normal,
                                           onTap: { showFeedingLog = true })
                                 StatBadge(value: sleepText,
                                           label: NSLocalizedString("home.sleep", comment: ""),
                                           color: .blSleep,
                                           subtitle: sleepSubtitle,
-                                          timeSince: isSelectedDateToday ? sleepTimeSince : nil,
-                                          timeSinceUrgency: isSelectedDateToday ? sleepUrgency : .normal,
                                           onTap: { showSleepLog = true })
                                 StatBadge(value: "\(todayDiapers.count)",
                                           label: NSLocalizedString("home.diapers", comment: ""),
                                           color: .blDiaper,
                                           subtitle: diaperBreakdownSubtitle,
-                                          timeSince: isSelectedDateToday ? diaperTimeSince : nil,
-                                          timeSinceUrgency: isSelectedDateToday ? diaperUrgency : .normal,
                                           onTap: { showDiaperLog = true })
                             }
                             .padding(.horizontal, 20)
-
-                            // Daily goal progress — age-based recommended ranges
-                            if let goals = dailyGoals, hasAnyRecords {
-                                dailyGoalProgress(goals)
-                                    .padding(.horizontal, 20)
-                            }
-
-                            // Smart daily summary sentence with share button
-                            if let summary = dailySummaryText {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "text.bubble.fill")
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(.blPrimary.opacity(0.6))
-                                    Text(summary)
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(.blTextSecondary)
-                                        .lineLimit(3)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    Spacer(minLength: 4)
-                                    Button {
-                                        Haptic.light()
-                                        shareText = buildShareableDaySummary()
-                                        showShareSheet = true
-                                    } label: {
-                                        Image(systemName: "square.and.arrow.up")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.blPrimary)
-                                            .frame(width: 28, height: 28)
-                                            .background(Color.blPrimary.opacity(0.1))
-                                            .clipShape(Circle())
-                                    }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel(NSLocalizedString("home.share.button", comment: ""))
-                                    .accessibilityHint(NSLocalizedString("home.share.hint", comment: ""))
-                                }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.blPrimary.opacity(0.04))
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                                .padding(.horizontal, 20)
-                                .accessibilityElement(children: .combine)
-                            }
                         }
 
                         // Quick log — available for all dates (retroactive logging)

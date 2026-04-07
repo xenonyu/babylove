@@ -128,7 +128,13 @@ class TrackViewModel: ObservableObject {
         record.timestamp = timestamp
         record.diaperType = type.rawValue
         record.notes = trimmedOrNil(notes)
-        return save()
+        let ok = save()
+        if ok {
+            Task { @MainActor in
+                NotificationManager.shared.scheduleDiaperReminder(afterChangeAt: timestamp)
+            }
+        }
+        return ok
     }
 
     // MARK: - Growth
@@ -152,7 +158,8 @@ class TrackViewModel: ObservableObject {
     // MARK: - Milestone
 
     @discardableResult
-    func addMilestone(title: String,
+    func addMilestone(id: UUID = UUID(),
+                      title: String,
                       category: MilestoneCategory,
                       date: Date = Date(),
                       notes: String = "",
@@ -160,7 +167,7 @@ class TrackViewModel: ObservableObject {
         let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
         guard !trimmedTitle.isEmpty else { return false }
         let m = CDMilestone(context: ctx)
-        m.id = UUID()
+        m.id = id
         m.title = trimmedTitle
         m.category = category.rawValue
         m.date = date

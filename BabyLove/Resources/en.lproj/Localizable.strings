@@ -73,9 +73,10 @@
 "units.imperial"                      = "Imperial (lbs, in, oz)";
 "settings.section.reminders"          = "Reminders";
 "settings.feedingReminders"           = "Feeding Reminders";
+"settings.diaperReminders"            = "Diaper Reminders";
 "settings.interval"                   = "Interval";
-"settings.reminders.footer.on"        = "You'll get a reminder after each feeding based on the interval above.";
-"settings.reminders.footer.off"       = "Get notified when it's time for the next feeding.";
+"settings.reminders.footer.active"    = "You'll get reminders after each event based on the intervals above.";
+"settings.reminders.footer.off"       = "Get notified when it's time for the next feeding or diaper change.";
 "settings.section.data"               = "Data";
 "settings.exportCSV"                  = "Export All Data (CSV)";
 "settings.export.footer"              = "Export all records as CSV files. Share with your pediatrician or save as a backup.";
@@ -678,6 +679,10 @@
 "memory.searchPlaceholder"  = "Search milestones…";
 "memory.noSearchResults %@" = "No milestones matching \"%@\"";
 "memory.clearSearch"        = "Clear Search";
+"memory.photo"              = "Photo";
+"memory.takePhoto"          = "Take Photo";
+"memory.choosePhoto"        = "From Library";
+"memory.removePhoto"        = "Remove Photo";
 
 /* Suggested Milestones */
 "memory.suggestions.title %lld"       = "%lld milestones for your baby";
@@ -751,6 +756,8 @@
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "Time to Feed";
 "notification.feedingBody %@"          = "It's been %@ since the last feeding.";
+"notification.diaperTitle"             = "Diaper Check";
+"notification.diaperBody %@"           = "It's been %@ since the last diaper change.";
 "notification.hours %lld"             = "%lld hours";
 "notification.hoursMinutes %lld %lld" = "%lldh %lldm";
 "notification.interval.1_5h"          = "1.5 hours";

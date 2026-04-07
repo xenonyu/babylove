@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import PhotosUI
 
 struct MemoryView: View {
     @EnvironmentObject var appState: AppState
@@ -224,8 +225,10 @@ struct MemoryView: View {
             Button(String(localized: "memory.delete"), role: .destructive) {
                 Haptic.warning()
                 if let m = milestoneToDelete {
+                    let capturedID = m.id
                     let (success, undoAction) = vm.deleteObjectWithUndo(m, in: ctx)
                     if success {
+                        if let id = capturedID { MilestonePhotoManager.delete(for: id) }
                         withAnimation { /* row removed */ }
                         let undoLabel = String(localized: "common.undo")
                         appState.showToast(String(localized: "memory.deleted"), icon: "trash.fill", color: .blPrimary, action: undoAction, actionLabel: undoAction != nil ? undoLabel : nil)
@@ -545,68 +548,74 @@ struct MilestoneCard: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
-            // Completion toggle button
-            Button {
-                onToggleCompleted?()
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color(hex: category.color).opacity(isCompleted ? 0.2 : 0.08))
-                        .frame(width: 52, height: 52)
-                    Image(systemName: isCompleted ? "checkmark.circle.fill" : category.icon)
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(Color(hex: category.color).opacity(isCompleted ? 1.0 : 0.5))
-                }
-            }
-            .buttonStyle(.plain)
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text(milestone.title ?? "")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(isCompleted ? .blTextPrimary : .blTextSecondary)
-                        .strikethrough(isCompleted, color: .blTextSecondary.opacity(0.4))
-                    Spacer()
-                    Text(isCompleted ? String(localized: "memory.achievedBadge") : String(localized: "memory.upcomingBadge"))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(isCompleted ? Color(hex: category.color) : .blTextSecondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background((isCompleted ? Color(hex: category.color) : Color.blTextSecondary).opacity(0.12))
-                        .clipShape(Capsule())
-                }
-
-                HStack(spacing: 6) {
-                    Text(category.displayName)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color(hex: category.color))
-
-                    Text("·")
-                        .foregroundColor(.blTextSecondary)
-
-                    Text(milestone.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
-                        .font(.system(size: 13))
-                        .foregroundColor(.blTextSecondary)
-
-                    // Baby's age at this milestone
-                    if let baby, let date = milestone.date {
-                        Text(baby.ageText(at: date))
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color(hex: category.color))
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background(Color(hex: category.color).opacity(0.12))
-                            .clipShape(Capsule())
+        VStack(spacing: 10) {
+            HStack(alignment: .top, spacing: 16) {
+                // Completion toggle button
+                Button {
+                    onToggleCompleted?()
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color(hex: category.color).opacity(isCompleted ? 0.2 : 0.08))
+                            .frame(width: 52, height: 52)
+                        Image(systemName: isCompleted ? "checkmark.circle.fill" : category.icon)
+                            .font(.system(size: 22, weight: .medium))
+                            .foregroundColor(Color(hex: category.color).opacity(isCompleted ? 1.0 : 0.5))
                     }
                 }
+                .buttonStyle(.plain)
 
-                if let notes = milestone.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
-                    Text(notes)
-                        .font(.system(size: 14))
-                        .foregroundColor(.blTextSecondary)
-                        .lineLimit(2)
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text(milestone.title ?? "")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(isCompleted ? .blTextPrimary : .blTextSecondary)
+                            .strikethrough(isCompleted, color: .blTextSecondary.opacity(0.4))
+                        Spacer()
+                        Text(isCompleted ? String(localized: "memory.achievedBadge") : String(localized: "memory.upcomingBadge"))
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(isCompleted ? Color(hex: category.color) : .blTextSecondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background((isCompleted ? Color(hex: category.color) : Color.blTextSecondary).opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+
+                    HStack(spacing: 6) {
+                        Text(category.displayName)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(Color(hex: category.color))
+
+                        Text("·")
+                            .foregroundColor(.blTextSecondary)
+
+                        Text(milestone.date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
+                            .font(.system(size: 13))
+                            .foregroundColor(.blTextSecondary)
+
+                        // Baby's age at this milestone
+                        if let baby, let date = milestone.date {
+                            Text(baby.ageText(at: date))
+                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .foregroundColor(Color(hex: category.color))
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(Color(hex: category.color).opacity(0.12))
+                                .clipShape(Capsule())
+                        }
+                    }
+
+                    if let notes = milestone.notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                        Text(notes)
+                            .font(.system(size: 14))
+                            .foregroundColor(.blTextSecondary)
+                            .lineLimit(2)
+                    }
                 }
+            }
+
+            if let id = milestone.id {
+                MilestonePhotoThumb(milestoneID: id)
             }
         }
         .padding(16)
@@ -645,6 +654,12 @@ struct AddMilestoneView: View {
     @State private var isCompleted = false
     @State private var showSuggestions = false
     @State private var isSaving = false
+    @State private var selectedImage: UIImage? = nil
+    @State private var photoPickerItem: PhotosPickerItem? = nil
+    @State private var showCamera = false
+    /// Stable UUID for a new milestone — generated once so the photo can be saved
+    /// to disk with the correct filename before the CoreData record is created.
+    @State private var pendingMilestoneID = UUID()
 
     private var isEditing: Bool { editingRecord != nil }
 
@@ -779,17 +794,82 @@ struct AddMilestoneView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
 
+                        // Photo
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label(String(localized: "memory.photo"), systemImage: "photo.on.rectangle")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.blTextSecondary)
+
+                            if let image = selectedImage {
+                                ZStack(alignment: .topTrailing) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 200)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                        .clipped()
+                                    Button {
+                                        selectedImage = nil
+                                        photoPickerItem = nil
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.system(size: 24, weight: .semibold))
+                                            .foregroundStyle(.white, Color.black.opacity(0.4))
+                                            .padding(8)
+                                    }
+                                    .accessibilityLabel(String(localized: "memory.removePhoto"))
+                                }
+                            } else {
+                                HStack(spacing: 12) {
+                                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                                        Button { showCamera = true } label: {
+                                            Label(String(localized: "memory.takePhoto"), systemImage: "camera")
+                                                .font(.system(size: 14, weight: .medium))
+                                                .frame(maxWidth: .infinity)
+                                                .padding(.vertical, 14)
+                                                .background(Color.blSurface)
+                                                .foregroundColor(.blTextPrimary)
+                                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                                        Label(String(localized: "memory.choosePhoto"), systemImage: "photo.on.rectangle")
+                                            .font(.system(size: 14, weight: .medium))
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 14)
+                                            .background(Color.blSurface)
+                                            .foregroundColor(.blTextPrimary)
+                                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+
                         Button(isEditing ? String(localized: "memory.update") : String(localized: "memory.save")) {
                             guard !isSaving else { return }
                             isSaving = true
                             var ok = false
                             if let record = editingRecord {
                                 ok = vm.updateMilestone(record, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                if ok {
+                                    let id = record.id ?? pendingMilestoneID
+                                    if let image = selectedImage {
+                                        MilestonePhotoManager.save(image: image, for: id)
+                                    } else {
+                                        MilestonePhotoManager.delete(for: id)
+                                    }
+                                }
                                 appState.showToast(ok ? String(localized: "memory.updated") : String(localized: "memory.saveFailed"),
                                                    icon: ok ? "pencil.circle.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blPrimary : .red)
                             } else {
-                                ok = vm.addMilestone(title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                ok = vm.addMilestone(id: pendingMilestoneID, title: title, category: category, date: date, notes: notes, isCompleted: isCompleted)
+                                if ok, let image = selectedImage {
+                                    MilestonePhotoManager.save(image: image, for: pendingMilestoneID)
+                                }
                                 appState.showToast(ok ? String(localized: "memory.saved") : String(localized: "memory.saveFailed"),
                                                    icon: ok ? "star.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blPrimary : .red)
@@ -821,6 +901,18 @@ struct AddMilestoneView: View {
             }
             .onAppear { populateFromRecord() }
             .interactiveDismissDisabled(hasUnsavedChanges)
+            .sheet(isPresented: $showCamera) {
+                CameraPickerView(image: $selectedImage)
+                    .ignoresSafeArea()
+            }
+            .onChange(of: photoPickerItem) { _, newItem in
+                Task {
+                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        selectedImage = uiImage
+                    }
+                }
+            }
         }
     }
 
@@ -831,6 +923,9 @@ struct AddMilestoneView: View {
         date = r.date ?? Date()
         notes = r.notes ?? ""
         isCompleted = r.isCompleted
+        if let id = r.id {
+            selectedImage = MilestonePhotoManager.load(for: id)
+        }
     }
 
     // MARK: - Suggestions Grid
@@ -945,5 +1040,98 @@ struct AddMilestoneView: View {
         .buttonStyle(.plain)
         .accessibilityLabel(label)
         .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+// MARK: - Milestone Photo Manager
+
+enum MilestonePhotoManager {
+    private static func photoURL(for id: UUID) -> URL? {
+        guard let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        let dir = docs.appendingPathComponent("milestones", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("\(id.uuidString).jpg")
+    }
+
+    static func save(image: UIImage, for id: UUID) {
+        guard let url = photoURL(for: id),
+              let data = image.jpegData(compressionQuality: 0.82) else { return }
+        try? data.write(to: url, options: .atomic)
+    }
+
+    static func load(for id: UUID) -> UIImage? {
+        guard let url = photoURL(for: id) else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
+
+    static func delete(for id: UUID) {
+        guard let url = photoURL(for: id) else { return }
+        try? FileManager.default.removeItem(at: url)
+    }
+
+    static func exists(for id: UUID) -> Bool {
+        guard let url = photoURL(for: id) else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+}
+
+// MARK: - Milestone Photo Thumbnail (lazy-loaded in card)
+
+private struct MilestonePhotoThumb: View {
+    let milestoneID: UUID
+    @State private var image: UIImage? = nil
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 180)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .clipped()
+            }
+        }
+        .onAppear {
+            if image == nil {
+                image = MilestonePhotoManager.load(for: milestoneID)
+            }
+        }
+    }
+}
+
+// MARK: - Camera Picker
+
+struct CameraPickerView: UIViewControllerRepresentable {
+    @Binding var image: UIImage?
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: CameraPickerView
+        init(_ parent: CameraPickerView) { self.parent = parent }
+
+        func imagePickerController(_ picker: UIImagePickerController,
+                                   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            if let uiImage = info[.originalImage] as? UIImage {
+                parent.image = uiImage
+            }
+            parent.dismiss()
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.dismiss()
+        }
     }
 }

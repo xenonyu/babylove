@@ -73,9 +73,10 @@
 "units.imperial"                      = "ヤード・ポンド法 (lbs, in, oz)";
 "settings.section.reminders"          = "リマインダー";
 "settings.feedingReminders"           = "授乳リマインダー";
+"settings.diaperReminders"            = "おむつリマインダー";
 "settings.interval"                   = "間隔";
-"settings.reminders.footer.on"        = "授乳後、設定した間隔でリマインダーが届きます。";
-"settings.reminders.footer.off"       = "次の授乳時間をお知らせします。";
+"settings.reminders.footer.active"    = "各イベント後、設定した間隔でリマインダーが届きます。";
+"settings.reminders.footer.off"       = "次の授乳やおむつ替えの時間をお知らせします。";
 "settings.section.data"               = "データ";
 "settings.exportCSV"                  = "全データをエクスポート (CSV)";
 "settings.export.footer"              = "すべての記録をCSVファイルとしてエクスポートします。小児科医と共有したりバックアップとして保存できます。";
@@ -678,6 +679,10 @@
 "memory.searchPlaceholder"  = "マイルストーンを検索…";
 "memory.noSearchResults %@" = "「%@」に一致するマイルストーンはありません";
 "memory.clearSearch"        = "検索をクリア";
+"memory.photo"              = "写真";
+"memory.takePhoto"          = "写真を撮る";
+"memory.choosePhoto"        = "ライブラリから選択";
+"memory.removePhoto"        = "写真を削除";
 
 // Suggested Milestones
 "memory.suggestions.title %lld" = "おすすめマイルストーン（%lld件）";
@@ -751,6 +756,8 @@
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "授乳の時間です";
 "notification.feedingBody %@"          = "前回の授乳から %@ 経ちました。";
+"notification.diaperTitle"             = "おむつチェック";
+"notification.diaperBody %@"           = "前回のおむつ替えから %@ 経ちました。";
 "notification.hours %lld"             = "%lld 時間";
 "notification.hoursMinutes %lld %lld" = "%lld時間%lld分";
 "notification.interval.1_5h"          = "1.5 時間";

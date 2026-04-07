@@ -1,0 +1,16 @@
+{
+  "name": "babylove-ai-function",
+  "version": "1.0.0",
+  "description": "BabyLove AI backend proxy — Azure AI Foundry via Azure Functions",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "deploy": "func azure functionapp publish babylove-ai"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

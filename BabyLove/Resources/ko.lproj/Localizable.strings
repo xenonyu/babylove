@@ -73,9 +73,10 @@
 "units.imperial"                      = "야드파운드법 (lbs, in, oz)";
 "settings.section.reminders"          = "알림";
 "settings.feedingReminders"           = "수유 알림";
+"settings.diaperReminders"            = "기저귀 알림";
 "settings.interval"                   = "간격";
-"settings.reminders.footer.on"        = "수유 후 설정한 간격에 따라 알림을 받습니다.";
-"settings.reminders.footer.off"       = "다음 수유 시간을 알려드립니다.";
+"settings.reminders.footer.active"    = "각 이벤트 후 설정한 간격에 따라 알림을 받습니다.";
+"settings.reminders.footer.off"       = "다음 수유 또는 기저귀 교체 시간을 알려드립니다.";
 "settings.section.data"               = "데이터";
 "settings.exportCSV"                  = "모든 데이터 내보내기 (CSV)";
 "settings.export.footer"              = "모든 기록을 CSV 파일로 내보냅니다. 소아과 의사와 공유하거나 백업으로 저장하세요.";
@@ -678,6 +679,10 @@
 "memory.searchPlaceholder"  = "마일스톤 검색…";
 "memory.noSearchResults %@" = "\"%@\"와 일치하는 마일스톤이 없습니다";
 "memory.clearSearch"        = "검색 지우기";
+"memory.photo"              = "사진";
+"memory.takePhoto"          = "사진 찍기";
+"memory.choosePhoto"        = "라이브러리에서 선택";
+"memory.removePhoto"        = "사진 삭제";
 
 // Suggested Milestones
 "memory.suggestions.title %lld" = "추천 마일스톤 (%lld개)";
@@ -751,6 +756,8 @@
 /* ===== Notifications ===== */
 "notification.feedingTitle"            = "수유 시간이에요";
 "notification.feedingBody %@"          = "마지막 수유 후 %@ 지났습니다.";
+"notification.diaperTitle"             = "기저귀 확인";
+"notification.diaperBody %@"           = "마지막 기저귀 교체 후 %@ 지났습니다.";
 "notification.hours %lld"             = "%lld시간";
 "notification.hoursMinutes %lld %lld" = "%lld시간 %lld분";
 "notification.interval.1_5h"          = "1.5시간";
