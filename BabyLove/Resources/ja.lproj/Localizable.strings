@@ -356,6 +356,7 @@
 "feedLog.largeAmountSave" = "このまま保存";
 "feedLog.largeAmountCancel"= "戻って修正";
 "feedLog.largeAmountMsg %@"= "%@ は一般的な1回の授乳量を超えています。この量で保存しますか？";
+"feedLog.todayCount %lld" = "今日：%lld回の授乳";
 "feedLog.chip.goodLatch"  = "吸い付き良好";
 "feedLog.chip.fussy"      = "ぐずり";
 "feedLog.chip.fellAsleep" = "飲みながら寝た";

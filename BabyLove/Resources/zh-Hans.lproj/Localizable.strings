@@ -356,6 +356,7 @@
 "feedLog.largeAmountSave" = "仍然保存";
 "feedLog.largeAmountCancel"= "返回修改";
 "feedLog.largeAmountMsg %@"= "%@ 超过了常见的单次喂食量，确定要保存吗？";
+"feedLog.todayCount %lld" = "今天已喂 %lld 次";
 "feedLog.chip.goodLatch"  = "衔乳好";
 "feedLog.chip.fussy"      = "哭闹";
 "feedLog.chip.fellAsleep" = "吃着睡着了";

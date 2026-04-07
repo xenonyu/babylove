@@ -356,6 +356,7 @@
 "feedLog.largeAmountSave" = "그대로 저장";
 "feedLog.largeAmountCancel"= "돌아가기";
 "feedLog.largeAmountMsg %@"= "%@은(는) 일반적인 1회 수유량보다 많습니다. 이대로 저장하시겠습니까?";
+"feedLog.todayCount %lld" = "오늘: %lld회 수유";
 "feedLog.chip.goodLatch"  = "젖물림 좋음";
 "feedLog.chip.fussy"      = "보챔";
 "feedLog.chip.fellAsleep" = "먹다 잠듦";

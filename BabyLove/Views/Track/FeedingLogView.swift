@@ -119,6 +119,8 @@ struct FeedingLogView: View {
 
     /// Confirmation state: shown when user taps Save with an unusually large amount.
     @State private var showLargeAmountConfirm = false
+    /// Today's feeding stats for the context badge
+    @State private var todayFeedingStats: TodayFeedingStats = .empty
 
     /// Whether the form has meaningful user input that would be lost on dismiss.
     /// Used to prevent accidental swipe-to-dismiss on the sheet.
@@ -141,12 +143,99 @@ struct FeedingLogView: View {
         }
     }
 
+    // MARK: - Today's Feeding Stats
+
+    /// Lightweight struct holding today's feeding summary
+    struct TodayFeedingStats {
+        let count: Int
+        let totalVolumeML: Double
+        let totalBreastMinutes: Int
+
+        static let empty = TodayFeedingStats(count: 0, totalVolumeML: 0, totalBreastMinutes: 0)
+    }
+
+    /// Fetch today's feeding records and compute the summary.
+    private func loadTodayFeedingStats() {
+        let ctx = PersistenceController.shared.container.viewContext
+        let req: NSFetchRequest<CDFeedingRecord> = CDFeedingRecord.fetchRequest()
+        let startOfDay = Calendar.current.startOfDay(for: Date()) as NSDate
+        req.predicate = NSPredicate(format: "timestamp >= %@", startOfDay)
+        guard let results = try? ctx.fetch(req) else { return }
+        var totalML: Double = 0
+        var totalBreast = 0
+        for r in results {
+            totalML += r.amountML
+            let ft = FeedType(rawValue: r.feedType ?? "")
+            if (ft == .breast || ft == .pump) && r.durationMinutes > 0 {
+                totalBreast += Int(r.durationMinutes)
+            }
+        }
+        todayFeedingStats = TodayFeedingStats(count: results.count, totalVolumeML: totalML, totalBreastMinutes: totalBreast)
+    }
+
+    /// The context badge showing today's feeding count with volume/duration breakdown
+    @ViewBuilder
+    private var todayFeedingContextBadge: some View {
+        if !isEditing && todayFeedingStats.count > 0 {
+            HStack(spacing: 10) {
+                Image(systemName: "chart.bar.doc.horizontal.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.blFeeding)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(format: NSLocalizedString("feedLog.todayCount %lld", comment: ""), todayFeedingStats.count))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blTextPrimary)
+                    HStack(spacing: 8) {
+                        if todayFeedingStats.totalVolumeML > 0 {
+                            let displayVol = unit.volumeFromML(todayFeedingStats.totalVolumeML)
+                            let volText = unit == .metric
+                                ? "\(Int(displayVol)) \(unit.volumeLabel)"
+                                : String(format: "%.1f %@", displayVol, unit.volumeLabel)
+                            Text("🍼 \(volText)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                        if todayFeedingStats.totalBreastMinutes > 0 {
+                            Text("🤱 \(DurationFormat.fromMinutes(todayFeedingStats.totalBreastMinutes))")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blTextSecondary)
+                        }
+                    }
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(Color.blFeeding.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(todayFeedingA11yLabel)
+        }
+    }
+
+    private var todayFeedingA11yLabel: String {
+        var parts = [String(format: NSLocalizedString("feedLog.todayCount %lld", comment: ""), todayFeedingStats.count)]
+        if todayFeedingStats.totalVolumeML > 0 {
+            let displayVol = unit.volumeFromML(todayFeedingStats.totalVolumeML)
+            if unit == .metric {
+                parts.append("\(Int(displayVol)) \(unit.volumeLabel)")
+            } else {
+                parts.append(String(format: "%.1f %@", displayVol, unit.volumeLabel))
+            }
+        }
+        if todayFeedingStats.totalBreastMinutes > 0 {
+            parts.append(DurationFormat.fromMinutes(todayFeedingStats.totalBreastMinutes))
+        }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.blBackground.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Today's feeding context (only for new records)
+                        todayFeedingContextBadge
 
                         // Retroactive date banner — shown when creating a new record for a past day
                         // Suppressed when editing, since the timestamp already belongs to the record
@@ -518,6 +607,8 @@ struct FeedingLogView: View {
                 }
                 checkExistingOngoingFeeding()
                 startElapsedTimerIfNeeded()
+                // Load today's feeding stats for context badge
+                loadTodayFeedingStats()
             }
             .onDisappear {
                 elapsedTimer?.invalidate()

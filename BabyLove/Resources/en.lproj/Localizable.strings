@@ -356,6 +356,7 @@
 "feedLog.largeAmountSave" = "Save Anyway";
 "feedLog.largeAmountCancel"= "Go Back";
 "feedLog.largeAmountMsg %@"= "%@ is higher than a typical single feeding. Are you sure this is correct?";
+"feedLog.todayCount %lld" = "Today: %lld feedings so far";
 "feedLog.chip.goodLatch"  = "Good latch";
 "feedLog.chip.fussy"      = "Fussy";
 "feedLog.chip.fellAsleep" = "Fell asleep";
