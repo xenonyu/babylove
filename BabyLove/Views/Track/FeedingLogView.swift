@@ -70,6 +70,15 @@ struct FeedingLogView: View {
         return NSLocalizedString("feedLog.logFeeding", comment: "")
     }
 
+    /// Whether the form has meaningful user input that would be lost on dismiss.
+    /// Used to prevent accidental swipe-to-dismiss on the sheet.
+    private var hasUnsavedChanges: Bool {
+        if isEditing { return true }
+        if !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        if (feedType == .formula || feedType == .solid) && amount > 0 { return true }
+        return false
+    }
+
     /// Formula/solid require amount > 0; breast/pump always valid (have duration).
     /// Timer mode is blocked when another feeding timer is already running.
     private var canSave: Bool {
@@ -469,6 +478,7 @@ struct FeedingLogView: View {
                 elapsedTimer?.invalidate()
                 elapsedTimer = nil
             }
+            .interactiveDismissDisabled(hasUnsavedChanges)
         }
     }
 

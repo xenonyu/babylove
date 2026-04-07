@@ -29,6 +29,13 @@ struct SleepLogView: View {
 
     private var isEditing: Bool { editingRecord != nil }
 
+    /// Whether the form has meaningful user input that would be lost on dismiss.
+    private var hasUnsavedChanges: Bool {
+        if isEditing { return true }
+        if !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        return false
+    }
+
     /// Whether the form is valid for saving:
     /// - Ongoing mode: valid only if no other sleep timer is already running
     /// - Finished mode: endTime must be after startTime (duration > 0)
@@ -323,6 +330,7 @@ struct SleepLogView: View {
             .onChange(of: startTime) { _, _ in
                 updateOngoingElapsed()
             }
+            .interactiveDismissDisabled(hasUnsavedChanges)
         }
     }
 

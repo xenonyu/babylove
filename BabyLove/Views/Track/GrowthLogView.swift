@@ -92,6 +92,14 @@ struct GrowthLogView: View {
         hasValidMeasurement && validationWarning == nil
     }
 
+    /// Whether the form has meaningful user input that would be lost on dismiss.
+    private var hasUnsavedChanges: Bool {
+        if isEditing { return true }
+        if !weightKG.isEmpty || !heightCM.isEmpty || !headCM.isEmpty { return true }
+        if !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        return false
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -277,6 +285,7 @@ struct GrowthLogView: View {
                 // Fetch the latest previous record to enable jump-detection warnings
                 previousRecord = vm.latestGrowthRecord(excluding: editingRecord?.id)
             }
+            .interactiveDismissDisabled(hasUnsavedChanges)
         }
     }
 

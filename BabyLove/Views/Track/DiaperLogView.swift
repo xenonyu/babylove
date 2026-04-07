@@ -23,6 +23,13 @@ struct DiaperLogView: View {
 
     private var isEditing: Bool { editingRecord != nil }
 
+    /// Whether the form has meaningful user input that would be lost on dismiss.
+    private var hasUnsavedChanges: Bool {
+        if isEditing { return true }
+        if !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        return false
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -178,6 +185,7 @@ struct DiaperLogView: View {
                     timestamp = initialDate
                 }
             }
+            .interactiveDismissDisabled(hasUnsavedChanges)
         }
     }
 
