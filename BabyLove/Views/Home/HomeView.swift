@@ -721,6 +721,20 @@ struct HomeView: View {
                     }
                     .padding(.top, 16)
                 }
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 50, coordinateSpace: .local)
+                        .onEnded { gesture in
+                            let horizontal = gesture.translation.width
+                            let vertical = gesture.translation.height
+                            // Only trigger if swipe is more horizontal than vertical
+                            guard abs(horizontal) > abs(vertical) * 1.5 else { return }
+                            if horizontal > 0 {
+                                navigateToPreviousDay()
+                            } else {
+                                navigateToNextDay()
+                            }
+                        }
+                )
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -1325,15 +1339,30 @@ struct HomeView: View {
         Calendar.current.startOfDay(for: selectedDate) > earliestNavigableDate
     }
 
+    /// Navigate to the previous day (if within range)
+    private func navigateToPreviousDay() {
+        let cal = Calendar.current
+        guard let prev = cal.date(byAdding: .day, value: -1, to: selectedDate),
+              cal.startOfDay(for: prev) >= earliestNavigableDate else { return }
+        Haptic.selection()
+        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = prev }
+    }
+
+    /// Navigate to the next day (capped at today)
+    private func navigateToNextDay() {
+        guard !isSelectedDateToday else { return }
+        let cal = Calendar.current
+        let tomorrow = cal.date(byAdding: .day, value: 1, to: selectedDate) ?? Date()
+        let capped = min(tomorrow, Date())
+        Haptic.selection()
+        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = capped }
+    }
+
     private var dateNavigationBar: some View {
         VStack(spacing: 8) {
             HStack {
                 Button {
-                    let cal = Calendar.current
-                    if let prev = cal.date(byAdding: .day, value: -1, to: selectedDate),
-                       cal.startOfDay(for: prev) >= earliestNavigableDate {
-                        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = prev }
-                    }
+                    navigateToPreviousDay()
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 14, weight: .semibold))
@@ -1358,10 +1387,7 @@ struct HomeView: View {
                     Color.clear.frame(width: 32, height: 32)
                 } else {
                     Button {
-                        let cal = Calendar.current
-                        let tomorrow = cal.date(byAdding: .day, value: 1, to: selectedDate) ?? Date()
-                        let capped = min(tomorrow, Date())
-                        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = capped }
+                        navigateToNextDay()
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14, weight: .semibold))
