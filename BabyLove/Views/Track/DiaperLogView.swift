@@ -5,6 +5,9 @@ struct DiaperLogView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
+    /// UserDefaults key for persisting the last-used diaper type across sessions
+    private static let lastDiaperTypeKey = "lastDiaperType"
+
     /// When non-nil, we are editing an existing record
     var editingRecord: CDDiaperRecord?
     /// Optional initial date for the timestamp (used for retroactive logging from past dates)
@@ -158,7 +161,7 @@ struct DiaperLogView: View {
                                                    icon: ok ? "oval.fill" : "exclamationmark.triangle.fill",
                                                    color: ok ? .blDiaper : .red)
                             }
-                            if ok { Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
+                            if ok { Self.saveLastDiaperType(diaperType); Haptic.success(); dismiss() } else { Haptic.error(); isSaving = false }
                         }
                         .buttonStyle(BLPrimaryButton(color: .blDiaper))
                         .disabled(isSaving)
@@ -185,6 +188,8 @@ struct DiaperLogView: View {
             }
             .onAppear {
                 populateFromRecord()
+                // Restore last-used diaper type for new records only
+                if !isEditing { restoreLastDiaperType() }
                 // Apply initial date for retroactive logging (only when creating new records)
                 if !isEditing, let initialDate {
                     timestamp = initialDate
@@ -293,5 +298,20 @@ struct DiaperLogView: View {
         diaperType = DiaperType(rawValue: r.diaperType ?? "") ?? .wet
         notes = r.notes ?? ""
         timestamp = r.timestamp ?? Date()
+    }
+
+    // MARK: - Remember Last Diaper Type
+
+    /// Restore the last-used diaper type so the user doesn't have to re-select every time.
+    /// Only applied for new records — editing always uses the record's own diaper type.
+    private func restoreLastDiaperType() {
+        guard let raw = UserDefaults.standard.string(forKey: Self.lastDiaperTypeKey),
+              let saved = DiaperType(rawValue: raw) else { return }
+        diaperType = saved
+    }
+
+    /// Persist the selected diaper type for next time.
+    private static func saveLastDiaperType(_ type: DiaperType) {
+        UserDefaults.standard.set(type.rawValue, forKey: lastDiaperTypeKey)
     }
 }
