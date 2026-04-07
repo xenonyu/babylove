@@ -267,6 +267,16 @@
 "home.share.noRecords"                 = "아직 기록이 없습니다";
 "home.share.sentFrom"                  = "BabyLove에서 보냄";
 
+/* Daily Goal Progress */
+"home.goals.newborn"                           = "신생아";
+"home.goals.ageRange %@"                       = "%@개월";
+"home.goals.title %@"                          = "일일 목표 · %@";
+"home.goals.hours"                             = "h";
+"home.goals.a11y.title %@"                     = "%@ 일일 목표";
+"home.goals.a11y.feedings %lld %lld %lld"      = "수유 %lld회, 목표 %lld~%lld회";
+"home.goals.a11y.sleep %lld %lld %lld"         = "수면 %lld시간, 목표 %lld~%lld시간";
+"home.goals.a11y.diapers %lld %lld %lld"       = "기저귀 %lld회, 목표 %lld~%lld회";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "낮잠 1회";
 "home.naps.plural %lld"    = "낮잠 %lld회";

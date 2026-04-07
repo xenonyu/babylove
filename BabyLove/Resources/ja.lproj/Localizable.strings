@@ -267,6 +267,16 @@
 "home.share.noRecords"                 = "まだ記録がありません";
 "home.share.sentFrom"                  = "BabyLoveより";
 
+/* Daily Goal Progress */
+"home.goals.newborn"                           = "新生児";
+"home.goals.ageRange %@"                       = "%@ ヶ月";
+"home.goals.title %@"                          = "1日の目安 · %@";
+"home.goals.hours"                             = "h";
+"home.goals.a11y.title %@"                     = "%@ の1日の目安";
+"home.goals.a11y.feedings %lld %lld %lld"      = "授乳 %lld 回、目安 %lld〜%lld 回";
+"home.goals.a11y.sleep %lld %lld %lld"         = "睡眠 %lld 時間、目安 %lld〜%lld 時間";
+"home.goals.a11y.diapers %lld %lld %lld"       = "おむつ %lld 回、目安 %lld〜%lld 回";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "1 回のお昼寝";
 "home.naps.plural %lld"    = "%lld 回のお昼寝";

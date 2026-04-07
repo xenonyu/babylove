@@ -267,6 +267,16 @@
 "home.share.noRecords"                 = "今天还没有记录";
 "home.share.sentFrom"                  = "来自 BabyLove";
 
+/* Daily Goal Progress */
+"home.goals.newborn"                           = "新生儿";
+"home.goals.ageRange %@"                       = "%@ 个月";
+"home.goals.title %@"                          = "每日目标 · %@";
+"home.goals.hours"                             = "h";
+"home.goals.a11y.title %@"                     = "%@ 每日目标";
+"home.goals.a11y.feedings %lld %lld %lld"      = "喂奶 %lld 次，目标 %lld 至 %lld 次";
+"home.goals.a11y.sleep %lld %lld %lld"         = "睡眠 %lld 小时，目标 %lld 至 %lld 小时";
+"home.goals.a11y.diapers %lld %lld %lld"       = "换尿布 %lld 次，目标 %lld 至 %lld 次";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "1 次小睡";
 "home.naps.plural %lld"    = "%lld 次小睡";

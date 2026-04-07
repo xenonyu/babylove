@@ -602,6 +602,166 @@ struct HomeView: View {
         return lines.joined(separator: "\n")
     }
 
+    // MARK: - Daily Goals (Age-Based)
+
+    /// Recommended daily ranges based on baby's age (WHO/AAP guidelines).
+    struct DailyGoals {
+        let feedingsRange: ClosedRange<Int>   // count
+        let sleepHoursRange: ClosedRange<Int> // total hours
+        let diapersRange: ClosedRange<Int>    // count
+        let ageLabel: String                  // e.g. "0–3 mo"
+    }
+
+    /// Whether the selected day has at least one record (to avoid showing empty progress)
+    private var hasAnyRecords: Bool {
+        !todayFeedings.isEmpty || !todaySleeps.isEmpty || !todayDiapers.isEmpty
+    }
+
+    /// Returns age-appropriate daily goals, or nil if no baby profile.
+    private var dailyGoals: DailyGoals? {
+        guard let baby else { return nil }
+        let ageMonths = baby.ageInMonths
+        // Guidelines based on AAP/WHO norms
+        switch ageMonths {
+        case 0..<1:
+            return DailyGoals(feedingsRange: 8...12, sleepHoursRange: 14...17, diapersRange: 8...12,
+                              ageLabel: NSLocalizedString("home.goals.newborn", comment: ""))
+        case 1..<4:
+            return DailyGoals(feedingsRange: 7...10, sleepHoursRange: 14...17, diapersRange: 8...10,
+                              ageLabel: String(format: NSLocalizedString("home.goals.ageRange %@", comment: ""), "1–3"))
+        case 4..<7:
+            return DailyGoals(feedingsRange: 5...8, sleepHoursRange: 12...16, diapersRange: 6...8,
+                              ageLabel: String(format: NSLocalizedString("home.goals.ageRange %@", comment: ""), "4–6"))
+        case 7..<13:
+            return DailyGoals(feedingsRange: 4...6, sleepHoursRange: 12...14, diapersRange: 5...7,
+                              ageLabel: String(format: NSLocalizedString("home.goals.ageRange %@", comment: ""), "7–12"))
+        default:
+            return DailyGoals(feedingsRange: 3...5, sleepHoursRange: 11...14, diapersRange: 4...6,
+                              ageLabel: String(format: NSLocalizedString("home.goals.ageRange %@", comment: ""), "12+"))
+        }
+    }
+
+    /// Compact progress view showing how the day is tracking against goals.
+    @ViewBuilder
+    private func dailyGoalProgress(_ goals: DailyGoals) -> some View {
+        let feedCount = todayFeedings.count
+        let sleepHrs = totalSleepMinutes / 60
+        let diaperCount = todayDiapers.count
+
+        let feedProgress = goalProgress(value: feedCount, range: goals.feedingsRange)
+        let sleepProgress = goalProgress(value: sleepHrs, range: goals.sleepHoursRange)
+        let diaperProgress = goalProgress(value: diaperCount, range: goals.diapersRange)
+
+        VStack(spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "target")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.blTextTertiary)
+                Text(String(format: NSLocalizedString("home.goals.title %@", comment: ""), goals.ageLabel))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.blTextTertiary)
+                Spacer()
+            }
+
+            HStack(spacing: 10) {
+                goalMiniBar(
+                    icon: "drop.fill",
+                    color: .blFeeding,
+                    value: feedCount,
+                    range: goals.feedingsRange,
+                    progress: feedProgress
+                )
+                goalMiniBar(
+                    icon: "moon.zzz.fill",
+                    color: .blSleep,
+                    value: sleepHrs,
+                    range: goals.sleepHoursRange,
+                    progress: sleepProgress,
+                    suffix: NSLocalizedString("home.goals.hours", comment: "")
+                )
+                goalMiniBar(
+                    icon: "oval.fill",
+                    color: .blDiaper,
+                    value: diaperCount,
+                    range: goals.diapersRange,
+                    progress: diaperProgress
+                )
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color.blSurface.opacity(0.6))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(goalAccessibilityLabel(goals))
+    }
+
+    /// Returns a normalized progress 0.0...1.0 where 1.0 means "within target range".
+    /// Below min → proportional to min; above max → capped at 1.0.
+    private func goalProgress(value: Int, range: ClosedRange<Int>) -> Double {
+        guard range.lowerBound > 0 else { return 0 }
+        if value >= range.lowerBound { return 1.0 }
+        return Double(value) / Double(range.lowerBound)
+    }
+
+    @ViewBuilder
+    private func goalMiniBar(icon: String, color: Color, value: Int, range: ClosedRange<Int>, progress: Double, suffix: String = "") -> some View {
+        let inRange = value >= range.lowerBound && value <= range.upperBound
+        let overRange = value > range.upperBound
+        let statusColor = inRange ? Color.blTeal : (overRange ? color.opacity(0.6) : color)
+
+        VStack(spacing: 4) {
+            HStack(spacing: 3) {
+                Image(systemName: icon)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(statusColor)
+                Text("\(value)\(suffix)")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundColor(statusColor)
+                Text("/\(range.lowerBound)–\(range.upperBound)")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.blTextTertiary)
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(color.opacity(0.12))
+                        .frame(height: 4)
+                    Capsule()
+                        .fill(statusColor)
+                        .frame(width: max(4, geo.size.width * min(progress, 1.0)), height: 4)
+                }
+            }
+            .frame(height: 4)
+
+            if inRange {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 8))
+                    .foregroundColor(.blTeal)
+            } else {
+                Color.clear.frame(height: 8)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    /// VoiceOver label summarizing goal progress
+    private func goalAccessibilityLabel(_ goals: DailyGoals) -> String {
+        let feedCount = todayFeedings.count
+        let sleepHrs = totalSleepMinutes / 60
+        let diaperCount = todayDiapers.count
+        var parts: [String] = [
+            String(format: NSLocalizedString("home.goals.a11y.title %@", comment: ""), goals.ageLabel)
+        ]
+        parts.append(String(format: NSLocalizedString("home.goals.a11y.feedings %lld %lld %lld", comment: ""), feedCount, goals.feedingsRange.lowerBound, goals.feedingsRange.upperBound))
+        parts.append(String(format: NSLocalizedString("home.goals.a11y.sleep %lld %lld %lld", comment: ""), sleepHrs, goals.sleepHoursRange.lowerBound, goals.sleepHoursRange.upperBound))
+        parts.append(String(format: NSLocalizedString("home.goals.a11y.diapers %lld %lld %lld", comment: ""), diaperCount, goals.diapersRange.lowerBound, goals.diapersRange.upperBound))
+        return parts.joined(separator: ", ")
+    }
+
     // MARK: - Quick Log Hints
 
     /// Contextual hint for the Feeding quick log card.
@@ -789,6 +949,12 @@ struct HomeView: View {
                                           onTap: { showDiaperLog = true })
                             }
                             .padding(.horizontal, 20)
+
+                            // Daily goal progress — age-based recommended ranges
+                            if let goals = dailyGoals, hasAnyRecords {
+                                dailyGoalProgress(goals)
+                                    .padding(.horizontal, 20)
+                            }
 
                             // Smart daily summary sentence with share button
                             if let summary = dailySummaryText {

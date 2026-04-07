@@ -267,6 +267,16 @@
 "home.share.noRecords"                 = "No records logged yet.";
 "home.share.sentFrom"                  = "Sent from BabyLove";
 
+/* Daily Goal Progress */
+"home.goals.newborn"                           = "Newborn";
+"home.goals.ageRange %@"                       = "%@ mo";
+"home.goals.title %@"                          = "Daily goals · %@";
+"home.goals.hours"                             = "h";
+"home.goals.a11y.title %@"                     = "Daily goals for %@";
+"home.goals.a11y.feedings %lld %lld %lld"      = "%lld feedings, goal %lld to %lld";
+"home.goals.a11y.sleep %lld %lld %lld"         = "%lld hours sleep, goal %lld to %lld";
+"home.goals.a11y.diapers %lld %lld %lld"       = "%lld diapers, goal %lld to %lld";
+
 /* Stat Subtitles */
 "home.naps.singular"       = "1 nap";
 "home.naps.plural %lld"    = "%lld naps";
