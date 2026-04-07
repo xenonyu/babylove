@@ -37,6 +37,8 @@
 "sleep.stroller"  = "Stroller";
 "sleep.carrier"   = "Carrier";
 "sleep.other"     = "Other";
+"sleep.category.night" = "Night";
+"sleep.category.nap"   = "Nap";
 
 /* ===== Age Display ===== */
 "age.format"      = "%@ old";

@@ -2714,9 +2714,8 @@ struct HomeView: View {
                 sortDate = st
                 timeLabel = st.formatted(date: .omitted, time: .shortened)
             }
-            let titleSuffix = startIsOnDifferentDay && !isOngoing
-                ? " 🌙"  // overnight indicator
-                : ""
+            let sleepCat = SleepCategory.from(startTime: st)
+            let titleSuffix = " \(sleepCat.icon)"
             let baseTitle: String
             if isOngoing {
                 baseTitle = "\(NSLocalizedString("home.sleep", comment: "")) (\(NSLocalizedString("home.inProgress", comment: "").lowercased()))"

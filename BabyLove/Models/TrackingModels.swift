@@ -239,6 +239,36 @@ enum SleepLocation: String, CaseIterable, Codable {
     }
 }
 
+// MARK: - Sleep Category (Night vs. Nap)
+
+/// Categorises a sleep session as nighttime sleep or daytime nap based on start hour.
+/// Night = 7 PM (19:00) – 7 AM (07:00), Nap = 7 AM – 7 PM.
+enum SleepCategory {
+    case night
+    case nap
+
+    /// Determine the category from a sleep record's start time.
+    static func from(startTime: Date?) -> SleepCategory {
+        guard let start = startTime else { return .nap }
+        let hour = Calendar.current.component(.hour, from: start)
+        return (hour >= 19 || hour < 7) ? .night : .nap
+    }
+
+    var label: String {
+        switch self {
+        case .night: return String(localized: "sleep.category.night")
+        case .nap:   return String(localized: "sleep.category.nap")
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .night: return "🌙"
+        case .nap:   return "☀️"
+        }
+    }
+}
+
 // MARK: - Duration Formatting
 
 /// Localized human-readable duration using `DateComponentsFormatter`.

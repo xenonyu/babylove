@@ -37,6 +37,8 @@
 "sleep.stroller"  = "ベビーカー";
 "sleep.carrier"   = "抱っこ紐";
 "sleep.other"     = "その他";
+"sleep.category.night" = "夜間";
+"sleep.category.nap"   = "昼寝";
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";

@@ -37,6 +37,8 @@
 "sleep.stroller"  = "유모차";
 "sleep.carrier"   = "아기띠";
 "sleep.other"     = "기타";
+"sleep.category.night" = "밤잠";
+"sleep.category.nap"   = "낮잠";
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";

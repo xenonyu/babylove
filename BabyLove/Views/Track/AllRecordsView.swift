@@ -569,6 +569,16 @@ struct AllSleepsView: View {
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.blTextPrimary)
 
+                    // Night / Nap category badge
+                    let cat = SleepCategory.from(startTime: r.startTime)
+                    Text("\(cat.icon) \(cat.label)")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(cat == .night ? .blSleep : .orange)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background((cat == .night ? Color.blSleep : Color.orange).opacity(0.12))
+                        .clipShape(Capsule())
+
                     if isOngoing {
                         Text(String(localized: "allRecords.inProgress"))
                             .font(.system(size: 11, weight: .semibold))

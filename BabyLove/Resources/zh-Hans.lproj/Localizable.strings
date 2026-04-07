@@ -37,6 +37,8 @@
 "sleep.stroller"  = "推车";
 "sleep.carrier"   = "背带";
 "sleep.other"     = "其他";
+"sleep.category.night" = "夜间";
+"sleep.category.nap"   = "小睡";
 
 /* ===== Age Display ===== */
 "age.format"      = "%@";

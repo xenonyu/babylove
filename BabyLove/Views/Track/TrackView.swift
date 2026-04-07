@@ -637,6 +637,15 @@ struct TrackView: View {
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.blTextPrimary)
                     }
+                    // Night / Nap category badge
+                    let cat = SleepCategory.from(startTime: r.startTime)
+                    Text("\(cat.icon) \(cat.label)")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(cat == .night ? .blSleep : .orange)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background((cat == .night ? Color.blSleep : Color.orange).opacity(0.12))
+                        .clipShape(Capsule())
                     if r.endTime == nil {
                         Text(String(localized: "track.inProgress"))
                             .font(.system(size: 11, weight: .semibold))
