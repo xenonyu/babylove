@@ -1,0 +1,20 @@
+Baby Tracker is the simplest, most beautiful app for tracking your newborn's daily routines.
+
+📊 TRACK EVERYTHING
+• Feeding — Log time, duration, and amount with one tap.
+• Sleep — Track naps and night sleep. Discover the golden sleep window.
+• Diapers — Quick log to monitor baby's health.
+• Growth — Weight, height, head circumference with WHO growth charts.
+
+🔮 SMART PREDICTIONS
+Powered by your baby's own data, the app predicts the next feeding time and sleep window so you can plan ahead with confidence.
+
+📅 MONTHLY & YEARLY SUMMARY
+Auto-generated monthly and yearly summaries capture every milestone and growth moment.
+
+📸 MEMORIES
+Capture photos and milestones to cherish every first smile, first step, and precious moment.
+
+🌍 Available in Chinese, English, Japanese & Korean.
+
+🔒 All data is stored locally on your device. No account required. Your family's privacy is fully protected.
