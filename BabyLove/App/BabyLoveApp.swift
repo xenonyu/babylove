@@ -18,6 +18,11 @@ struct BabyLoveApp: App {
             )
             state.completeOnboarding(with: testBaby)
         }
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["SEED_DEMO_DATA"] == "1" {
+            DemoDataSeeder.seed(context: persistence.container.viewContext, appState: state)
+        }
+        #endif
         _appState = StateObject(wrappedValue: state)
     }
 

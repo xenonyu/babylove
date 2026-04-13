@@ -37,6 +37,7 @@
 		A88C755EBD6649AE2DE72FC2 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB35C87B52C0632F7D66D72 /* SummaryView.swift */; };
 		ADA6CC5F0666ADE0D9390394 /* TrackViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3FF8EA410AA77A514874E1 /* TrackViewModelTests.swift */; };
 		C550E9D974880E15B6822532 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4EB730BAF8A5435D9D2058 /* PurchaseManager.swift */; };
+		C5D012FDCB46E5BDDD2397A7 /* DemoDataSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4000C07CAE9135B5B673424 /* DemoDataSeeder.swift */; };
 		C7CCEF8ED59DDBA809C1A502 /* SleepLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87860DF03AD4B3B60EA4CEF3 /* SleepLogView.swift */; };
 		D199000C4589D1FE528D163E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709C21D5EB7D4BCDACEA7C19 /* SettingsView.swift */; };
 		D837CB4B6B05AD3B6841267D /* BabyModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49262E70FA0EB20482A2D08E /* BabyModelTests.swift */; };
@@ -105,6 +106,7 @@
 		DB27CB76740F08E9C4B67907 /* AllRecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllRecordsView.swift; sourceTree = "<group>"; };
 		E30F645A03C655447715B8A3 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		EB9E67A455E271C9061EDAFB /* WHOGrowthData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WHOGrowthData.swift; sourceTree = "<group>"; };
+		F4000C07CAE9135B5B673424 /* DemoDataSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataSeeder.swift; sourceTree = "<group>"; };
 		F839C827D77ACEFAE44D8F76 /* TrackingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingModels.swift; sourceTree = "<group>"; };
 		FC15279BB5BDEFB55581EDCC /* GrowthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -194,6 +196,7 @@
 				B0247BB54BD42C6812F09569 /* BabyLove.entitlements */,
 				5AEA6BF3D149E58A676172EB /* BabyLove.xcdatamodeld */,
 				31AF4709B20897595582F4F8 /* App */,
+				9798E92628D757F556BE09CC /* Debug */,
 				DDF68C22565E42B2046B6D88 /* Design */,
 				46313D6FF2C4BC65E11C5729 /* Models */,
 				8BB8A9D22E1015D35E11556E /* Resources */,
@@ -268,6 +271,14 @@
 				876AD3B1D80CF827CEA5FC8E /* Localizable.strings */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		9798E92628D757F556BE09CC /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				F4000C07CAE9135B5B673424 /* DemoDataSeeder.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		A6BF4373EBFC8BE10F86A1DB /* Growth */ = {
@@ -442,6 +453,7 @@
 				A309EDB311E378B0141DD6DF /* BabyLove.xcdatamodeld in Sources */,
 				0C8C80E1D8F868B4DE42DE7F /* BabyLoveApp.swift in Sources */,
 				76D7C8046DBEA67B6EC25C51 /* ContentView.swift in Sources */,
+				C5D012FDCB46E5BDDD2397A7 /* DemoDataSeeder.swift in Sources */,
 				013168E7FAC730251676107F /* DesignSystem.swift in Sources */,
 				560B20B87D81AD2F8F35FDBB /* DiaperLogView.swift in Sources */,
 				2E493A664C6C133F70A23942 /* FeedingLogView.swift in Sources */,
