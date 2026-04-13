@@ -18,6 +18,9 @@ struct SettingsView: View {
     @State private var feedingReminderEnabled = NotificationManager.shared.isEnabled
     @State private var feedingReminderInterval = NotificationManager.shared.intervalMinutes
     @State private var notificationDenied = false
+    // Diaper reminder state
+    @State private var diaperReminderEnabled = NotificationManager.shared.isDiaperEnabled
+    @State private var diaperReminderInterval = NotificationManager.shared.diaperIntervalMinutes
     /// Pre-computed message shown in the reset confirmation dialog
     @State private var resetConfirmMessage = ""
 
@@ -112,12 +115,49 @@ struct SettingsView: View {
                                 NotificationManager.shared.scheduleFeedingReminder(afterFeedingAt: lastFeedingTime())
                             }
                         }
+                        // Diaper reminders
+                        Toggle(isOn: $diaperReminderEnabled) {
+                            Label(String(localized: "settings.diaperReminders"), systemImage: "bell.badge")
+                        }
+                        .tint(.blDiaper)
+                        .onChange(of: diaperReminderEnabled) { _, enabled in
+                            Task { @MainActor in
+                                if enabled {
+                                    let granted = await NotificationManager.shared.requestPermission()
+                                    if granted {
+                                        NotificationManager.shared.isDiaperEnabled = true
+                                        NotificationManager.shared.scheduleDiaperReminder(afterChangeAt: lastDiaperTime())
+                                    } else {
+                                        diaperReminderEnabled = false
+                                        notificationDenied = true
+                                    }
+                                } else {
+                                    NotificationManager.shared.isDiaperEnabled = false
+                                }
+                            }
+                        }
+
+                        if diaperReminderEnabled {
+                            Picker(selection: $diaperReminderInterval) {
+                                ForEach(NotificationManager.ReminderInterval.options) { opt in
+                                    Text(opt.label).tag(opt.id)
+                                }
+                            } label: {
+                                Label(String(localized: "settings.interval"), systemImage: "clock.arrow.circlepath")
+                            }
+                            .onChange(of: diaperReminderInterval) { _, newVal in
+                                NotificationManager.shared.diaperIntervalMinutes = newVal
+                                NotificationManager.shared.scheduleDiaperReminder(afterChangeAt: lastDiaperTime())
+                            }
+                        }
                     } header: {
                         Text(String(localized: "settings.section.reminders"))
                     } footer: {
-                        Text(feedingReminderEnabled
-                             ? String(localized: "settings.reminders.footer.on")
-                             : String(localized: "settings.reminders.footer.off"))
+                        if feedingReminderEnabled || diaperReminderEnabled {
+                            Text(String(localized: "settings.reminders.footer.active"))
+                        } else {
+                            Text(String(localized: "settings.reminders.footer.off"))
+                        }
                     }
 
                     // Data export
@@ -531,6 +571,16 @@ struct SettingsView: View {
             return ts
         }
         return Date() // no feedings yet — fall back to now
+    }
+
+    private func lastDiaperTime() -> Date {
+        let req: NSFetchRequest<CDDiaperRecord> = CDDiaperRecord.fetchRequest()
+        req.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        req.fetchLimit = 1
+        if let last = (try? ctx.fetch(req))?.first, let ts = last.timestamp {
+            return ts
+        }
+        return Date() // no diaper records yet — fall back to now
     }
 
     private static func csvEscape(_ value: String?) -> String {

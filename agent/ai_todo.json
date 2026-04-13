@@ -3,12 +3,14 @@
     "id": 1,
     "title": "Smart Prediction Card",
     "desc": "在 HomeView QuickLog 区域下方插入一张「智能预测卡」，同时预测下次喂奶时间和下次入睡窗口。\n\n【算法（纯 Swift，无外部依赖）】\n- 喂奶：取最近 14 条 CDFeedingRecord，计算相邻间隔的中位数（去除极端值），加到最后一次喂奶时间上，得到预测时刻\n- 睡眠：取最近 14 条 CDSleepRecord，提取每条的开始时间（转换为「当天分钟数」），计算均值，得到「黄金入睡时间段 ±30min」\n- 数据不足（< 3 条）时显示「记录更多数据，预测将更准确」的引导态\n\n【UI 设计规范】\n- 整张卡片用 RoundedRectangle(cornerRadius: 20)，背景为 BG #FFF9F5 + 微妙阴影\n- 卡片内分左右两列：左列「下次喂奶」(Feeding 色 #4BAEE8)，右列「入睡窗口」(Sleep 色 #9B8EC4)\n- 每列：大号 SF Symbol (fork.knife / moon.fill) + 预测时刻（HH:mm，.title2 bold）+ 距现在倒计时（如「约 1h 45m 后」，.caption，secondary）\n- 卡片顶部标题行：「✦ 智能预测」+ 右侧「基于 14 条记录」小字\n- 置信度用 3 个小圆点（●●○ 表示中等置信）：< 5 条记录 = 1 点，5-10 = 2 点，> 10 = 3 点\n- 数据不足时整卡显示柔和的虚线边框 + 居中提示文字，不显示预测值\n- 卡片整体支持 tap → 跳转到对应记录列表\n\n【国际化】en / zh-Hans / ja / ko 四种语言全部实现\n\n【测试】Simulator boot → install → launch → 截图验证卡片可见且样式正确 → git commit",
-    "status": "pending"
+    "status": "done",
+    "done_at": "04/07 20:50"
   },
   {
     "id": 2,
     "title": "Monthly & Yearly Summary",
     "desc": "新建 SummaryView.swift，从 HomeView 的月份标题区域（或 Settings 底部）入口进入，展示月度和年度育儿小结。完全不需要 AI，纯数据统计。\n\n【数据计算（CDFeedingRecord / CDSleepRecord / CDDiaperRecord / CDGrowthRecord）】\n月度：\n- 喂奶：总次数、推算总奶量（若有 duration 字段则估算）、日均次数\n- 睡眠：总时长（格式化为「X 天 Y 小时」）、日均睡眠、最长连续睡眠\n- 尿布：总次数、wet / dirty 分布\n- 成长：体重/身高变化量（最后一条 - 第一条）\n- 对比上月：各项 +/- 变化值，用绿/红色显示\n年度：\n- 各月喂奶次数的 12 格迷你柱状图（用 Rectangle height 表示，不用 Charts 框架）\n- 全年总睡眠时长、全年总喂奶次数、里程碑数量\n\n【UI 设计规范】\n- 顶部：月份/年份切换器（月 ← 2025年4月 → ，轻拍切换；长按弹出年度视图）\n- 使用「卡片组」布局：每个维度一张小卡（2列网格），卡片颜色与设计系统对齐（Feeding #4BAEE8，Sleep #9B8EC4，Diaper #55C189，Growth #F5A623）\n- 对比上月的 badge：绿色上箭头 / 红色下箭头 / 灰色持平，放在数字右上角\n- 年度视图：12 列迷你柱状图 + 全年汇总大数字（magazine 风格排版）\n- 空数据月份显示「这个月还没有记录」插画态（用 SF Symbol contentUnavailable 风格）\n- 支持从 HomeView 月份标题 tap 进入（NavigationLink 或 sheet）\n\n【国际化】en / zh-Hans / ja / ko 四种语言\n\n【测试】Simulator boot → install → launch → 截图月度视图 + 年度视图 → 验证数字计算正确 → git commit",
-    "status": "pending"
+    "status": "done",
+    "done_at": "04/07 20:58"
   }
 ]

@@ -50,6 +50,8 @@ struct HomeView: View {
     @State private var showShareSheet = false
     /// The generated share text for the day summary
     @State private var shareText: String = ""
+    /// Whether the monthly/yearly summary sheet is shown
+    @State private var showMonthlySummary = false
 
     // Global "last event" times — not filtered by selected day
     @State private var globalLastFeedingRecord: CDFeedingRecord?
@@ -1004,6 +1006,36 @@ struct HomeView: View {
                             weeklySummaryCard
                         }
 
+                        // Monthly summary entry
+                        if isSelectedDateToday {
+                            Button {
+                                Haptic.light()
+                                showMonthlySummary = true
+                            } label: {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "calendar.badge.clock")
+                                        .font(.system(size: 18, weight: .medium))
+                                        .foregroundColor(.blPrimary)
+                                    Text(NSLocalizedString("summary.viewMonthly", comment: ""))
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(.blPrimary)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(.blPrimary.opacity(0.6))
+                                }
+                                .padding(16)
+                                .background(Color.blPrimary.opacity(0.08))
+                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .strokeBorder(Color.blPrimary.opacity(0.15), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 20)
+                        }
+
                         // Recent activity or empty state
                         if !todayFeedings.isEmpty || !todaySleeps.isEmpty || !todayDiapers.isEmpty || !todayGrowth.isEmpty {
                             recentActivitySection
@@ -1103,6 +1135,9 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(activityItems: [shareText])
+        }
+        .sheet(isPresented: $showMonthlySummary) {
+            SummaryView()
         }
         .sheet(isPresented: $showDateJumpPicker) {
             DateJumpPickerView(

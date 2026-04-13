@@ -1,5 +1,4 @@
 [
-  "[04/07 14:35] ## ✅ 迭代 #56 完成\n\n**改进**: AllFeedingsView 添加 **搜索功能** (`.searc",
   "[04/07 14:39] ## ✅ 迭代 #57 完成\n\n**改进**: AllSleepsView 添加 **搜索功能** (`.searcha",
   "[04/07 14:41] ## ✅ 迭代 #58 完成\n\n**改进**: AllDiapersView 添加 **搜索功能** (`.search",
   "[04/07 14:45] ## ✅ 迭代 #59 完成\n\n**改进**: TrackView 最近记录卡片内添加 **行间分隔线**\n\n**详情*",
@@ -28,5 +27,6 @@
   "[04/07 17:23] **Iteration #92 complete** ✅\n\n**Improvement:** Added a **ric",
   "[04/07 17:29] **Iteration #93 complete ✅**\n\n**Improvement**: Growth Insigh",
   "[04/07 17:39] **Iteration #95 complete ✅**\n\n**Improvement:** Added **undo ",
-  "[04/07 17:44] **Iteration #96 complete ✅**\n\n**Improvement:** Added **age m"
+  "[04/07 17:44] **Iteration #96 complete ✅**\n\n**Improvement:** Added **age m",
+  "[04/07 18:10] **Iteration #98 完成 ✅**\n\n**改进：为喂养/睡眠/尿布记录的上下文徽章添加\"距上次\"时间指示器**"
 ]

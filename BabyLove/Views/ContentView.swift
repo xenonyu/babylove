@@ -5,11 +5,21 @@ struct ContentView: View {
     @EnvironmentObject var appState: AppState
 
     var body: some View {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["SHOW_SUMMARY"] == "1" {
+            SummaryView()
+        } else if appState.hasCompletedOnboarding {
+            MainTabView()
+        } else {
+            OnboardingView()
+        }
+        #else
         if appState.hasCompletedOnboarding {
             MainTabView()
         } else {
             OnboardingView()
         }
+        #endif
     }
 }
 

@@ -9,7 +9,7 @@ final class NotificationManager: NSObject, Sendable {
 
     private let center = UNUserNotificationCenter.current()
 
-    // MARK: - UserDefaults Keys
+    // MARK: - Feeding Reminder UserDefaults Keys
 
     private let enabledKey = "feedingReminderEnabled"
     private let intervalKey = "feedingReminderInterval" // in minutes
@@ -23,7 +23,7 @@ final class NotificationManager: NSObject, Sendable {
         }
     }
 
-    /// Reminder interval in minutes (default 180 = 3 hours)
+    /// Feeding reminder interval in minutes (default 180 = 3 hours)
     var intervalMinutes: Int {
         get {
             let val = UserDefaults.standard.integer(forKey: intervalKey)
@@ -31,6 +31,31 @@ final class NotificationManager: NSObject, Sendable {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: intervalKey)
+        }
+    }
+
+    // MARK: - Diaper Reminder UserDefaults Keys
+
+    private let diaperEnabledKey = "diaperReminderEnabled"
+    private let diaperIntervalKey = "diaperReminderInterval" // in minutes
+
+    /// Whether diaper reminders are enabled
+    var isDiaperEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: diaperEnabledKey) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: diaperEnabledKey)
+            if !newValue { cancelDiaperReminder() }
+        }
+    }
+
+    /// Diaper reminder interval in minutes (default 120 = 2 hours)
+    var diaperIntervalMinutes: Int {
+        get {
+            let val = UserDefaults.standard.integer(forKey: diaperIntervalKey)
+            return val > 0 ? val : 120
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: diaperIntervalKey)
         }
     }
 
@@ -90,7 +115,7 @@ final class NotificationManager: NSObject, Sendable {
 
         let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("notification.feedingTitle", comment: "")
-        content.body = String(format: NSLocalizedString("notification.feedingBody %@", comment: ""), formattedInterval())
+        content.body = String(format: NSLocalizedString("notification.feedingBody %@", comment: ""), formattedInterval(intervalMinutes))
         content.sound = .default
         content.categoryIdentifier = "FEEDING_REMINDER"
 
@@ -118,11 +143,58 @@ final class NotificationManager: NSObject, Sendable {
         center.removePendingNotificationRequests(withIdentifiers: [feedingReminderID])
     }
 
+    // MARK: - Schedule Diaper Reminder
+
+    private let diaperReminderID = "com.babylove.diaperReminder"
+
+    /// Schedule a diaper reminder `diaperIntervalMinutes` after the given change time.
+    /// Cancels any existing diaper reminder first.
+    func scheduleDiaperReminder(afterChangeAt changeTime: Date = Date()) {
+        guard isDiaperEnabled else { return }
+
+        // Cancel previous
+        center.removePendingNotificationRequests(withIdentifiers: [diaperReminderID])
+
+        let fireDate = changeTime.addingTimeInterval(Double(diaperIntervalMinutes) * 60)
+
+        // Don't schedule if fire date is in the past
+        guard fireDate > Date() else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = NSLocalizedString("notification.diaperTitle", comment: "")
+        content.body = String(format: NSLocalizedString("notification.diaperBody %@", comment: ""), formattedInterval(diaperIntervalMinutes))
+        content.sound = .default
+        content.categoryIdentifier = "DIAPER_REMINDER"
+
+        let comps = Calendar.current.dateComponents(
+            [.year, .month, .day, .hour, .minute, .second],
+            from: fireDate
+        )
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+
+        let request = UNNotificationRequest(
+            identifier: diaperReminderID,
+            content: content,
+            trigger: trigger
+        )
+
+        center.add(request) { error in
+            if let error {
+                print("BabyLove: Failed to schedule diaper reminder: \(error)")
+            }
+        }
+    }
+
+    /// Cancel any pending diaper reminder
+    func cancelDiaperReminder() {
+        center.removePendingNotificationRequests(withIdentifiers: [diaperReminderID])
+    }
+
     // MARK: - Helpers
 
-    private func formattedInterval() -> String {
-        let hours = intervalMinutes / 60
-        let mins = intervalMinutes % 60
+    private func formattedInterval(_ minutes: Int) -> String {
+        let hours = minutes / 60
+        let mins = minutes % 60
         if mins == 0 {
             return String(format: NSLocalizedString("notification.hours %lld", comment: ""), hours)
         }

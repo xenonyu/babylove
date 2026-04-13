@@ -8,7 +8,7 @@ final class PurchaseManager {
     static let shared = PurchaseManager()
 
     // App Store Connect 里配置的产品 ID
-    static let aiProductID = "com.babylove.app.ai_insights"
+    static let aiProductID = "com.babylove.xym.app.ai_insights"
 
     var isPurchased = false
     var isLoading   = false
@@ -21,7 +21,10 @@ final class PurchaseManager {
         Task { await refreshStatus() }
     }
 
-    deinit { listenerTask?.cancel() }
+    deinit {
+        let task = MainActor.assumeIsolated { listenerTask }
+        task?.cancel()
+    }
 
     // MARK: - Public
 
